@@ -1,0 +1,26 @@
+GET http://localhost:8000/api-auth/users/me/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxMDQ3NjI4LCJpYXQiOjE3NTEwNDczMjgsImp0aSI6IjE0ZDgzN2NkNzNjYzRjZmU5MTM1OThlNjdiZGViNDUyIiwidXNlcl9pZCI6MX0.EuHEHYMpyI-Vm1b_Y3ExrcR03zs0t9trBtufo-l89I0.UsA73YGkDJINPIG1HuJawfBkl3BRL32i_Fimb1zs-aQ
+
+###
+POST http://localhost:8000/api-auth/token/login/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "test"
+}
+
+###
+POST http://localhost:8000/api-auth/token/logout/ HTTP/1.1
+Authorization: token 89b8415c5607bd786297874de072f22d224c6ca4
+
+
+###
+POST http://localhost:8000/api-auth/jwt/create/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "test"
+}
+
