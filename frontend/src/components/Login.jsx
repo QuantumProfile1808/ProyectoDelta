@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import AuthContext from '../AuthContext';
-import { userNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-    const navigate = userNavigate();
+    const navigate = useNavigate();
     const { user, login } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,7 +14,7 @@ export const Login = () => {
         const success = await login(username, password);
         if (success) {
             console.log('Login successful');
-            userNavigate('/dashboard', { replace: true });
+            navigate('/dashboard', { replace: true });
         }
         else {
             console.error('Login failed');

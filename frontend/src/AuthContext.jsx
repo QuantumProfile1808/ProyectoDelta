@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${data.access}`,
+            "Authorization": `JWT ${data.access}`,
           },
         });
 

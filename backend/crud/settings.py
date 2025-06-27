@@ -149,5 +149,4 @@ SIMPLE_JWT = {
 
 DJOSER = {
     'SERIALIZERS': {},
-    'TOKEN_MODEL': None,
 }
