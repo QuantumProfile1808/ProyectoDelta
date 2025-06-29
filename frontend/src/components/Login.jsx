@@ -1,13 +1,15 @@
 import React, { useState, useContext } from 'react';
 import AuthContext from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import  './css/Login.css'; // Assuming you have a CSS file for styles
+import  './css/Login.css';
+import { Modal } from './Modal';
 
 export const Login = () => {
     const navigate = useNavigate();
     const { user, login } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -17,12 +19,16 @@ export const Login = () => {
             navigate('/dashboard', { replace: true });
         }
         else {
+            setShowModal(true);
             console.error('Login failed');
         }
     }
 
     return (
         <div className="login-bg">
+        <Modal show={showModal} onClose={() => setShowModal(false)} 
+        title="Usuario o Contraseña incorrecta" 
+        message="Por favor, vuelva a intentarlo"/>
             <div className="login-box">
                 <div className="login-title">Iniciar Sesión</div>
                 <form onSubmit={handleLogin}>
