@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 
 
 export const Dashboard = () => {
-    const { user } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
     if (!user) {
     return <Navigate to ="/login" replace/>
     }
@@ -14,7 +14,7 @@ export const Dashboard = () => {
         <div>
             <h2>Dashboard</h2>
             {user && <p>Welcome, {user.username}!</p>}
-            <button>Logout</button>
+            <button onClick={logout}>Logout</button>
             
         </div>
     );
