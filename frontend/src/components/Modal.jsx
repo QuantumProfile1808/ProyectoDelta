@@ -18,30 +18,39 @@ export const Modal = ({ show, onClose, title, message }) => {
       color : "#222"}}>
 
       <div style={{
-        background: "#fff", 
-        borderRadius: 10, 
-        padding: 24, minWidth: 250, 
-        boxShadow: "0 2px 16px rgba(0,0,0,0.12)", 
+        background: "#fff",
+        borderRadius: 10,
+        padding: 24,
+        paddingRight: 40,
+        minWidth: 250,
+        boxShadow: "0 2px 16px rgba(0,0,0,0.12)",
         position: "relative"}}>
 
         <button onClick={onClose} style={{
-          position: "absolute", 
-          top: 8, right: 8, 
-          border: "none", 
-          background: "none", 
-          fontSize: 18, 
-          cursor: "pointer"}}>×</button>
+            position: "absolute",
+            top: 10,
+            right: 10,
+            border: "none",
+            background: "none",
+            fontSize: 20,
+            color: "#888",
+            cursor: "pointer",
+            padding: 0,
+            lineHeight: 1,
+        }}>×</button>
 
         <h3 style={{ margin: "0 0 8px 0" }}>{title}</h3>
         <p style={{ margin: "0 0 16px 0" }}>{message}</p>
 
-        <button onClick={onClose} style={{
-          background: "#222", 
-          color: "#fff", 
-          border: "none", 
-          borderRadius: 6, 
-          padding: "6px 18px", 
-          cursor: "pointer"}}>Ok</button>
+            <button onClick={onClose} style={{
+            background: "#222", 
+            color: "#fff", 
+            border: "none", 
+            borderRadius: 6, 
+            padding: "6px 18px", 
+            cursor: "pointer",
+            marginTop: "18px"
+            }}>Ok</button>
       </div>
     </div>
   );
