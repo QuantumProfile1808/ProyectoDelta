@@ -13,10 +13,14 @@ export const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const success = await login(username, password);
-        if (success) {
+        const userData = await login(username, password);
+        if (userData) {
             console.log('Login successful');
-            navigate('/dashboard', { replace: true });
+            if (userData.is_staff) {
+                navigate('/dashboard', { replace: true });
+            } else {
+                navigate('/no-staff', { replace: true });
+            }
         }
         else {
             setShowModal(true);

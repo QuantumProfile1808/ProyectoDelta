@@ -96,12 +96,12 @@ export const AuthProvider = ({ children }) => {
         const userData = await userResponse.json();
         console.log("User data fetched:", userData);
         setUser(userData);
-        return true;
+        return userData;
       }
-      return false;
+      return null;
     } catch (error) {
       console.error("Login failed:", error);
-      return false;
+      return null;
     }
   };
 
