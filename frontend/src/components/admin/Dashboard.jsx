@@ -13,32 +13,44 @@ export const Dashboard = () => {
 
     return (
         <div className="dashboard-container">
-            {/* Sidebar toggle button */}
-
-
-            <button className={`hamburger${sidebarOpen ? " open" : ""}`} onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle sidebar">
-                <span />
-                <span />
-                <span />
-            </button>
-            <aside className={`sidebar${sidebarOpen ? " open" : ""}`}>
-
-
-
-                <h2 className="sidebar-title">Admin</h2>
-                <nav>
-                    <ul>
-                        <li><Link to="/dashboard">Inicio</Link></li>
-                        <li><Link to="/dashboard/productos">Productos</Link></li>
-                        <li><Link to="/dashboard/historial">Historial</Link></li>
-                        <li><Link to="/dashboard/finanzas">Finanzas</Link></li>
-                        <li><Link to="/dashboard/usuarios">Usuarios</Link></li>
-                    </ul>
-                </nav>
-                <button onClick={logout} style={{ marginTop: "40px", width: "80%", marginLeft: "10%" }}>
-                    Logout
-                </button>
-            </aside>
+            {}
+                <aside className={`sidebar${sidebarOpen ? " open" : ""}`}>
+                    <div className="sidebar-header">
+                        <h2 className="sidebar-title">Dashboard</h2>
+                            <button
+                            className={`hamburger${sidebarOpen ? " open" : ""}`}
+                            style={{
+                                left: sidebarOpen ? 180 : 24
+                            }}
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                            aria-label="Toggle sidebar"
+                            >
+                            <span />
+                            <span />
+                            <span />
+                            </button>
+                    </div>
+                    <nav>
+                        <ul>
+                            <li><Link to="/dashboard">Inicio</Link></li>
+                            <li><Link to="/dashboard/productos">Productos</Link></li>
+                            <li><Link to="/dashboard/historial">Historial</Link></li>
+                            <li><Link to="/dashboard/finanzas">Finanzas</Link></li>
+                            <li><Link to="/dashboard/usuarios">Usuarios</Link></li>
+                        </ul>
+                    </nav>
+                    <button
+                        onClick={logout}
+                        style={{
+                            marginTop: "40px",
+                            width: "80%",
+                            marginLeft: "10%",
+                            marginRight: "10%"
+                        }}
+                    >
+                        Logout
+                    </button>
+                </aside>
             <main className="dashboard-content">
                 <h2>Dashboard</h2>
                 <p>Welcome, {user.username}!</p>

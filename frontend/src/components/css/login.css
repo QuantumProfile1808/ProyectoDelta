@@ -4,21 +4,20 @@
 
 .login-bg {
   min-height: 100vh;
-  background: #fafafa;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #fafafa;
 }
 
 .login-box {
-  background: #e0e0e0;
-  padding: 32px 28px;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  background: #e5e5e5;
+  padding: 48px 36px;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   min-width: 320px;
-  max-width: 90vw;
-  text-align: center;
-  border: 1px solid #bbb;
+  max-width: 350px;
+  margin: 0 auto;
 }
 
 .login-title {
@@ -45,7 +44,7 @@
   margin-bottom: 12px;
   font-size: 1rem;
   background: #fafafa;
-  color: #222; /* Color de texto corregido */
+  color: #222;
   transition: border-color 0.2s;
 }
 

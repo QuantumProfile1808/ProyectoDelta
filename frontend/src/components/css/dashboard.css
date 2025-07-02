@@ -4,11 +4,9 @@
   width: 100vw;
 }
 
-/* Hamburguesa */
 .hamburger {
   position: fixed;
   top: 24px;
-  left: 24px;
   z-index: 300;
   width: 36px;
   height: 36px;
@@ -19,7 +17,10 @@
   justify-content: space-between;
   cursor: pointer;
   padding: 6px;
+  transition: left 0.3s;
 }
+
+
 .hamburger span {
   display: block;
   height: 4px;
@@ -34,7 +35,11 @@
   background: #ffffff;
 }
 
-/* Sidebar animado */
+.sidebar.open ~ .hamburger {
+  left: 24px; /* Pegado al borde izquierdo */
+}
+
+
 .sidebar {
   width: 220px;
   background: #222;
@@ -88,9 +93,27 @@
   color: #fff;
   text-decoration: none;
   font-size: 1.1rem;
-  transition: color 0.2s;
+  transition: 
+    color 0.2s,
+    background 0.2s,
+    border 0.2s;
+  padding: 8px 18px;
+  border-radius: 18px;
+  display: inline-block;
+  border: 2px solid transparent;
 }
 
 .sidebar a:hover {
-  color: #4b9fff;
+  color: #222;
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 18px;
+}
+.sidebar-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Título a la izq, botón a la der */
+  padding: 0 18px;
+  margin-bottom: 10px;
 }
