@@ -36,7 +36,7 @@
 }
 
 .sidebar.open ~ .hamburger {
-  left: 24px; /* Pegado al borde izquierdo */
+  left: 24px;
 }
 
 
@@ -113,7 +113,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Título a la izq, botón a la der */
+  justify-content: space-between;
   padding: 0 18px;
   margin-bottom: 10px;
 }

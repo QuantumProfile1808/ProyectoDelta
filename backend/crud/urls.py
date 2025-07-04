@@ -10,4 +10,5 @@ urlpatterns = [
     re_path(r'^api-auth/', include('djoser.urls.authtoken')),  # For token authentication
     re_path(r'^api-auth/', include('djoser.urls.jwt')),  # For browsable API authentication
     path('api-auth/jwt/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('api/', include('api.urls')),
 ]

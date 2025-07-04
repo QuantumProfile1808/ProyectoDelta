@@ -2,18 +2,23 @@ import React, { useContext, useState } from "react";
 import AuthContext from "../../AuthContext";
 import { Navigate, Link, Outlet } from "react-router-dom";
 import "../css/Dashboard.css";
+import { useLocation } from "react-router-dom";
 
 export const Dashboard = () => {
     const { user, logout } = useContext(AuthContext);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const location = useLocation();
 
     if (!user) {
         return <Navigate to="/login" replace />;
     }
 
+    const isDashboardRoot = location.pathname === "/dashboard";
     return (
         <div className="dashboard-container">
-            {}
+
+            {/*sidebar */}
+
                 <aside className={`sidebar${sidebarOpen ? " open" : ""}`}>
                     <div className="sidebar-header">
                         <h2 className="sidebar-title">Dashboard</h2>
@@ -46,14 +51,17 @@ export const Dashboard = () => {
                             width: "80%",
                             marginLeft: "10%",
                             marginRight: "10%"
-                        }}
-                    >
+                        }}>
                         Logout
                     </button>
                 </aside>
             <main className="dashboard-content">
-                <h2>Dashboard</h2>
-                <p>Welcome, {user.username}!</p>
+                {isDashboardRoot && (
+                    <div className="dashboard-welcome">
+                        <h1>Bienvenido al Dashboard</h1>
+                        <p>Selecciona una opción del menú para comenzar.</p>
+                    </div>
+                )}
                 <Outlet />
             </main>
         </div>
