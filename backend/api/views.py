@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import viewsets
 from django.contrib.auth.models import User
-from .models import Perfil, Sucursal, Permiso
-from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer
+from .models import Perfil, Sucursal, Permiso, Categoria, Producto
+from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer
 
 
 # Create your views here.
@@ -16,6 +16,10 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class ProductoViewSet(viewsets.ModelViewSet):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
+
 class PerfilViewSet(viewsets.ModelViewSet):
     queryset = Perfil.objects.all()
     serializer_class = PerfilSerializer
@@ -23,6 +27,10 @@ class PerfilViewSet(viewsets.ModelViewSet):
 class SucursalViewSet(viewsets.ModelViewSet):
     queryset = Sucursal.objects.all()
     serializer_class = SucursalSerializer
+
+class CategoriaViewSet(viewsets.ModelViewSet):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
 
 class PermisoViewSet(viewsets.ModelViewSet):
     queryset = Permiso.objects.all()
