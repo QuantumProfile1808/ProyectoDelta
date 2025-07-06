@@ -30,6 +30,7 @@ export const Dashboard = () => {
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             aria-label="Toggle sidebar"
                             >
+                                
                             <span />
                             <span />
                             <span />
@@ -42,6 +43,7 @@ export const Dashboard = () => {
                             <li><Link to="/dashboard/historial">Historial</Link></li>
                             <li><Link to="/dashboard/finanzas">Finanzas</Link></li>
                             <li><Link to="/dashboard/usuarios">Usuarios</Link></li>
+                            <li><Link to="/dashboard/tablausuario">tabla</Link></li>
                         </ul>
                     </nav>
                     <button

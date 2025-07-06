@@ -30,8 +30,8 @@ export const Login = () => {
 
     return (
         <div className="login-bg">
-        <Modal show={showModal} onClose={() => setShowModal(false)} 
-        title="Usuario o Contraseña incorrecta" 
+        <Modal show={showModal} onClose={() => setShowModal(false)}
+        title="Usuario o Contraseña incorrecta"
         message="Por favor, vuelva a intentarlo"/>
             <div className="login-box">
                 <div className="login-title">Iniciar Sesión</div>

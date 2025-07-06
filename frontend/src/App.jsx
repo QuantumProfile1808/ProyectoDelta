@@ -9,6 +9,7 @@ import Usuarios from "./components/admin/Usuarios";
 import Finanzas from "./components/admin/Finanzas";
 import Productos from "./components/admin/Productos";
 import Historial from "./components/admin/Historial";;
+import TablaUsuario from './components/admin/tablausuario'
 
 
 function App() {
@@ -25,6 +26,7 @@ return (
             <Route path="historial" element={<Historial />} />
             <Route path="finanzas" element={<Finanzas />} />
             <Route path="usuarios" element={<Usuarios />} />
+            <Route path="tablausuario" element={<TablaUsuario />} />
             {}
             {}
           </Route>

@@ -1,0 +1,57 @@
+.tabla-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tabla-titulo {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-usuarios th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  background-color: #f5f5f5;
+}
+
+.tabla-usuarios td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.tabla-acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.boton-eliminar {
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.boton-editar {
+  background: #4285f4;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.icono-admin {
+  color: #0f9d58;
+  font-size: 20px;
+  padding: 5px;
+}

@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from django.contrib.auth.models import User
 from .models import Perfil, Sucursal, Permiso, Categoria, Producto
 from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer
-
+from rest_framework import generics
 
 # Create your views here.
 
@@ -35,3 +35,8 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 class PermisoViewSet(viewsets.ModelViewSet):
     queryset = Permiso.objects.all()
     serializer_class = PermisoSerializer
+
+class PerfilList(generics.ListAPIView):
+    queryset = Perfil.objects.select_related('user', 'sucursal', 'permiso').all()
+    serializer_class = PerfilSerializer
+

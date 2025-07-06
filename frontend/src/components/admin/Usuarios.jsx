@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../../components/css/Usuario.css";
 
 const Usuarios = () => {
   const [form, setForm] = useState({
@@ -71,6 +72,7 @@ const Usuarios = () => {
         dni: "",
         sucursal: "",
         is_staff: false,
+        is_active: null,
       });
     } else {
       alert("Error al crear perfil");
@@ -79,8 +81,8 @@ const Usuarios = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-      <div style={{ flex: 1, minWidth: 250 }}>
+    <form onSubmit={handleSubmit} className="form-container">
+      <div className="form-column">
         <label>DNI</label>
         <input name="dni" value={form.dni} onChange={handleChange} required />
         <label>Nombre</label>
@@ -96,7 +98,7 @@ const Usuarios = () => {
           />¿Es administrador?</label>
       </div>
 
-      <div style={{ flex: 1, minWidth: 250 }}>
+      <div className="form-column">
         <label>Usuario</label>
         <input name="username" value={form.username} onChange={handleChange} required />
         <label>Contraseña</label>
@@ -109,8 +111,8 @@ const Usuarios = () => {
           ))}
         </select>
       </div>
-      
-      <div style={{ alignSelf: "flex-end", marginTop: 24 }}>
+
+      <div className="button-container">
         <button type="submit" disabled={loading}>
           {loading ? "Guardando..." : "Guardar"}
         </button>

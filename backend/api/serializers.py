@@ -2,6 +2,7 @@ from djoser.serializers import UserSerializer as BaseUserSerializer
 from .models import Perfil, Sucursal, Permiso, Categoria, Producto
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django.db import models
 
 
 class CustomUserSerializer(BaseUserSerializer):
@@ -12,47 +13,36 @@ class CustomUserSerializer(BaseUserSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name']
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'is_staff', 'is_active']
         extra_kwargs = {'password': {'write_only': True}}
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'is_staff']  # agregá is_staff acá
-        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        is_staff = validated_data.pop('is_staff', False)  # sacar is_staff del dict, o usar False por defecto
-        user = User.objects.create_user(**validated_data)  # crea usuario con password encriptado
-        user.is_staff = is_staff  # asigna is_staff
+        is_staff = validated_data.pop('is_staff', False)
+        user = User.objects.create_user(**validated_data)
+        user.is_staff = is_staff
         user.save()
         return user
-
-class ProductoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Producto
-        fields = '__all__'
-
-    def create(self, validated_data):
-        producto = Producto.objects.create(**validated_data)
-        return producto
-    
-class PerfilSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Perfil
-        fields = ['id', 'user', 'sucursal', 'permiso', 'dni']
-
 class SucursalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sucursal
         fields = '__all__'
-
-class CategoriaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Categoria
-        fields = '__all__'
-        
 class PermisoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permiso
         fields = '__all__'
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = '__all__'
+class ProductoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producto
+        fields = '__all__'
+class PerfilSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    sucursal = SucursalSerializer()  # Incluir el serializador de sucursal
+    permiso = PermisoSerializer(allow_null=True)  # Incluir el serializador de permiso, permitiendo null
+    class Meta:
+        model = Perfil
+        fields = ['id', 'user', 'sucursal', 'permiso', 'dni']

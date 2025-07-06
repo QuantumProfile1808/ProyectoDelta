@@ -11,7 +11,9 @@ router.register(r'producto', ProductoViewSet)
 router.register(r'categoria', CategoriaViewSet)
 router.register(r'permiso', PermisoViewSet)
 
+
+
 urlpatterns = [
-    path('', home),
-    path('', include(router.urls)),
+    path('', home, name='home'),  # Si tienes una vista de inicio
+    path('api/', include(router.urls)),  # Incluye las URLs del enrutador
 ]
