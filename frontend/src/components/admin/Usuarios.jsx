@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../../components/css/Usuario.css";
 
 const Usuarios = () => {
   const [form, setForm] = useState({
@@ -13,13 +12,18 @@ const Usuarios = () => {
   });
 
   const [sucursales, setSucursales] = useState([]);
+  const [permisos, setPermisos] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/sucursal/")
       .then(res => res.json())
       .then(data => setSucursales(data));
-  }, []);
+
+    fetch("http://127.0.0.1:8000/api/permiso/")  // esta es la URL de permisos
+      .then(res => res.json())
+      .then(data => setPermisos(data));
+}, []);
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -52,12 +56,15 @@ const Usuarios = () => {
 
     const user = await userRes.json();
 
+    
+    console.log(form.sucursal);
     const perfilRes = await fetch("http://127.0.0.1:8000/api/perfil/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user: user.id,
-        sucursal: form.sucursal,
+        sucursal: Number(form.sucursal),
+        permiso: form.is_staff ? 1 : 2,
         dni: form.dni,
       }),
     });
@@ -72,7 +79,6 @@ const Usuarios = () => {
         dni: "",
         sucursal: "",
         is_staff: false,
-        is_active: null,
       });
     } else {
       alert("Error al crear perfil");
@@ -81,8 +87,8 @@ const Usuarios = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-container">
-      <div className="form-column">
+    <form onSubmit={handleSubmit} style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+      <div style={{ flex: 1, minWidth: 250 }}>
         <label>DNI</label>
         <input name="dni" value={form.dni} onChange={handleChange} required />
         <label>Nombre</label>
@@ -98,7 +104,7 @@ const Usuarios = () => {
           />¿Es administrador?</label>
       </div>
 
-      <div className="form-column">
+      <div style={{ flex: 1, minWidth: 250 }}>
         <label>Usuario</label>
         <input name="username" value={form.username} onChange={handleChange} required />
         <label>Contraseña</label>
@@ -111,8 +117,8 @@ const Usuarios = () => {
           ))}
         </select>
       </div>
-
-      <div className="button-container">
+      
+      <div style={{ alignSelf: "flex-end", marginTop: 24 }}>
         <button type="submit" disabled={loading}>
           {loading ? "Guardando..." : "Guardar"}
         </button>

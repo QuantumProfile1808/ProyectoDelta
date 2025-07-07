@@ -28,11 +28,10 @@ class Permiso(models.Model):
         return self.descripcion
 
 class Producto(models.Model):
-    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     stock = models.IntegerField()
-    tipo_medida = models.CharField(max_length=50)
+    medida = models.BooleanField(default=False)
     descripcion = models.CharField(max_length=255)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 

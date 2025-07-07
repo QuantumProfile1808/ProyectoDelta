@@ -40,9 +40,10 @@ class ProductoSerializer(serializers.ModelSerializer):
         model = Producto
         fields = '__all__'
 class PerfilSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    sucursal = SucursalSerializer()  # Incluir el serializador de sucursal
-    permiso = PermisoSerializer(allow_null=True)  # Incluir el serializador de permiso, permitiendo null
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    sucursal = serializers.PrimaryKeyRelatedField(queryset=Sucursal.objects.all(), allow_null=True)
+    permiso = serializers.PrimaryKeyRelatedField(queryset=Permiso.objects.all(), allow_null=True)
+
     class Meta:
         model = Perfil
         fields = ['id', 'user', 'sucursal', 'permiso', 'dni']

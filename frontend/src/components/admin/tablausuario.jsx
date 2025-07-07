@@ -80,8 +80,8 @@ const TablaUsuarios = () => {
           {usuarios.map((u) => (
             <tr key={u.id}>
               <td>{u.dni || '-'}</td>
-              <td>{u.user?.first_name || '-'}</td>
-              <td>{u.user?.last_name || '-'}</td>
+              <td>{u.first_name || '-'}</td>
+              <td>{u.last_name || '-'}</td>
               <td>{u.user?.username || '-'}</td>
               <td>{u.user?.email || '-'}</td>
               <td>{u.permiso?.descripcion || (u.user?.is_staff ? 'Administrador' : 'Usuario')}</td>
