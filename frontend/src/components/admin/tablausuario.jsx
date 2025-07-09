@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaEdit, FaUserShield } from "react-icons/fa";
+import { FaEdit, FaUserShield } from "react-icons/fa";
 import "../../components/css/TablaUsuario.css";
 
 const TablaUsuarios = () => {
@@ -7,57 +7,34 @@ const TablaUsuarios = () => {
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/perfil/")
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      })
-      .then(data => {
-        setUsuarios(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+      .then(res => res.ok ? res.json() : Promise.reject(res))
+      .then(setUsuarios)
+      .catch(err => console.error("Error fetching perfiles:", err));
   }, []);
 
-
-  // hide the user if i click on the trash icon
-  const desactivarUsuario = async (id) => {
-  if (!window.confirm("¿Está seguro que quiere desactivar este usuario?")) return;
-
-  try {
-    const response = await fetch(`http://127.0.0.1:8000/api/perfil/${id}/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ is_active: false }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Error al desactivar el usuario");
+  const toggleActivo = async (userId, currentStatus) => {
+    const nuevoEstado = !currentStatus;
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/users/${userId}/`, 
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ is_active: nuevoEstado })
+        }
+      );
+      if (!res.ok) throw new Error("Patch falló");
+      setUsuarios(prev =>
+        prev.map(u =>
+          u.user.id === userId
+            ? { ...u, user: { ...u.user, is_active: nuevoEstado } }
+            : u
+        )
+      );
+    } catch (error) {
+      console.error("Error actualizando is_active:", error);
     }
-
-    // Confirmar que el usuario está desactivado
-    const updatedUser = await response.json();
-
-    // Actualizar el usuario correspondiente en el estado
-    setUsuarios((prevUsuarios) => {
-  const actualizados = prevUsuarios.map((u) =>
-    u.user.id === updatedUser.id
-      ? { ...u, user: { ...u.user, is_active: updatedUser.is_active } }
-      : u
-  );
-  console.log("Usuarios actualizados:", actualizados);
-  return actualizados;
-});
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-
-
+  };
 
   return (
     <div className="tabla-container">
@@ -76,22 +53,42 @@ const TablaUsuarios = () => {
           </tr>
         </thead>
         <tbody>
-          {usuarios.map((u) => (
+          {usuarios.map(u => (
             <tr key={u.id}>
               <td>{u.dni || '-'}</td>
-              <td>{u.user?.first_name || '-'}</td>
-              <td>{u.user?.last_name || '-'}</td>
-              <td>{u.user?.username || '-'}</td>
-              <td>{u.permiso?.descripcion || (u.user?.is_staff ? 'Administrador' : 'Usuario')}</td>
-              <td>{u.sucursal ? `${u.sucursal.localidad} - ${u.sucursal.direccion}` : '-'}</td>
-              <td>{u.user?.is_active ? 'Sí' : 'No'}</td>
+              <td className={u.user.is_active ? "" : "texto-inactivo"}>
+                {u.user.first_name || '-'}
+              </td>
+              <td className={u.user.is_active ? "" : "texto-inactivo"}>
+                {u.user.last_name || '-'}
+              </td>
+              <td>{u.user.username || '-'}</td>
+              <td>
+                {u.permiso?.descripcion ||
+                  (u.user.is_staff ? 'Administrador' : 'Usuario')}
+              </td>
+              <td>
+                {u.sucursal
+                  ? `${u.sucursal.localidad} - ${u.sucursal.direccion}`
+                  : '-'}
+              </td>
+              <td>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={u.user.is_active}
+                    onChange={() =>
+                      toggleActivo(u.user.id, u.user.is_active)
+                    }
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </td>
               <td className="tabla-acciones">
-                <button className="boton-eliminar" onClick={() => desactivarUsuario(u.user.id)} disabled={!u.user.is_active} title={!u.user.is_active ? "Usuario ya desactivado" : "Desactivar usuario"}>               <FaTrash />
-                </button>
                 <button className="boton-editar">
                   <FaEdit />
                 </button>
-                {u.user?.is_staff && (
+                {u.user.is_staff && (
                   <FaUserShield
                     className="icono-admin"
                     title="Administrador"
