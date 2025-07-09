@@ -18,8 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
-    serializer_class = ProductoSerializer
-
+    serializer_class = ProductoSerializer        
 class SucursalViewSet(viewsets.ModelViewSet):
     queryset = Sucursal.objects.all()
     serializer_class = SucursalSerializer
