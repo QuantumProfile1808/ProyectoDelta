@@ -3,36 +3,56 @@ import { createContext, useState, useEffect } from "react";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user,  setUser]    = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    inizializeUser();
+    (async () => {
+      await initializeUser();
+      setLoading(false);
+    })();
   }, []);
 
-
-  const inizializeUser = async () => {
+  const initializeUser = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+      let access = localStorage.getItem("token");
+      const refresh = localStorage.getItem("refresh");
+      if (!access) return;
 
-      const response = await fetch("http://localhost:8000/api-auth/users/me/", {
-        method: "GET",
+      let res = await fetch("http://localhost:8000/api-auth/users/me/", {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `JWT ${token}`,
+          "Authorization": `JWT ${access}`,  // o "Bearer" según tu backend
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
+      if (res.status === 401 && refresh) {
+        const refreshRes = await fetch("http://localhost:8000/api-auth/jwt/refresh/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh }),
+        });
+        if (!refreshRes.ok) throw new Error("Refresh token invalido");
+        const { access: newAccess } = await refreshRes.json();
+        access = newAccess;
+        localStorage.setItem("token", newAccess);
+
+        res = await fetch("http://localhost:8000/api-auth/users/me/", {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `JWT ${newAccess}`,
+          },
+        });
       }
 
-      const userData = await response.json();
+      if (!res.ok) throw new Error("User fetch falló");
+      const userData = await res.json();
       setUser(userData);
     } catch (error) {
-      console.error("Initialization failed:", error);
+      console.error("initializeUser:", error);
+      setUser(null);
     }
-  }
+  };
 
   const logout = async () => {
     
@@ -105,8 +125,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+   if (loading) {
+    return <div>Cargando...</div>;
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, logout}}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
