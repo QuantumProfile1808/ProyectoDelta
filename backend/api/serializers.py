@@ -1,49 +1,61 @@
-from djoser.serializers import UserSerializer as BaseUserSerializer
-from .models import Perfil, Sucursal, Permiso, Categoria, Producto
-from django.contrib.auth.models import User
-from rest_framework import serializers
 from django.db import models
+from django.contrib.auth.models import User
 
+class Sucursal(models.Model):
+    direccion = models.CharField(max_length=255)
+    localidad = models.CharField(max_length=100)
 
-class CustomUserSerializer(BaseUserSerializer):
-    class Meta(BaseUserSerializer.Meta):
-        model = User
-        fields = BaseUserSerializer.Meta.fields + ('is_staff', 'is_superuser')
+    def __str__(self):
+        return f"{self.localidad} - {self.direccion}"
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'is_staff', 'is_active']
-        extra_kwargs = {'password': {'write_only': True}}
+class Proveedor(models.Model):
+    descripcion = models.CharField(max_length=255)
+    contacto = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.descripcion
 
-    def create(self, validated_data):
-        is_staff = validated_data.pop('is_staff', False)
-        user = User.objects.create_user(**validated_data)
-        user.is_staff = is_staff
-        user.save()
-        return user
-class SucursalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sucursal
-        fields = '__all__'
-class PermisoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permiso
-        fields = '__all__'
-class CategoriaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Categoria
-        fields = '__all__'
-class ProductoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Producto
-        fields = '__all__'
-class PerfilSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    sucursal = serializers.PrimaryKeyRelatedField(queryset=Sucursal.objects.all(), allow_null=True)
-    permiso = serializers.PrimaryKeyRelatedField(queryset=Permiso.objects.all(), allow_null=True)
+class Categoria(models.Model):
+    descripcion = models.CharField(max_length=100)
 
-    class Meta:
-        model = Perfil
-        fields = ['id', 'user', 'sucursal', 'permiso', 'dni']
+    def __str__(self):
+        return self.descripcion
+
+class Permiso(models.Model):
+    descripcion = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.descripcion
+
+class Producto(models.Model):
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    stock = models.IntegerField()
+    medida = models.BooleanField(default=False)
+    descripcion = models.CharField(max_length=255)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.descripcion
+
+class Movimiento(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha_hora = models.DateTimeField(auto_now_add=True)
+    tipo_movimiento = models.CharField(max_length=50)
+    metodo_pago = models.CharField(max_length=50)
+    cantidad = models.IntegerField()
+    descripcion = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.tipo_movimiento} - {self.producto.descripcion} ({self.cantidad})"
+
+class Perfil(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.SET_NULL, null=True, blank=True)
+    permiso = models.ForeignKey(Permiso, on_delete=models.SET_NULL, null=True, blank=True)
+    dni = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+
