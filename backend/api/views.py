@@ -41,7 +41,6 @@ class PerfilViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
-        # Ahora modificamos la respuesta antes de devolverla
         for perfil in response.data:
             user = User.objects.get(id=perfil['user'])
             sucursal = Sucursal.objects.get(id=perfil['sucursal']) if perfil['sucursal'] else None
@@ -71,3 +70,4 @@ class PerfilViewSet(viewsets.ModelViewSet):
                 }
 
         return response
+
