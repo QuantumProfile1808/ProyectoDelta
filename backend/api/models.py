@@ -28,8 +28,8 @@ class Permiso(models.Model):
         return self.descripcion
 
 class Producto(models.Model):
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.SET_NULL, null=True, blank=True)
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     stock = models.IntegerField()
     medida = models.BooleanField(default=False)
     descripcion = models.CharField(max_length=255)

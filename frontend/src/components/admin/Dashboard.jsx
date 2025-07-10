@@ -40,10 +40,11 @@ export const Dashboard = () => {
                         <ul>
                             <li><Link to="/dashboard">Inicio</Link></li>
                             <li><Link to="/dashboard/productos">Productos</Link></li>
+                            <li><Link to="/dashboard/tablaproductos">Listado de productos</Link></li>
                             <li><Link to="/dashboard/historial">Historial</Link></li>
                             <li><Link to="/dashboard/finanzas">Finanzas</Link></li>
                             <li><Link to="/dashboard/usuarios">Usuarios</Link></li>
-                            <li><Link to="/dashboard/tablausuario">tabla</Link></li>
+                            <li><Link to="/dashboard/tablausuario">Listado de usuarios</Link></li>
                         </ul>
                     </nav>
                     <button

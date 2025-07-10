@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       let res = await fetch("http://localhost:8000/api-auth/users/me/", {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `JWT ${access}`,  // o "Bearer" según tu backend
+          "Authorization": `JWT ${access}`,  
         },
       });
 
