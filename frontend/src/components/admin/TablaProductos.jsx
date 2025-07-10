@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
+import "../css/TablaProductos.css";
 
 const TablaProductos = () => {
   const [productos, setProductos] = useState([]);
@@ -22,6 +24,7 @@ const TablaProductos = () => {
             <th>Stock</th>
             <th>Sucursal</th>
             <th>Categoría</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -33,6 +36,17 @@ const TablaProductos = () => {
               <td>{p.stock}</td>
               <td>{p.sucursal ? `${p.sucursal.localidad} - ${p.sucursal.direccion}` : ''}</td>
               <td>{p.categoria ? p.categoria.descripcion : ''}</td>
+              <td>
+                <button className="btn-delete">
+                  <FaTrash />
+                </button>
+                <button className="btn-edit">
+                  <FaEdit />
+                </button>
+                <button className="btn-add">
+                  <FaPlus />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
