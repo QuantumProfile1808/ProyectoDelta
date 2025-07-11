@@ -173,14 +173,9 @@ const TablaUsuarios = () => {
           ))}
         </tbody>
       </table>
-
-      //button to add new user
       <Link to="/dashboard/usuarios" className="fab-boton">
         <FaPlus />
       </Link>
-
-
-      // Modal for editing user
       <EditUserModal
         show={showModal}
         onClose={() => setShowModal(false)}
