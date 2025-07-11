@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../../components/css/Usuario.css";
 
 const Usuarios = () => {
   const [form, setForm] = useState({
@@ -8,32 +9,36 @@ const Usuarios = () => {
     last_name: "",
     dni: "",
     sucursal: "",
-    is_staff: false, // nuevo campo
+    is_staff: false,
   });
 
   const [sucursales, setSucursales] = useState([]);
   const [permisos, setPermisos] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Fetch sucursales and permisos on a component
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/sucursal/")
       .then(res => res.json())
       .then(data => setSucursales(data));
 
-    fetch("http://127.0.0.1:8000/api/permiso/")  // esta es la URL de permisos
+    fetch("http://127.0.0.1:8000/api/permiso/")// esta es la URL de permisos
       .then(res => res.json())
       .then(data => setPermisos(data));
 }, []);
 
+  //Handle form changes
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
+  //Handle form
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
 
+    // Create user
     const userRes = await fetch("http://127.0.0.1:8000/api/users/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -55,9 +60,9 @@ const Usuarios = () => {
     }
 
     const user = await userRes.json();
-
-    
     console.log(form.sucursal);
+
+    // Create perfil
     const perfilRes = await fetch("http://127.0.0.1:8000/api/perfil/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -86,8 +91,9 @@ const Usuarios = () => {
     setLoading(false);
   };
 
+  // Render form and page
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+    <form onSubmit={handleSubmit}>
       <div style={{ flex: 1, minWidth: 250 }}>
         <label>DNI</label>
         <input name="dni" value={form.dni} onChange={handleChange} required />
@@ -104,7 +110,7 @@ const Usuarios = () => {
           />¿Es administrador?</label>
       </div>
 
-      <div style={{ flex: 1, minWidth: 250 }}>
+      <div>
         <label>Usuario</label>
         <input name="username" value={form.username} onChange={handleChange} required />
         <label>Contraseña</label>
@@ -118,7 +124,7 @@ const Usuarios = () => {
         </select>
       </div>
       
-      <div style={{ alignSelf: "flex-end", marginTop: 24 }}>
+      <div>
         <button type="submit" disabled={loading}>
           {loading ? "Guardando..." : "Guardar"}
         </button>

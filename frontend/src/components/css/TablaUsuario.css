@@ -110,3 +110,104 @@ input:checked + .slider:before {
   font-weight: 600;
   opacity: 0.8;
 }
+.fab-boton {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.fab-boton:hover {
+  background-color: #218838;
+}
+
+/* Contenedor general del modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenido del modal */
+.custom-edit-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 360px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Título */
+.custom-edit-modal h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+/* Subtítulo */
+.custom-edit-modal p {
+  margin: 0.5rem 0 1rem;
+  color: #555;
+}
+
+/* Inputs y select */
+.custom-edit-modal label {
+  display: block;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+
+.custom-edit-modal input,
+.custom-edit-modal select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Botones de acción */
+.edit-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.btn-cancel,
+.btn-save {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cancel {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.btn-save {
+  background: #2ecc71;
+  color: #fff;
+}
