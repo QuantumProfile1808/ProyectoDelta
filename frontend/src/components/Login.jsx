@@ -12,21 +12,29 @@ export const Login = () => {
     const [showModal, setShowModal] = useState(false);
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        const userData = await login(username, password);
-        if (userData) {
-            console.log('Login successful');
-            if (userData.is_staff) {
-                navigate('/dashboard', { replace: true });
-            } else {
-                navigate('/no-staff', { replace: true });
-            }
-        }
-        else {
-            setShowModal(true);
-            console.error('Login failed');
-        }
+  e.preventDefault();
+  try {
+    const userData = await login(username, password);
+    console.log(' Resultado login:', userData);
+
+    if (!userData) {
+      navigate('/no-staff', { replace: true });
+      return;
     }
+
+    // Usuario válido
+    if (userData.is_staff) {
+      navigate('/dashboard', { replace: true });
+    } else {
+      navigate('/user', { replace: true });
+    }
+
+  } catch (err) {
+    console.error('Error inesperado:', err);
+    setShowModal(true);
+  }
+};
+
 
     return (
         <div className="login-bg">

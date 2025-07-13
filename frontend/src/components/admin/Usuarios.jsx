@@ -22,7 +22,7 @@ const Usuarios = () => {
       .then(res => res.json())
       .then(data => setSucursales(data));
 
-    fetch("http://127.0.0.1:8000/api/permiso/")// esta es la URL de permisos
+    fetch("http://127.0.0.1:8000/api/permiso/")
       .then(res => res.json())
       .then(data => setPermisos(data));
 }, []);
@@ -94,7 +94,7 @@ const Usuarios = () => {
   // Render form and page
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ flex: 1, minWidth: 250 }}>
+      <div>
         <label>DNI</label>
         <input name="dni" value={form.dni} onChange={handleChange} required />
         <label>Nombre</label>
