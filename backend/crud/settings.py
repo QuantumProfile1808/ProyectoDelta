@@ -154,3 +154,5 @@ DJOSER = {
         "current_user": "api.serializers.CustomUserSerializer",
     }
 }
+
+CORS_ALLOW_CREDENTIALS = True
