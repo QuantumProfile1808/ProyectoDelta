@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import  './css/Login.css';
 import { Modal } from './Modal';
 
+
 export const Login = () => {
     const navigate = useNavigate();
     const { user, login } = useContext(AuthContext);
@@ -26,7 +27,7 @@ export const Login = () => {
     if (userData.is_staff) {
       navigate('/dashboard', { replace: true });
     } else {
-      navigate('/user', { replace: true });
+      navigate('/User', { replace: true });
     }
 
   } catch (err) {
