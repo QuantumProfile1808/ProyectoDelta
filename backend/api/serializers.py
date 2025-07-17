@@ -1,5 +1,5 @@
 from djoser.serializers import UserSerializer as BaseUserSerializer
-from .models import Perfil, Sucursal, Permiso, Categoria, Producto
+from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.db import models
@@ -50,3 +50,7 @@ class PerfilSerializer(serializers.ModelSerializer):
         model = Perfil
         fields = ['id', 'user', 'sucursal', 'permiso', 'dni']
 
+class MovimientoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movimiento
+        fields = '__all__'

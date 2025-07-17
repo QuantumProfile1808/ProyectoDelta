@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import viewsets
 from django.contrib.auth.models import User
-from .models import Perfil, Sucursal, Permiso, Categoria, Producto
-from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer
+from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento
+from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer, MovimientoSerializer
 from rest_framework import generics
 
 # Create your views here.
@@ -70,3 +70,6 @@ class PerfilViewSet(viewsets.ModelViewSet):
 
         return response
 
+class MovimientoViewset(viewsets.ModelViewSet):
+    queryset = Movimiento.objects.all()
+    serializer_class = MovimientoSerializer

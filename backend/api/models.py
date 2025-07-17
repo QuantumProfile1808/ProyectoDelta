@@ -59,3 +59,31 @@ class Perfil(models.Model):
     def __str__(self):
         return f"Perfil de {self.user.username}"
 
+class Movimiento(models.Model):
+    TIPO_CHOICES = [
+        ('entrada', 'Entrada'),
+        ('salida', 'Salida'),
+    ]
+
+    METODO_PAGO_CHOICES = [
+        ('efectivo', 'Efectivo'),
+        ('debito', 'Débito'),
+        ('credito', 'Crédito'),
+        ('transferencia', 'Transferencia'),
+        ('otro', 'Otro'),
+    ]
+
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    fecha = models.DateField()
+    hora = models.TimeField()
+
+    tipo_de_movimiento = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    metodo_de_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES)
+    
+    cantidad = models.FloatField()
+    descripcion = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Movimiento #{self.id} - {self.producto} - {self.tipo_de_movimiento}"
