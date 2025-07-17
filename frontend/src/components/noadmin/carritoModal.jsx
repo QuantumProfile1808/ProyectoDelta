@@ -27,7 +27,14 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
 
   function confirmarVenta() {
     const cambio = esEfectivo ? recibido - totalVenta : null;
-    setVuelto(cambio);
+
+    // Primer clic en efectivo: solo mostrar el vuelto
+    if (esEfectivo && vuelto === null) {
+      setVuelto(cambio);
+      return;
+    }
+
+    // Segundo clic (o pago no efectivo): confirmar y cerrar modal
     onConfirm({
       paymentMethod: metodoPago,
       amountReceived: esEfectivo ? recibido : null,
@@ -92,7 +99,12 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
 
         <div className="modal-buttons">
           <button onClick={onClose}>Cancelar</button>
-          <button onClick={confirmarVenta} disabled={!puedeConfirmar}>Confirmar</button>
+          <button
+            onClick={confirmarVenta}
+            disabled={!puedeConfirmar}
+          >
+            {esEfectivo && vuelto !== null ? 'Aceptar' : 'Confirmar'}
+          </button>
         </div>
 
         {vuelto !== null && <div className="modal-change">Vuelto: ${vuelto.toFixed(2)}</div>}

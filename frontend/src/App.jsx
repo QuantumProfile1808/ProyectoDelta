@@ -12,7 +12,6 @@ import Historial from "./components/admin/Historial";
 import TablaUsuario from './components/admin/tablausuario';
 import TablaProductos from './components/admin/TablaProductos';
 import User from "./components/noadmin/User";
-import TablaCarrito from './components/noadmin/TablaCarrito';
 
 
 
@@ -24,7 +23,6 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="no-staff" element={<NoStaff />} />
             <Route path="/User" element={<User />} />
-            <Route path="/carrito" element={<TablaCarrito />} />
             <Route path="/dashboard" element={<Dashboard />} >
               <Route path="productos" element={<Productos />} />
               <Route path="historial" element={<Historial />} />

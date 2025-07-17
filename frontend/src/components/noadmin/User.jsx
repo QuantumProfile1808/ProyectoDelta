@@ -56,13 +56,11 @@ export default function User() {
   if (error) return <p>Error: {error}</p>;
 
   const productosFiltrados = productos.filter(p => {
-    const term = searchTerm.toLowerCase();
-    return (
-      p.descripcion.toLowerCase().includes(term) ||
-      (p.categoria &&
-        p.categoria.descripcion.toLowerCase().includes(term))
-    );
-  });
+  const term = searchTerm.toLowerCase();
+  const desc = p.descripcion?.toLowerCase() || "";
+  const catDesc = p.categoria?.descripcion?.toLowerCase() || "";
+  return desc.includes(term) || catDesc.includes(term);
+});
 
   const totalItems = Object.values(carrito).reduce((sum, n) => sum + (n || 0), 0);
 
@@ -86,7 +84,7 @@ function prepararLineas() {
     console.log("Venta confirmada:", { paymentMethod, amountReceived, change, lineas });
     setCarrito({});       // limpia el carrito
     setShowModal(false);   // cierra el modal
-    alert("Venta exitosa. ¡Carrito reiniciado!");
+    alert("Venta exitosa.");
   }
   
 
