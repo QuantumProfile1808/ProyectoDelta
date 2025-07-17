@@ -36,8 +36,8 @@ class CategoriaSerializer(serializers.ModelSerializer):
         model = Categoria
         fields = '__all__'
 class ProductoSerializer(serializers.ModelSerializer):
-    sucursal = SucursalSerializer()
-    categoria = CategoriaSerializer()
+    sucursal = serializers.PrimaryKeyRelatedField(queryset=Sucursal.objects.all())
+    categoria = serializers.PrimaryKeyRelatedField(queryset=Categoria.objects.all())
     class Meta:
         model = Producto
         fields = '__all__'

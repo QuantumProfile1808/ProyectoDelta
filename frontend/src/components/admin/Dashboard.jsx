@@ -39,8 +39,7 @@ export const Dashboard = () => {
                     <nav>
                         <ul>
                             <li><Link to="/dashboard">Inicio</Link></li>
-                            <li><Link to="/dashboard/productos">Productos</Link></li>
-                            <li><Link to="/dashboard/tablaproductos">Listado de productos</Link></li>
+                            <li><Link to="/dashboard/tablaproductos">Productos</Link></li>
                             <li><Link to="/dashboard/historial">Historial</Link></li>
                             <li><Link to="/dashboard/finanzas">Finanzas</Link></li>
                             <li><Link to="/dashboard/tablausuario">Usuarios</Link></li>

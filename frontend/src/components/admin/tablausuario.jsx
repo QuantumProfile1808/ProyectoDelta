@@ -5,7 +5,7 @@ import EditUserModal from "./EditUserModal";
 import "../../components/css/TablaUsuario.css";
 
 const TablaUsuarios = () => {
-  const [usuarios, setUsuarios] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);3
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [formValues, setFormValues] = useState({
