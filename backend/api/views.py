@@ -70,6 +70,6 @@ class PerfilViewSet(viewsets.ModelViewSet):
 
         return response
 
-class MovimientoViewset(viewsets.ModelViewSet):
+class MovimientoViewSet(viewsets.ModelViewSet):
     queryset = Movimiento.objects.all()
     serializer_class = MovimientoSerializer

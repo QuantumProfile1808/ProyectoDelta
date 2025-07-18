@@ -34,21 +34,10 @@ class Producto(models.Model):
     medida = models.BooleanField(default=False)
     descripcion = models.CharField(max_length=255)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.descripcion
-
-class Movimiento(models.Model):
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    fecha_hora = models.DateTimeField(auto_now_add=True)
-    tipo_movimiento = models.CharField(max_length=50)
-    metodo_pago = models.CharField(max_length=50)
-    cantidad = models.IntegerField()
-    descripcion = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.tipo_movimiento} - {self.producto.descripcion} ({self.cantidad})"
 
 class Perfil(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -76,11 +65,11 @@ class Movimiento(models.Model):
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
-    fecha = models.DateField()
-    hora = models.TimeField()
+    fecha = models.DateField(null=True, blank=True)
+    hora = models.TimeField(null=True, blank=True)
 
-    tipo_de_movimiento = models.CharField(max_length=10, choices=TIPO_CHOICES)
-    metodo_de_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES)
+    tipo_de_movimiento = models.CharField(max_length=10, choices=TIPO_CHOICES, null=True, blank=True)
+    metodo_de_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES, null=True, blank=True)
     
     cantidad = models.FloatField()
     descripcion = models.TextField(blank=True)
