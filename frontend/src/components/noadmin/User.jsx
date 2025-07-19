@@ -11,6 +11,7 @@ export default function User() {
   const [showModal, setShowModal] = useState(false);
   const lineas = prepararLineas();
   
+  
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/perfil/", { credentials: "include" })
@@ -81,11 +82,50 @@ function prepararLineas() {
   const grandTotal = lineas.reduce((sum, l) => sum + l.lineTotal, 0);
 
   function handleConfirmSale({ paymentMethod, amountReceived, change }) {
-    console.log("Venta confirmada:", { paymentMethod, amountReceived, change, lineas });
-    setCarrito({});       // limpia el carrito
-    setShowModal(false);   // cierra el modal
-    alert("Venta exitosa.");
-  }
+  const ahora = new Date();
+  const fecha = ahora.toISOString().slice(0, 10); // YYYY-MM-DD
+  const hora = ahora.toTimeString().slice(0, 8);  // HH:MM:SS
+
+  const movimientos = lineas.map(l => ({
+    producto: parseInt(l.id),
+    usuario: perfil.user.id,
+    cantidad: l.qty,
+    tipo_de_movimiento: "salida",
+    metodo_de_pago: paymentMethod.toLowerCase(),
+    descripcion: `Venta de ${l.qty} unidad/es a $${l.unitPrice} c/u`,
+    fecha,
+    hora
+  }));
+
+  Promise.all(
+  movimientos.map(m => {
+    console.log("Enviando movimiento:", JSON.stringify(m));
+    return fetch("http://127.0.0.1:8000/api/movimiento/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(m)
+      })
+  })
+  )
+    .then(responses => {
+      if (responses.some(r => !r.ok)) throw new Error("Error al guardar movimiento");
+      return Promise.all(responses.map(r => r.json()));
+    })
+    .then(data => {
+      console.log("Movimientos guardados:", data);
+      setCarrito({});
+      setShowModal(false);
+      alert("Venta registrada con éxito.");
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Ocurrió un error al guardar la venta.");
+    });
+}
+
   
 
   return (
@@ -156,7 +196,13 @@ function prepararLineas() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onConfirm={({ paymentMethod, amountReceived, change }) => {
-          // Aquí recibes la info de la venta
+          handleConfirmSale({ paymentMethod, amountReceived, change });
+            // Aquí podrías hacer un POST a tu API para registrar la venta
+            console.log("Detalles de la venta:", {
+              paymentMethod,
+              amountReceived,
+              change
+            });
           console.log("Venta realizada:", { paymentMethod, amountReceived, change });
           setCarrito({});          // limpia el carrito
           setShowModal(false);      // cierra el modal
