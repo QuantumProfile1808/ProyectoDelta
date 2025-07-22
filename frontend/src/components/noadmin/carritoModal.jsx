@@ -3,13 +3,13 @@ import ReactDOM from "react-dom";
 import "../css/carritoModal.css";
 
 export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
-  const [metodoPago, setMetodoPago] = useState("Mercado Pago");
+  const [metodoPago, setMetodoPago] = useState("transferencia");
   const [montoRecibido, setMontoRecibido] = useState("");
   const [vuelto, setVuelto] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
-      setMetodoPago("Mercado Pago");
+      setMetodoPago("transferencia");
       setMontoRecibido("");
       setVuelto(null);
     }
@@ -74,7 +74,7 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
               setVuelto(null);
             }}
           >
-            <option>Mercado Pago</option>
+            <option>Transferencia</option>
             <option>Efectivo</option>
           </select>
         </label>
