@@ -13,7 +13,6 @@ router.register(r'permiso', PermisoViewSet)
 router.register(r'movimiento', MovimientoViewSet)
 
 
-
 urlpatterns = [
     path('', home, name='home'),  # Si tienes una vista de inicio
     path('api/', include(router.urls)),  # Incluye las URLs del enrutador

@@ -6,8 +6,13 @@ from django.contrib.auth.models import User
 from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento
 from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer, MovimientoSerializer
 from rest_framework import generics
+<<<<<<< HEAD
 from rest_framework.decorators import action
 from rest_framework.response import Response
+=======
+from rest_framework.response import Response
+
+>>>>>>> 3063dac84ecdcd21321b0b441899a9f29ac4b40e
 
 # Create your views here.
 
@@ -86,3 +91,41 @@ class PerfilViewSet(viewsets.ModelViewSet):
 class MovimientoViewSet(viewsets.ModelViewSet):
     queryset = Movimiento.objects.all()
     serializer_class = MovimientoSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        movimientos = serializer.data
+
+        total_ventas = sum(item['subtotal'] for item in movimientos)
+
+        movimientos.append({
+            'id': None,
+            'producto': None,
+            'usuario': None,
+            'fecha': None,
+            'hora': None,
+            'tipo_de_movimiento': 'total',
+            'metodo_de_pago': None,
+            'cantidad': None,
+            'descripcion': f'Total de ventas: ${total_ventas:.2f}',
+            'subtotal': total_ventas,
+        })
+
+        return Response(movimientos)
+
+    def perform_create(self, serializer):
+        producto = serializer.validated_data['producto']
+        cantidad = serializer.validated_data['cantidad']
+        tipo = serializer.validated_data.get('tipo_de_movimiento')
+
+        if tipo == 'salida':
+            if producto.stock is None or cantidad > producto.stock:
+                raise serializers.ValidationError("No hay suficiente stock para esta venta.")
+
+        movimiento = serializer.save()
+
+        if movimiento.tipo_de_movimiento == 'salida':
+            producto.stock -= movimiento.cantidad
+            producto.save()
+

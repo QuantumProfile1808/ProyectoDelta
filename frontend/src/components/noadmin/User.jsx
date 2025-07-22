@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CarritoModal from "./carritoModal";
+import "../css/Empleado.css";
 
 export default function User() {
   const [perfil, setPerfil] = useState(null);
@@ -10,6 +11,8 @@ export default function User() {
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const lineas = prepararLineas();
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   
   
 
@@ -22,6 +25,7 @@ export default function User() {
       .then(data => {
         const p = Array.isArray(data) ? data[0] : data;
         setPerfil(p);
+
         return fetch(
           `http://127.0.0.1:8000/api/producto/?sucursal=${p.sucursal.id}`,
           { credentials: "include" }
@@ -34,6 +38,14 @@ export default function User() {
       .then(setProductos)
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
+      
+        fetch("http://127.0.0.1:8000/api/categoria/", { credentials: "include" })
+    .then(res => {
+      if (!res.ok) throw new Error("Error al cargar categorías");
+      return res.json();
+    })
+    .then(setCategorias)
+    .catch(err => console.error("Categorías:", err));
   }, []);
 
   function toggleSelect(id) {
@@ -57,10 +69,13 @@ export default function User() {
   if (error) return <p>Error: {error}</p>;
 
   const productosFiltrados = productos.filter(p => {
-  const term = searchTerm.toLowerCase();
-  const desc = p.descripcion?.toLowerCase() || "";
-  const catDesc = p.categoria?.descripcion?.toLowerCase() || "";
-  return desc.includes(term) || catDesc.includes(term);
+    const term       = searchTerm.toLowerCase();
+    const desc       = p.descripcion?.toLowerCase() || "";
+    const catDesc    = categorias.find(c => c.id === p.categoria)?.descripcion.toLowerCase() || "";
+    const coincideTexto     = desc.includes(term) || catDesc.includes(term);
+    const coincideCategoria = !categoriaSeleccionada || p.categoria === parseInt(categoriaSeleccionada);
+
+    return coincideTexto && coincideCategoria;
 });
 
   const totalItems = Object.values(carrito).reduce((sum, n) => sum + (n || 0), 0);
@@ -83,8 +98,8 @@ function prepararLineas() {
 
   function handleConfirmSale({ paymentMethod, amountReceived, change }) {
   const ahora = new Date();
-  const fecha = ahora.toISOString().slice(0, 10); // YYYY-MM-DD
-  const hora = ahora.toTimeString().slice(0, 8);  // HH:MM:SS
+  const fecha = ahora.toISOString().slice(0, 10);
+  const hora = ahora.toTimeString().slice(0, 8);
 
   const movimientos = lineas.map(l => ({
     producto: parseInt(l.id),
@@ -110,44 +125,64 @@ function prepararLineas() {
       })
   })
   )
-    .then(responses => {
-      if (responses.some(r => !r.ok)) throw new Error("Error al guardar movimiento");
-      return Promise.all(responses.map(r => r.json()));
-    })
-    .then(data => {
-      console.log("Movimientos guardados:", data);
+    .then(async responses => {
+      const results = await Promise.all(
+        responses.map(async r => {
+          const body = await r.json();
+          return { ok: r.ok, body };
+        })
+      );
+
+      const errores = results.filter(r => !r.ok);
+      if (errores.length > 0) {
+        const mensaje = errores
+          .map(e =>
+            e.body?.non_field_errors?.[0] ||
+            Object.values(e.body)[0]?.[0] ||
+            "Error desconocido"
+          )
+          .join("\n");
+        throw new Error(mensaje);
+      }
+
       setCarrito({});
       setShowModal(false);
       alert("Venta registrada con éxito.");
     })
     .catch(err => {
       console.error(err);
-      alert("Ocurrió un error al guardar la venta.");
+      alert(`Error: ${err.message}`);
     });
 }
 
-  
-
   return (
-    <div>
+    <div className="user-container">
       <h1>
         Bienvenido, {perfil.user.first_name} — Sucursal: {perfil.sucursal.localidad}
       </h1>
 
-      <button onClick={() => setShowModal(true)} disabled={grandTotal === 0}>
-        🛒 Ver Carrito
-      </button>
-
-      <div>
+      <div className="search-container">
         <input
           type="text"
           placeholder="Buscar…"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
+        <select
+          className="search-select"
+          value={categoriaSeleccionada}
+          onChange={e => setCategoriaSeleccionada(e.target.value)}>
+          <option value="">Todas las categorías</option>
+          {categorias.map(c => (
+            <option key={c.id} value={c.id}>
+              {c.descripcion}
+            </option>
+          ))}
+        </select>
+
       </div>
 
-      <table>
+      <table className="product-table">
         <thead>
           <tr>
             <th>Sel</th>
@@ -161,6 +196,7 @@ function prepararLineas() {
         <tbody>
           {productosFiltrados.map(p => {
             const qty = carrito[p.id] || "";
+            const catObj = categorias.find(c => c.id === p.categoria);
             return (
               <tr key={p.id}>
                 <td>
@@ -174,7 +210,7 @@ function prepararLineas() {
                 <td>{p.descripcion}</td>
                 <td>${p.precio}</td>
                 <td>{p.stock}</td>
-                <td>{p.categoria?.descripcion || "—"}</td>
+                <td>{catObj ? catObj.descripcion : "—"}</td>
                 <td>
                   <input
                     type="number"
@@ -190,6 +226,9 @@ function prepararLineas() {
           })}
         </tbody>
       </table>
+      <button className="cart-btn-container" onClick={() => setShowModal(true)} disabled={grandTotal === 0}>
+        🛒 Ver Carrito
+      </button>
 
       {/* Modal de detalles */}
       <CarritoModal
@@ -197,7 +236,6 @@ function prepararLineas() {
         onClose={() => setShowModal(false)}
         onConfirm={({ paymentMethod, amountReceived, change }) => {
           handleConfirmSale({ paymentMethod, amountReceived, change });
-            // Aquí podrías hacer un POST a tu API para registrar la venta
             console.log("Detalles de la venta:", {
               paymentMethod,
               amountReceived,
