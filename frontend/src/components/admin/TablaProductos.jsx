@@ -28,8 +28,12 @@ function AddStock({ producto, onClose, onGuardar }) {
           onChange={(e) => setCantidad(e.target.value)}
         />
         <div className="popup-buttons">
-          <button onClick={handleSubmit} className="btn-confirm">Guardar</button>
-          <button onClick={onClose} className="btn-cancel">Cancelar</button>
+          <button onClick={handleSubmit} className="btn-confirm">
+            Guardar
+          </button>
+          <button onClick={onClose} className="btn-cancel">
+            Cancelar
+          </button>
         </div>
       </div>
     </div>
@@ -51,9 +55,13 @@ const TablaProductos = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [sucursal, setSucursal] = useState([]);
   const [categoria, setCategoria] = useState([]);
+  const [mostrarInactivos, setMostrarInactivos] = useState(false);
 
   const reloadProductos = async () => {
-    const res = await fetch("http://127.0.0.1:8000/api/producto/");
+    const url = mostrarInactivos
+      ? "http://127.0.0.1:8000/api/producto/inactivos/"
+      : "http://127.0.0.1:8000/api/producto/";
+    const res = await fetch(url);
     const data = await res.json();
     setProductos(data);
   };
@@ -72,7 +80,7 @@ const TablaProductos = () => {
 
   useEffect(() => {
     reloadProductos();
-  }, []);
+  }, [mostrarInactivos]);
 
   const abrirPopup = (producto) => {
     setProductoSeleccionado(producto);
@@ -82,6 +90,45 @@ const TablaProductos = () => {
     setProductoSeleccionado(null);
   };
 
+  const desactivarProducto = (id) => {
+    fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ is_active: false }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Error al actualizar producto");
+        }
+        return res.json();
+      })
+      .then(() => {
+        reloadProductos();
+      })
+      .catch((err) => console.error("Error desactivando producto:", err));
+  };
+
+  const reactivarProducto = (id) => {
+    fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ is_active: true }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Error al reactivar producto");
+        }
+        return res.json();
+      })
+      .then(() => {
+        reloadProductos();
+      })
+      .catch((err) => console.error("Error reactivando producto:", err));
+  };
   const guardarStock = (cantidad) => {
     const id = productoSeleccionado.id;
     const nuevoStock = productoSeleccionado.stock + cantidad;
@@ -144,9 +191,15 @@ const TablaProductos = () => {
       console.error(err);
     }
   };
-  
+
   return (
     <div className="tabla-container">
+      <button
+        onClick={() => setMostrarInactivos(!mostrarInactivos)}
+        className="btn-toggle"
+      >
+        {mostrarInactivos ? "Mostrar activos" : "Mostrar desactivados"}
+      </button>
       <h2 className="tabla-titulo">Lista de Productos</h2>
       <table className="tabla-productos">
         <thead>
@@ -168,15 +221,22 @@ const TablaProductos = () => {
               <td>{p.precio}</td>
               <td>{p.stock}</td>
               <td>
-                {sucursal.find(s => s.id === p.sucursal)?.localidad} - {sucursal.find(s => s.id === p.sucursal)?.direccion}
+                {sucursal.find((s) => s.id === p.sucursal)?.localidad} -{" "}
+                {sucursal.find((s) => s.id === p.sucursal)?.direccion}
               </td>
               <td>
-                {categoria.find(c => c.id === p.categoria)?.descripcion}
+                {categoria.find((c) => c.id === p.categoria)?.descripcion}
               </td>
               <td>
-                <button className="btn-delete"><FaTrash /></button>
-                <button className="btn-edit" onClick={() => openEditModal(p)}><FaEdit /></button>
-                <button className="btn-add" onClick={() => abrirPopup(p)}><FaPlus /></button>
+                {mostrarInactivos ? (
+                  <button className="btn-reactivar" onClick={() => reactivarProducto(p.id)}>Reactivar</button>
+                ) : (
+                  <>
+                    <button className="btn-delete" onClick={() => desactivarProducto(p.id)}><FaTrash /></button>
+                    <button className="btn-edit" onClick={() => openEditModal(p)}><FaEdit /></button>
+                    <button className="btn-add" onClick={() => abrirPopup(p)}><FaPlus /></button>
+                  </>
+                )}
               </td>
             </tr>
           ))}

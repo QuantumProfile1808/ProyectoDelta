@@ -30,7 +30,7 @@ class Permiso(models.Model):
 class Producto(models.Model):
     sucursal = models.ForeignKey(Sucursal, on_delete=models.SET_NULL, null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
-    stock = models.IntegerField(max_length=10)
+    stock = models.IntegerField(default=0)
     medida = models.BooleanField(default=False)
     descripcion = models.CharField(max_length=255)
     precio = models.DecimalField(max_digits=10, decimal_places=2)

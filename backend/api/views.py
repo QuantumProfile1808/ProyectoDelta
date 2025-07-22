@@ -1,10 +1,13 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from rest_framework import viewsets
 from django.contrib.auth.models import User
 from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento
 from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer, MovimientoSerializer
 from rest_framework import generics
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 # Create your views here.
 
@@ -16,8 +19,18 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 class ProductoViewSet(viewsets.ModelViewSet):
-    queryset = Producto.objects.all()
-    serializer_class = ProductoSerializer        
+    queryset = Producto.objects.filter(is_active=True)
+    serializer_class = ProductoSerializer
+
+    @action(detail=False, methods=['get'], url_path='inactivos')
+    def productos_inactivos(self, request):
+        productos = Producto.objects.filter(is_active=False)
+        serializer = self.get_serializer(productos, many=True)
+        return Response(serializer.data)
+    def get_object(self):
+        queryset = Producto.objects.all()
+        return get_object_or_404(queryset, pk=self.kwargs["pk"])
+    
 class SucursalViewSet(viewsets.ModelViewSet):
     queryset = Sucursal.objects.all()
     serializer_class = SucursalSerializer
