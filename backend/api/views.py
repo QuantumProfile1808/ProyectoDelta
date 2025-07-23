@@ -6,13 +6,9 @@ from django.contrib.auth.models import User
 from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento
 from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer, MovimientoSerializer
 from rest_framework import generics
-<<<<<<< HEAD
 from rest_framework.decorators import action
 from rest_framework.response import Response
-=======
-from rest_framework.response import Response
 
->>>>>>> 3063dac84ecdcd21321b0b441899a9f29ac4b40e
 
 # Create your views here.
 
@@ -121,7 +117,7 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 
         if tipo == 'salida':
             if producto.stock is None or cantidad > producto.stock:
-                raise serializers.ValidationError("No hay suficiente stock para esta venta.")
+                raise serializer.ValidationError("No hay suficiente stock para esta venta.")
 
         movimiento = serializer.save()
 

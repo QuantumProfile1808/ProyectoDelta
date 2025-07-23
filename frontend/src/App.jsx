@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { BrowserRouter, Route, Routes, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import { AuthProvider } from './AuthContext';
 import { Login } from './components/Login';
@@ -12,30 +11,42 @@ import Historial from "./components/admin/Historial";
 import TablaUsuario from './components/admin/tablausuario';
 import TablaProductos from './components/admin/TablaProductos';
 import User from "./components/noadmin/User";
-
-
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="login" element={<Login />} />
-            <Route path="no-staff" element={<NoStaff />} />
-            <Route path="/User" element={<User />} />
-            <Route path="/dashboard" element={<Dashboard />} >
-              <Route path="productos" element={<Productos />} />
-              <Route path="historial" element={<Historial />} />
-              <Route path="finanzas" element={<Finanzas />} />
-              <Route path="usuarios" element={<Usuarios />} />
-              <Route path="tablausuario" element={<TablaUsuario />} />
-              <Route path="TablaProductos" element={<TablaProductos />} />
-            </Route>
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    )
-  }
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
 
-export default App
+          <Route path="/login" element={<Login />} />
+          <Route path="/no-staff" element={<NoStaff />} />
+
+          <Route path="/User" element={
+            <ProtectedRoute>
+              <User />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/dashboard" element={
+            <ProtectedRoute onlyAdmin={true}>
+              <Dashboard />
+            </ProtectedRoute>
+          }>
+            <Route path="productos" element={<Productos />} />
+            <Route path="historial" element={<Historial />} />
+            <Route path="finanzas" element={<Finanzas />} />
+            <Route path="usuarios" element={<Usuarios />} />
+            <Route path="tablausuario" element={<TablaUsuario />} />
+            <Route path="TablaProductos" element={<TablaProductos />} />
+          </Route>
+
+          <Route path="/" element={<Navigate to="/login" />} />
+
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;

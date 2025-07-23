@@ -25,9 +25,9 @@ export const Login = () => {
 
     // Usuario válido
     if (userData.is_staff) {
-      navigate('/dashboard', { replace: true });
+      navigate('/dashboard');
     } else {
-      navigate('/User', { replace: true });
+      navigate('/User');
     }
 
   } catch (err) {
