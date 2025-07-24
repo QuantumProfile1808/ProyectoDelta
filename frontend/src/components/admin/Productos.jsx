@@ -1,4 +1,6 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState } from "react";
+import { useCategorias } from "../hooks/useCategorias";
+import { useSucursales } from "../hooks/useSucursales";
 
 const Productos = () => {
   const [form, setForm] = useState({
@@ -9,21 +11,9 @@ const Productos = () => {
       categoria: "",
       medicion: "",
   });
-
-const [sucursales, setSucursales] = useState([]);
-const [categorias, setCategorias] = useState([]);
+const sucursales= useSucursales();
+const categorias = useCategorias();
 const [loading, setLoading] = useState(false);
-
-useEffect(() => {
-  fetch("http://127.0.0.1:8000/api/sucursal/")
-    .then(res => res.json())
-    .then(data => setSucursales(data));
-}, []);
-useEffect(() => {
-  fetch("http://127.0.0.1:8000/api/categoria/")
-    .then(res => res.json())
-    .then(data => setCategorias(data));
-}, []);
 
 const handleChange = e => {
   const { name, value, type, checked } = e.target;

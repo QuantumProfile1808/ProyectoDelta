@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../components/css/Usuario.css";
+import { useSucursales } from "../hooks/useSucursales";
+import { usePermisos } from "../hooks/usePermisos";
 
 const Usuarios = () => {
   const [form, setForm] = useState({
@@ -12,20 +14,12 @@ const Usuarios = () => {
     is_staff: false,
   });
 
-  const [sucursales, setSucursales] = useState([]);
-  const [permisos, setPermisos] = useState([]);
+  const sucursales = useSucursales();
+  const permisos = usePermisos();
   const [loading, setLoading] = useState(false);
 
   // Fetch sucursales and permisos on a component
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/sucursal/")
-      .then(res => res.json())
-      .then(data => setSucursales(data));
 
-    fetch("http://127.0.0.1:8000/api/permiso/")
-      .then(res => res.json())
-      .then(data => setPermisos(data));
-}, []);
 
   //Handle form changes
   const handleChange = e => {

@@ -4,6 +4,8 @@ import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "../css/TablaProductos.css";
 import EditProductModal from "./EditProductModal";
+import { useSucursales } from "../hooks/useSucursales";
+import { useCategorias } from "../hooks/useCategorias";
 
 function AddStock({ producto, onClose, onGuardar }) {
   const [cantidad, setCantidad] = useState("");
@@ -53,8 +55,8 @@ const TablaProductos = () => {
   });
   const [productos, setProductos] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
-  const [sucursal, setSucursal] = useState([]);
-  const [categoria, setCategoria] = useState([]);
+  const sucursal = useSucursales();
+  const categoria = useCategorias();
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
 
   const reloadProductos = async () => {
@@ -65,18 +67,6 @@ const TablaProductos = () => {
     const data = await res.json();
     setProductos(data);
   };
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/sucursal/")
-      .then((res) => res.json())
-      .then((data) => setSucursal(data))
-      .catch((err) => console.error("Error cargando sucursales", err));
-
-    fetch("http://127.0.0.1:8000/api/categoria/")
-      .then((res) => res.json())
-      .then((data) => setCategoria(data))
-      .catch((err) => console.error("Error cargando categorías", err));
-  }, []);
 
   useEffect(() => {
     reloadProductos();
