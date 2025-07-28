@@ -1,0 +1,128 @@
+:root {
+  --card-bg: #f5f5f5;
+  --card-radius: 8px;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin: 20px 0;
+}
+
+.search-container input[type="text"],
+.search-container select {
+  width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #555;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin: 20px 0;
+}
+
+.search-container input[type="text"]:focus,
+.search-container select:focus {
+  border-color: #000000;
+}
+
+.search-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D%22%23333%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+}
+
+.product-table input[type="number"] {
+  width: 70px;
+  padding: 6px 10px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #555;
+  font-size: 0.95rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s ease;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.product-table input[type="number"]:focus {
+  border-color: #4a90e2;
+}
+
+.user-card {
+  background-color: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Opcional: adaptar la tabla al interior de la tarjeta */
+.user-card .product-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+.user-card .product-table th,
+.user-card .product-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+.user-card .product-table tr:nth-child(odd) {
+  background: #fff;
+}
+
+.user-card .product-table tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.user-card .product-table tr:hover {
+  background: #e6f7ff;
+}
+
+/* Botón dentro de la tarjeta */
+.user-card .cart-btn-container {
+  align-self: flex-end;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: var(--card-radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.user-card .cart-btn-container:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

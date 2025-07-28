@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaEdit, FaUserShield, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import EditUserModal from "./EditUserModal";
 import "../../components/css/TablaUsuario.css";
+import { usePerfiles } from "../hooks/usePerfiles";
 
 const TablaUsuarios = () => {
-  const [usuarios, setUsuarios] = useState([]);
+  // Usamos el hook que devuelve perfiles y el setter para actualizarlos
+  const [perfiles, setPerfiles] = usePerfiles();
+
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [formValues, setFormValues] = useState({
@@ -16,13 +19,6 @@ const TablaUsuarios = () => {
     password: "",
     role: ""
   });
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/perfil/")
-      .then(res => (res.ok ? res.json() : Promise.reject(res)))
-      .then(setUsuarios)
-      .catch(err => console.error("Error fetching perfiles:", err));
-  }, []);
 
   const toggleActivo = async (userId, curr) => {
     const nuevo = !curr;
@@ -36,7 +32,9 @@ const TablaUsuarios = () => {
         }
       );
       if (!res.ok) throw new Error("Patch falló");
-      setUsuarios(prev =>
+
+      // Actualizamos el estado local para reflejar el cambio
+      setPerfiles(prev =>
         prev.map(u =>
           u.user.id === userId
             ? { ...u, user: { ...u.user, is_active: nuevo } }
@@ -48,8 +46,7 @@ const TablaUsuarios = () => {
     }
   };
 
-
-  // Open modal for editing user
+  // Abre modal para editar usuario
   const openEditModal = userObj => {
     setSelectedUser(userObj);
     setFormValues({
@@ -63,13 +60,11 @@ const TablaUsuarios = () => {
     setShowModal(true);
   };
 
-  // Handle form submission for editing user
+  // Maneja el submit de edición
   const handleSubmit = async e => {
     e.preventDefault();
     if (!selectedUser) return;
 
-
-    // Prepare payload for updating user
     const payload = {
       first_name: formValues.first_name,
       last_name: formValues.last_name,
@@ -77,7 +72,6 @@ const TablaUsuarios = () => {
       is_staff: formValues.role === "administrador"
     };
 
-    // If password is provided, include it in the payload
     try {
       const res = await fetch(
         `http://127.0.0.1:8000/api/users/${selectedUser.user.id}/`,
@@ -90,8 +84,7 @@ const TablaUsuarios = () => {
       if (!res.ok) throw new Error("Falló la edición");
       const updated = await res.json();
 
-      // Update the user in the state
-      setUsuarios(prev =>
+      setPerfiles(prev =>
         prev.map(u =>
           u.user.id === updated.id
             ? { ...u, user: { ...u.user, ...updated }, dni: formValues.dni }
@@ -105,7 +98,6 @@ const TablaUsuarios = () => {
     }
   };
 
-  //Table rendering
   return (
     <div className="tabla-container">
       <h2 className="tabla-titulo">Gestión de Usuarios</h2>
@@ -124,7 +116,7 @@ const TablaUsuarios = () => {
           </tr>
         </thead>
         <tbody>
-          {usuarios.map(u => (
+          {perfiles.map(u => (
             <tr key={u.id}>
               <td>{u.dni || "-"}</td>
               <td className={u.user.is_active ? "" : "texto-inactivo"}>
@@ -148,9 +140,7 @@ const TablaUsuarios = () => {
                   <input
                     type="checkbox"
                     checked={u.user.is_active}
-                    onChange={() =>
-                      toggleActivo(u.user.id, u.user.is_active)
-                    }
+                    onChange={() => toggleActivo(u.user.id, u.user.is_active)}
                   />
                   <span className="slider round"></span>
                 </label>
@@ -173,9 +163,11 @@ const TablaUsuarios = () => {
           ))}
         </tbody>
       </table>
+
       <Link to="/dashboard/usuarios" className="fab-boton">
         <FaPlus />
       </Link>
+
       <EditUserModal
         show={showModal}
         onClose={() => setShowModal(false)}

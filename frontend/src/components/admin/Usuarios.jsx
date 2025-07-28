@@ -18,9 +18,6 @@ const Usuarios = () => {
   const permisos = usePermisos();
   const [loading, setLoading] = useState(false);
 
-  // Fetch sucursales and permisos on a component
-
-
   //Handle form changes
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
