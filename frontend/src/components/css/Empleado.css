@@ -25,33 +25,22 @@
   padding: 8px 12px;
   border: 1px solid #000;
   border-radius: 20px;
-  background-color: #fff;
+  background: #fff;
   color: #555;
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.3s ease;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.search-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 1rem;
-  margin: 20px 0;
+  transition: border-color 0.3s;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
 }
 
 .search-container input[type="text"]:focus,
 .search-container select:focus {
-  border-color: #000000;
+  border-color: #000;
 }
 
 .search-select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D%22%23333%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
+  background: url("data:image/svg+xml,%3Csvg fill='333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E") no-repeat right 0.75rem center/1rem;
   padding-right: 2rem;
 }
 
@@ -60,21 +49,30 @@
   padding: 6px 10px;
   border: 1px solid #000;
   border-radius: 20px;
-  background-color: #fff;
+  background: #fff;
   color: #555;
   font-size: 0.95rem;
   text-align: center;
   outline: none;
-  transition: border-color 0.3s ease;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 .product-table input[type="number"]:focus {
   border-color: #4a90e2;
 }
 
+.product-table input[type="number"]::-webkit-outer-spin-button,
+.product-table input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.product-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .user-card {
-  background-color: var(--card-bg);
+  background: var(--card-bg);
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
   padding: 20px;
@@ -85,7 +83,6 @@
   gap: 20px;
 }
 
-/* Opcional: adaptar la tabla al interior de la tarjeta */
 .user-card .product-table {
   width: 100%;
   border-collapse: collapse;
@@ -98,31 +95,84 @@
   border: 1px solid #ddd;
 }
 
-.user-card .product-table tr:nth-child(odd) {
-  background: #fff;
-}
+.user-card .product-table tr:nth-child(odd) { background: #fff; }
+.user-card .product-table tr:nth-child(even) { background: #fafafa; }
+.user-card .product-table tr:hover { background: #e6f7ff; }
 
-.user-card .product-table tr:nth-child(even) {
-  background: #fafafa;
-}
+.selected-row { background: #e3f2fd !important; }
 
-.user-card .product-table tr:hover {
-  background: #e6f7ff;
-}
-
-/* Botón dentro de la tarjeta */
-.user-card .cart-btn-container {
-  align-self: flex-end;
-  padding: 10px 20px;
-  background-color: #4caf50;
+.user-card .cart-btn-container,
+.cart-btn-floating {
+  background: #4caf50;
   color: #fff;
   border: none;
   border-radius: var(--card-radius);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
 }
 
-.user-card .cart-btn-container:disabled {
-  background-color: #ccc;
+.user-card .cart-btn-container {
+  align-self: flex-end;
+  padding: 10px 20px;
+}
+
+.user-card .cart-btn-container:disabled,
+.cart-btn-floating:disabled {
+  background: #ccc;
   cursor: not-allowed;
+  color: #888;
+}
+
+.cart-btn-floating {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
+  padding: 16px 28px;
+  font-size: 1.15rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  border-radius: 24px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #ccc;
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.switch input:checked + .slider { background: #1976d2; }
+.switch input:checked + .slider:before { transform: translateX(20px); }
+.switch input:disabled + .slider {
+  background: #eee;
+  cursor: not-allowed;
+  opacity: 0.7;
 }

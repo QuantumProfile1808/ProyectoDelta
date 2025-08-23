@@ -98,8 +98,9 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
         )}
 
         <div className="modal-buttons">
-          <button onClick={onClose}>Cancelar</button>
+          <button className="btn-cancel" onClick={onClose}>Cancelar</button>
           <button
+            className="btn-confirm"
             onClick={confirmarVenta}
             disabled={!puedeConfirmar}
           >

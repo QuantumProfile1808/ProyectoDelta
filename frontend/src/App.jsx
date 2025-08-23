@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate, Outlet } from 'react-router-dom';
 import './App.css';
 import { AuthProvider } from './AuthContext';
 import { Login } from './components/Login';
@@ -12,6 +12,17 @@ import TablaUsuario from './components/admin/tablausuario';
 import TablaProductos from './components/admin/TablaProductos';
 import User from "./components/noadmin/User";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/admin/Header";
+
+// Layout para admin con Header
+function AdminLayout() {
+  return (
+    <>
+      <Header />
+      <Outlet />
+    </>
+  );
+}
 
 function App() {
   return (
@@ -28,17 +39,19 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/dashboard" element={
+          <Route element={
             <ProtectedRoute onlyAdmin={true}>
-              <Dashboard />
+              <AdminLayout />
             </ProtectedRoute>
           }>
-            <Route path="productos" element={<Productos />} />
-            <Route path="historial" element={<Historial />} />
-            <Route path="finanzas" element={<Finanzas />} />
-            <Route path="usuarios" element={<Usuarios />} />
-            <Route path="tablausuario" element={<TablaUsuario />} />
-            <Route path="TablaProductos" element={<TablaProductos />} />
+            <Route path="/dashboard" element={<Dashboard />}>
+              <Route path="productos" element={<Productos />} />
+              <Route path="historial" element={<Historial />} />
+              <Route path="finanzas" element={<Finanzas />} />
+              <Route path="usuarios" element={<Usuarios />} />
+              <Route path="tablausuario" element={<TablaUsuario />} />
+              <Route path="TablaProductos" element={<TablaProductos />} />
+            </Route>
           </Route>
 
           <Route path="/" element={<Navigate to="/login" />} />

@@ -25,12 +25,14 @@ export default function User() {
   }
 
   function handleQtyChange(id, e) {
-    const qty = parseInt(e.target.value, 10) || 0;
-    setCarrito(prev => ({
-      ...prev,
-      [id]: qty > 0 ? qty : undefined
-    }));
-  }
+  const value = e.target.value;
+  const qty = parseInt(value, 10);
+
+  setCarrito(prev => ({
+    ...prev,
+    [id]: value === "" ? "" : (qty > 0 ? qty : undefined)
+  }));
+}
 
   if (loading) return <p>Cargando…</p>;
   if (error) return <p>Error: {error}</p>;
@@ -163,14 +165,17 @@ export default function User() {
             const qty = carrito[p.id] || "";
             const catObj = categorias.find(c => c.id === p.categoria);
             return (
-              <tr key={p.id}>
+              <tr key={p.id} className={carrito[p.id] ? "selected-row" : ""}>
                 <td>
-                  <input
-                    type="checkbox"
-                    checked={!!carrito[p.id]}
-                    onChange={() => toggleSelect(p.id)}
-                    disabled={p.stock === 0}
-                  />
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={!!carrito[p.id]}
+                      onChange={() => toggleSelect(p.id)}
+                      disabled={p.stock === 0}
+                    />
+                    <span className="slider"></span>
+                  </label>
                 </td>
                 <td>{p.descripcion}</td>
                 <td>${p.precio}</td>
@@ -178,13 +183,13 @@ export default function User() {
                 <td>{catObj ? catObj.descripcion : "—"}</td>
                 <td>
                   <input
-                    type="number"
-                    min="1"
-                    max={p.stock}
-                    value={qty}
-                    onChange={e => handleQtyChange(p.id, e)}
-                    disabled={!carrito[p.id]}
-                  />
+                      type="number"
+                      min="1"
+                      max={p.stock}
+                      value={carrito[p.id] === undefined ? "" : carrito[p.id]}
+                      onChange={e => handleQtyChange(p.id, e)}
+                      disabled={!carrito[p.id] && carrito[p.id] !== ""}
+                    />
                 </td>
               </tr>
             );
@@ -193,12 +198,20 @@ export default function User() {
       </table>
 
       <button
-        className="cart-btn-container"
-        onClick={() => setShowModal(true)}
-        disabled={grandTotal === 0}
-      >
-        🛒 Ver Carrito
-      </button>
+      className="cart-btn-floating"
+      onClick={() => setShowModal(true)}
+      disabled={grandTotal === 0}>
+      🛒 Ver Carrito
+    </button>
+
+    <CarritoModal
+      isOpen={showModal}
+      onClose={() => setShowModal(false)}
+      onConfirm={({ paymentMethod, amountReceived, change }) =>
+        handleConfirmSale({ paymentMethod, amountReceived, change })
+      }
+      lineas={lineas}
+    />
     </div>
 
       <CarritoModal
