@@ -90,11 +90,7 @@ const EditProductModal = ({
             <button type="button" className="btn-cancel" onClick={onClose}>
               ✕
             </button>
-<<<<<<< HEAD
             <button type="submit" className="btn-confirm">
-=======
-            <button type="submit" className="btn-save">
->>>>>>> 071cac5a24d330b006a378993dbb1d173a6cc3ac
               ✓
             </button>
           </div>
