@@ -1,6 +1,10 @@
 // TablaProductos.jsx (corregido)
 import React, { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { FaEdit, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
+=======
+import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
+>>>>>>> 071cac5a24d330b006a378993dbb1d173a6cc3ac
 import { Link } from "react-router-dom";
 import "../css/TablaProductos.css";
 import EditProductModal from "./EditProductModal";
@@ -22,7 +26,11 @@ function AddStock({ producto, onClose, onGuardar }) {
   return (
     <div className="popup-overlay">
       <div className="popup">
+<<<<<<< HEAD
         <h3>Agregar stock a {producto.descripcion}</h3>
+=======
+        <h3>Agregar stock a: {producto.descripcion}</h3>
+>>>>>>> 071cac5a24d330b006a378993dbb1d173a6cc3ac
         <input
           type="number"
           placeholder="Cantidad"
@@ -30,11 +38,19 @@ function AddStock({ producto, onClose, onGuardar }) {
           onChange={(e) => setCantidad(e.target.value)}
         />
         <div className="popup-buttons">
+<<<<<<< HEAD
           <button onClick={onClose} className="btn-cancel">
             ✕
           </button>
           <button onClick={handleSubmit} className="btn-confirm">
             ✓
+=======
+          <button onClick={handleSubmit} className="btn-confirm">
+            Guardar
+          </button>
+          <button onClick={onClose} className="btn-cancel">
+            Cancelar
+>>>>>>> 071cac5a24d330b006a378993dbb1d173a6cc3ac
           </button>
         </div>
       </div>
@@ -195,7 +211,11 @@ const TablaProductos = () => {
         <thead>
           <tr>
             <th>ID</th>
+<<<<<<< HEAD
             <th>Nombre</th>
+=======
+            <th>Descripción</th>
+>>>>>>> 071cac5a24d330b006a378993dbb1d173a6cc3ac
             <th>Precio</th>
             <th>Stock</th>
             <th>Sucursal</th>
@@ -222,7 +242,11 @@ const TablaProductos = () => {
                   <button className="btn-reactivar" onClick={() => reactivarProducto(p.id)}>Reactivar</button>
                 ) : (
                   <>
+<<<<<<< HEAD
                     <button className="btn-delete" onClick={() => desactivarProducto(p.id)}><FaMinus /></button>
+=======
+                    <button className="btn-delete" onClick={() => desactivarProducto(p.id)}><FaTrash /></button>
+>>>>>>> 071cac5a24d330b006a378993dbb1d173a6cc3ac
                     <button className="btn-edit" onClick={() => openEditModal(p)}><FaEdit /></button>
                     <button className="btn-add" onClick={() => abrirPopup(p)}><FaPlus /></button>
                   </>
