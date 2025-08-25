@@ -1,0 +1,40 @@
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f2f2f2;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+.admin-header__back {
+  background: #d32f2f;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.admin-header__title {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.admin-header__icons {
+  display: flex;
+  align-items: center;
+}
+
+.admin-header__icon {
+  font-size: 22px;
+  margin-left: 16px;
+  cursor: pointer;
+}
