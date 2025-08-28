@@ -1,0 +1,94 @@
+/* Contenedor principal */
+.finanzas-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* Título */
+.finanzas-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Tabla de movimientos */
+.finanzas-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.finanzas-table th,
+.finanzas-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.finanzas-table th {
+  background: #f2f2f2;
+  font-weight: 600;
+}
+
+.finanzas-table tr {
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.finanzas-table tr:hover {
+  background: #e3f2fd;
+}
+
+.finanzas-table tr.selected-row {
+  background: #e3f2fd !important;
+}
+
+/* Pop-up de detalles */
+.finanzas-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  padding: 1.5rem;
+  z-index: 999;
+  min-width: 320px;
+  max-width: 90vw;
+}
+
+.finanzas-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.finanzas-popup-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.finanzas-popup-close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #d32f2f;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.finanzas-popup-close:hover {
+  color: #b71c1c;
+}
+
+.finanzas-popup-details div {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
