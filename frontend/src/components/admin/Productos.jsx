@@ -13,7 +13,6 @@ const Productos = () => {
   });
 const sucursales= useSucursales();
 const categorias = useCategorias();
-const [loading, setLoading] = useState(false);
 
 const handleChange = e => {
   const { name, value, type, checked } = e.target;
@@ -22,7 +21,6 @@ const handleChange = e => {
 
 const handleSubmit = async e => {
   e.preventDefault();
-  setLoading(true);
 
   const productRes = await fetch("http://127.0.0.1:8000/api/producto/", {
     method: "POST",
@@ -45,7 +43,6 @@ const handleSubmit = async e => {
     throw new Error("Failed to create product");
   }
 
-  const productData = await productRes.json();
 
   setForm({
     descripcion: "",
@@ -56,7 +53,6 @@ const handleSubmit = async e => {
     medicion: "",
   });
 
-  setLoading(false);
 };
 
   return (

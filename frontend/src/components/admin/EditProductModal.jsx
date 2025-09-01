@@ -1,6 +1,6 @@
-// EditProductModal.jsx (corregido)
 import React from "react";
 import PropTypes from "prop-types";
+import { FaTimes, FaCheck } from "react-icons/fa";
 import "../../components/css/EditUserModal.css";
 
 const EditProductModal = ({
@@ -88,10 +88,10 @@ const EditProductModal = ({
 
           <div className="modal-buttons edit-modal-buttons">
             <button type="button" className="btn-cancel" onClick={onClose}>
-              ✕
+              <FaTimes />
             </button>
             <button type="submit" className="btn-confirm">
-              ✓
+              <FaCheck />
             </button>
           </div>
         </form>

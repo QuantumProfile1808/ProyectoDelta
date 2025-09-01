@@ -14,7 +14,6 @@ import User from "./components/noadmin/User";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/admin/Header";
 
-// Layout para admin con Header
 function AdminLayout() {
   return (
     <>

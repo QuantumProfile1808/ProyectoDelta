@@ -1,6 +1,6 @@
 // TablaProductos.jsx (corregido)
-import React, { useEffect, useState } from "react";
-import { FaEdit, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
+import React, { useEffect, useState, useCallback } from "react";
+import { FaCheck, FaEdit, FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "../css/TablaProductos.css";
 import EditProductModal from "./EditProductModal";
@@ -31,10 +31,10 @@ function AddStock({ producto, onClose, onGuardar }) {
         />
         <div className="popup-buttons">
           <button onClick={onClose} className="btn-cancel">
-            ✕
+            <FaTimes />
           </button>
           <button onClick={handleSubmit} className="btn-confirm">
-            ✓
+            <FaCheck />
           </button>
         </div>
       </div>
@@ -59,18 +59,18 @@ const TablaProductos = () => {
   const categoria = useCategorias();
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
 
-  const reloadProductos = async () => {
+  const reloadProductos = useCallback(async () => {
     const url = mostrarInactivos
       ? "http://127.0.0.1:8000/api/producto/inactivos/"
       : "http://127.0.0.1:8000/api/producto/";
     const res = await fetch(url);
     const data = await res.json();
     setProductos(data);
-  };
+  }, [mostrarInactivos]);
 
   useEffect(() => {
     reloadProductos();
-  }, [mostrarInactivos]);
+  }, [reloadProductos]);
 
   const abrirPopup = (producto) => {
     setProductoSeleccionado(producto);
@@ -218,6 +218,7 @@ const TablaProductos = () => {
                 {categoria.find((c) => c.id === p.categoria)?.descripcion}
               </td>
               <td>
+                <div className="acciones">
                 {mostrarInactivos ? (
                   <button className="btn-reactivar" onClick={() => reactivarProducto(p.id)}>Reactivar</button>
                 ) : (
@@ -227,6 +228,7 @@ const TablaProductos = () => {
                     <button className="btn-add" onClick={() => abrirPopup(p)}><FaPlus /></button>
                   </>
                 )}
+                </div>
               </td>
             </tr>
           ))}

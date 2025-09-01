@@ -93,7 +93,6 @@
   margin-top: 1.2rem;
 }
 .modal-buttons button {
-  padding: 0.7rem 1.4rem;
   border-radius: 8px;
   border: none;
   font-size: 1rem;
@@ -104,7 +103,6 @@
 .modal-buttons .btn-cancel {
   background: #d32f2f;
   color: #fff;
-  padding: 0.9rem 3rem;
 }
 .modal-buttons .btn-cancel:disabled {
   background: #ef9a9a;
