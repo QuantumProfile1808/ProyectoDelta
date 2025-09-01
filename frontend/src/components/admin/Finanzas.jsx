@@ -5,10 +5,23 @@ import useFinanzas from "../hooks/useFinanzas";
 export const Finanzas = () => {
   const { movimientos, loading } = useFinanzas();
   const [selected, setSelected] = useState(null);
+  const [searchDate, setSearchDate] = useState("");
+  const movimientosFiltrados = searchDate
+    ? movimientos.filter(m => m.fecha === searchDate)
+    : movimientos;
+  
 
   return (
     <div className="finanzas-container">
       <h2>Finanzas</h2>
+      <div className="search-container">
+            <input
+              type="date"
+              value={searchDate}
+              onChange={e => setSearchDate(e.target.value)}
+              placeholder="Filtrar por fecha"
+            />
+      </div>
       {loading ? (
         <p>Cargando movimientos...</p>
       ) : (
@@ -26,7 +39,7 @@ export const Finanzas = () => {
             </tr>
           </thead>
           <tbody>
-            {movimientos.map(m => (
+            {movimientosFiltrados.map(m => (
               <tr
                 key={m.id}
                 className={selected?.id === m.id ? "selected-row" : ""}
@@ -45,8 +58,6 @@ export const Finanzas = () => {
           </tbody>
         </table>
       )}
-
-      {/* Pop-up de detalles */}
       {selected && (
         <div className="finanzas-popup">
           <div className="finanzas-popup-header">
