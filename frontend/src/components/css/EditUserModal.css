@@ -41,7 +41,7 @@
 
 .edit-modal-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 0.6rem;
   margin-top: 1.2rem;
 }
@@ -58,5 +58,5 @@
   justify-content: center;
 }
 
-.btn-cancel { background: #e74c3c; color: #fff; }
+.btn-cancel { background: #ffffff; color: #fff; }
 .btn-save   { background: #2ecc71; color: #fff; }

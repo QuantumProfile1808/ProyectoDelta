@@ -42,11 +42,11 @@
 .tabla-productos tbody tr:hover {
   background: #e5e5e5;
 }
-.tabla-productos tbody td:last-child {
+.acciones {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 3px;
+  gap: 6px;
 }
 .btn-edit {
   background: #0077ff;
@@ -99,6 +99,7 @@
 .btn-add:hover{
   background: #45a049;
 }
+
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -118,21 +119,25 @@
   border-radius: 10px;
   min-width: 300px;
   max-width: 90%;
+  text-align: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .popup input {
   width: 100%;
-  padding: 8px;
-  margin-top: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   font-size: 16px;
 }
 
 .popup-buttons {
-  margin-top: 15px;
   display: flex;
   justify-content: space-between;
+  margin-top: 10px;
 }
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -140,18 +145,25 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .btn-confirm {
-  background-color: #28a745;;
-  color: white;
-  padding: 8px 16px;
+  background: #28a745;
+  color: #fff;
   border: none;
-  border-radius: 25px;
+  width: 45px;
+  height: 45px;
+  padding: 0 0 0 0;
+  font-size: 16px;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .btn-cancel {
-  width: auto;
-  background-color: gray;
-  color: white;
-  padding: 8px 16px;
+  background: #f44336;
+  color: #fff;
   border: none;
-  border-radius: 25px;
+  width: 45px;
+  height: 45px;
+  padding: 0 0 0 0;
+  font-size: 16px;
+  border-radius: 50%;
+  cursor: pointer;
 }

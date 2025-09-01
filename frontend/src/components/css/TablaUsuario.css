@@ -181,14 +181,6 @@ input:checked + .slider:before {
   border-radius: 4px;
 }
 
-/* Botones de acción */
-.edit-modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
-  margin-top: 1.2rem;
-}
-
 .btn-cancel,
 .btn-save {
   width: 42px;

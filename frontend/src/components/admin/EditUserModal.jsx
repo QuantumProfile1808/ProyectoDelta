@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { FaTimes, FaCheck } from "react-icons/fa";
 import "../../components/css/EditUserModal.css";
 
 const EditUserModal = ({ show, onClose, onSubmit, formValues, onChange }) => {
@@ -67,10 +68,10 @@ const EditUserModal = ({ show, onClose, onSubmit, formValues, onChange }) => {
 
           <div className="modal-buttons edit-modal-buttons">
             <button type="button" className="btn-cancel" onClick={onClose}>
-              ✕
+              <FaTimes />
             </button>
             <button type="submit" className="btn-save">
-              ✓
+              <FaCheck />
             </button>
           </div>
         </form>
