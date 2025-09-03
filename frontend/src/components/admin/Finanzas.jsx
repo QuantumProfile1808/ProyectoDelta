@@ -26,8 +26,13 @@ function ResumenFinanzas() {
       const fecha = new Date(m.fecha);
 
       switch (rango) {
-        case "dia":
-          return fecha.toDateString() === hoy.toDateString();
+        case "dia": {
+          const fechaStr = new Date(m.fecha).toISOString().split("T")[0];
+          const hoyStr = (fechaSeleccionada
+            ? new Date(fechaSeleccionada)
+            : new Date()
+          ).toISOString().split("T")[0];
+          return fechaStr === hoyStr;}
         case "semana": {
           const inicioSemana = new Date(hoy);
           inicioSemana.setDate(hoy.getDate() - hoy.getDay());
@@ -64,7 +69,7 @@ function ResumenFinanzas() {
   ];
 
   const stats = {
-    dia: calcularStats("Día"),
+    dia: calcularStats("dia"),
     semana: calcularStats("semana"),
     mes: calcularStats("mes"),
     anio: calcularStats("anio"),

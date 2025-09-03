@@ -13,6 +13,7 @@ import TablaProductos from './components/admin/TablaProductos';
 import User from "./components/noadmin/User";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/admin/Header";
+import MenuDashboard from "./components/admin/menudashboard";
 
 function AdminLayout() {
   return (
@@ -50,6 +51,7 @@ function App() {
               <Route path="usuarios" element={<Usuarios />} />
               <Route path="tablausuario" element={<TablaUsuario />} />
               <Route path="TablaProductos" element={<TablaProductos />} />
+              <Route index element={<MenuDashboard />} />
             </Route>
           </Route>
 

@@ -119,23 +119,42 @@ const TablaProductos = () => {
       })
       .catch((err) => console.error("Error reactivando producto:", err));
   };
-  const guardarStock = (cantidad) => {
-    const id = productoSeleccionado.id;
-    const nuevoStock = productoSeleccionado.stock + cantidad;
+  const guardarStock = async (cantidad) => {
+  const id = productoSeleccionado.id;
+  const nuevoStock = productoSeleccionado.stock + cantidad;
 
-    fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ stock: nuevoStock }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        reloadProductos();
-        cerrarPopup();
-      })
-      .catch((err) => console.error("Error actualizando stock:", err));
+    try {
+      // 1️⃣ Actualizar stock del producto
+      await fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ stock: nuevoStock }),
+      });
+
+      // 2️⃣ Registrar movimiento de entrada
+      await fetch(`http://127.0.0.1:8000/api/movimiento/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          producto: id,
+          usuario: 1, // ID del usuario logueado
+          tipo_de_movimiento: "entrada",
+          cantidad: cantidad,
+          descripcion: `Ingreso de stock para ${productoSeleccionado.descripcion}`,
+          fecha: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+          hora: new Date().toLocaleTimeString("es-AR", { hour12: false }) // HH:mm:ss
+        }),
+      });
+
+      reloadProductos();
+      cerrarPopup();
+    } catch (err) {
+      console.error("Error actualizando stock o creando movimiento:", err);
+    }
   };
 
   const openEditModal = (producto) => {
