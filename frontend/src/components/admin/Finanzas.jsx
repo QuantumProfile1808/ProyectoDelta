@@ -1,86 +1,99 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../css/Finanzas.css";
-import useFinanzas from "../hooks/useFinanzas";
 
-export const Finanzas = () => {
-  const { movimientos, loading } = useFinanzas();
-  const [selected, setSelected] = useState(null);
-  const [searchDate, setSearchDate] = useState("");
-  const movimientosFiltrados = searchDate
-    ? movimientos.filter(m => m.fecha === searchDate)
-    : movimientos;
-  
+const API_URL = "http://127.0.0.1:8000/api/movimiento/";
+
+function ResumenFinanzas() {
+  const [movimientos, setMovimientos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState("");
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        setMovimientos(data.filter(m => m.tipo_de_movimiento !== "total"));
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p className="text-center">Cargando...</p>;
+
+  const getResumen = (rango) => {
+    const hoy = fechaSeleccionada ? new Date(fechaSeleccionada) : new Date();
+    return movimientos.filter(m => {
+      if (!m.fecha) return false;
+      const fecha = new Date(m.fecha);
+
+      switch (rango) {
+        case "dia":
+          return fecha.toDateString() === hoy.toDateString();
+        case "semana": {
+          const inicioSemana = new Date(hoy);
+          inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+          const finSemana = new Date(inicioSemana);
+          finSemana.setDate(inicioSemana.getDate() + 6);
+          return fecha >= inicioSemana && fecha <= finSemana;
+        }
+        case "mes":
+          return (
+            fecha.getMonth() === hoy.getMonth() &&
+            fecha.getFullYear() === hoy.getFullYear()
+          );
+        case "anio":
+          return fecha.getFullYear() === hoy.getFullYear();
+        default:
+          return false;
+      }
+    });
+  };
+
+  const calcularStats = (rango) => {
+    const lista = getResumen(rango);
+    const ventas = lista.length;
+    const balance = lista.reduce((acc, m) => acc + (m.subtotal || 0), 0);
+    return { ventas, balance };
+  };
+
+  // Definimos el orden y los nombres personalizados
+  const orden = [
+    { key: "dia", label: "Día" },
+    { key: "semana", label: "Semana" },
+    { key: "mes", label: "Mes" },
+    { key: "anio", label: "Año" }
+  ];
+
+  const stats = {
+    dia: calcularStats("Día"),
+    semana: calcularStats("semana"),
+    mes: calcularStats("mes"),
+    anio: calcularStats("anio"),
+  };
 
   return (
-    <div className="finanzas-container">
-      <h2>Finanzas</h2>
-      <div className="search-container">
-            <input
-              type="date"
-              value={searchDate}
-              onChange={e => setSearchDate(e.target.value)}
-              placeholder="Filtrar por fecha"
-            />
+    <div className="container">
+      <div className="selector">
+        <label>Calendario: </label>
+        <input
+          type="date"
+          value={fechaSeleccionada}
+          onChange={(e) => setFechaSeleccionada(e.target.value)}
+        />
       </div>
-      {loading ? (
-        <p>Cargando movimientos...</p>
-      ) : (
-        <table className="finanzas-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Tipo</th>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Método de pago</th>
-              <th>Subtotal</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movimientosFiltrados.map(m => (
-              <tr
-                key={m.id}
-                className={selected?.id === m.id ? "selected-row" : ""}
-                onClick={() => setSelected(m)}
-                title="Ver detalles">
-                <td>{m.fecha}</td>
-                <td>{m.hora}</td>
-                <td>{m.tipo_de_movimiento}</td>
-                <td>{m.producto}</td>
-                <td>{m.cantidad}</td>
-                <td>{m.metodo_de_pago}</td>
-                <td>${Number(m.subtotal).toFixed(2)}</td>
-                <td>{m.descripcion}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      {selected && (
-        <div className="finanzas-popup">
-          <div className="finanzas-popup-header">
-            <strong>Detalles del movimiento</strong>
-            <button className="finanzas-popup-close"
-            onClick={() => setSelected(null)}
-            title="Cerrar">
-              &#10006;
+
+      <div className="grid">
+        {orden.map(({ key, label }) => (
+          <div key={key} className="card">
+            <h2>{label}</h2>
+            <p>Ventas: x{stats[key].ventas}</p>
+            <button className="balance-btn">
+              Balance: ${stats[key].balance.toFixed(2)}
             </button>
           </div>
-          <div>
-            <div>Producto vendido: <b>{selected.producto}</b></div>
-            <div>Cantidad vendida: <b>{selected.cantidad}</b></div>
-            <div>Precio por unidad: <b>${selected.precio ? Number(selected.precio).toFixed(2) : "-"}</b></div>
-            <div>Total de la venta: <b>${selected.subtotal ? Number(selected.subtotal).toFixed(2) : "-"}</b></div>
-            <div>Realizada por: <b>{selected.usuario || "-"}</b></div>
-            <div>Método de pago: <b>{selected.metodo_de_pago || "-"}</b></div>
-            <div>Descripción: <b>{selected.descripcion}</b></div>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
-};
+}
 
-export default Finanzas;
+export default ResumenFinanzas;

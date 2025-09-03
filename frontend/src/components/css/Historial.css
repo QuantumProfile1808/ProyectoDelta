@@ -1,0 +1,112 @@
+/* Contenedor principal */
+.historial-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* Título */
+.historial-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Tabla de movimientos */
+.historial-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.historial-table th,
+.historial-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.historial-table th {
+  background: #f2f2f2;
+  font-weight: 600;
+}
+
+.historial-table tr {
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.historial-table tr:hover {
+  background: #e3f2fd;
+}
+
+.historial-table tr.selected-row {
+  background: #e3f2fd !important;
+}
+
+/* Pop-up de detalles */
+.historial-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  padding: 1.5rem;
+  z-index: 999;
+  min-width: 320px;
+  max-width: 90vw;
+}
+
+.historial-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.historial-popup-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.historial-popup-close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #d32f2f;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.historial-popup-close:hover {
+  color: #b71c1c;
+}
+
+.historial-popup-details div {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.search-container input[type="date"] {
+  width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #555;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+  background: url("data:image/svg+xml,%3Csvg fill='333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E") no-repeat right 0.75rem center/1rem;
+}
+
+.search-container input[type="date"]:focus {
+  border-color: #000;
+}
