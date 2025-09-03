@@ -63,6 +63,7 @@
   align-items: center;
   box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
   transition: transform 0.2s ease-in-out;
+
 }
 
 .card:hover {
@@ -70,13 +71,13 @@
 }
 
 .card h2 {
-  font-size: 22px;
+  font-size: 35px;
   font-weight: bold;
   margin-bottom: 8px;
 }
 
 .card p {
-  font-size: 16px;
+  font-size: 25px;
   margin-bottom: 15px;
 }
 
