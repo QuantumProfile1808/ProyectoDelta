@@ -17,52 +17,75 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
 
   if (!isOpen) return null;
 
-  // Calcula total de la venta
   const totalVenta = lineas.reduce((acc, item) => acc + item.lineTotal, 0);
   const esEfectivo = metodoPago === "Efectivo";
   const recibido = parseFloat(montoRecibido) || 0;
 
-  const montoInsuficiente = esEfectivo && montoRecibido !== "" && recibido < totalVenta;
+  const montoInsuficiente =
+    esEfectivo && montoRecibido !== "" && recibido < totalVenta;
   const puedeConfirmar = esEfectivo ? recibido >= totalVenta : true;
 
   function confirmarVenta() {
     const cambio = esEfectivo ? recibido - totalVenta : null;
 
-    // Primer clic en efectivo: solo mostrar el vuelto
     if (esEfectivo && vuelto === null) {
       setVuelto(cambio);
       return;
     }
 
-    // Segundo clic (o pago no efectivo): confirmar y cerrar modal
     onConfirm({
       paymentMethod: metodoPago,
       amountReceived: esEfectivo ? recibido : null,
-      change: cambio
+      change: cambio,
     });
   }
 
   return ReactDOM.createPortal(
     <div className="modal-overlay">
       <div className="modal">
-        <button onClick={onClose} className="modal-close">✖</button>
+        <button onClick={onClose} className="modal-close">
+          ✖
+        </button>
         <h2>Detalles del Pedido</h2>
 
-        <table className="table-modal">
-          <thead><tr><th>Desc.</th><th>Cant.</th><th>Precio</th><th>Total</th></tr></thead>
-          <tbody>
-            {lineas.map(item => (
-              <tr key={item.id}>
-                <td>{item.descripcion}</td>
-                <td>{item.qty}</td>
-                <td>${item.unitPrice.toFixed(2)}</td>
-                <td>${item.lineTotal.toFixed(2)}</td>
+        <div className="table-wrapper">
+          <table className="table-modal">
+            <thead>
+              <tr>
+                <th>Desc.</th>
+                <th>Cant.</th>
+                <th>Precio</th>
+                <th>Total</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {lineas.map((item) => (
+                <tr key={item.id}>
+                  <td className="desc-cell" title={item.descripcion}>
+                    {item.descripcion}
+                  </td>
+                  <td>{item.qty}</td>
+                  <td>
+                    $
+                    {item.unitPrice.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </td>
+                  <td>
+                    $
+                    {item.lineTotal.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="modal-total">Total: <strong>${totalVenta.toFixed(2)}</strong></div>
+        <div className="modal-total">
+          Total: <strong>${totalVenta.toFixed(2)}</strong>
+        </div>
 
         <label>
           Forma de pago:
@@ -92,23 +115,29 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
               />
             </label>
             {montoInsuficiente && (
-              <p className="modal-error">Monto insuficiente (${totalVenta.toFixed(2)})</p>
+              <p className="modal-error">
+                Monto insuficiente (${totalVenta.toFixed(2)})
+              </p>
             )}
           </div>
         )}
 
         <div className="modal-buttons">
-          <button className="btn-cancel" onClick={onClose}>Cancelar</button>
+          <button className="btn-cancel" onClick={onClose}>
+            Cancelar
+          </button>
           <button
             className="btn-confirm"
             onClick={confirmarVenta}
             disabled={!puedeConfirmar}
           >
-            {esEfectivo && vuelto !== null ? 'Aceptar' : 'Confirmar'}
+            {esEfectivo && vuelto !== null ? "Aceptar" : "Confirmar"}
           </button>
         </div>
 
-        {vuelto !== null && <div className="modal-change">Vuelto: ${vuelto.toFixed(2)}</div>}
+        {vuelto !== null && (
+          <div className="modal-change">Vuelto: ${vuelto.toFixed(2)}</div>
+        )}
       </div>
     </div>,
     document.body

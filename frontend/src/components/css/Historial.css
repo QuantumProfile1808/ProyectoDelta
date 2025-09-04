@@ -30,6 +30,13 @@
   text-align: left;
 }
 
+.historial-table td.producto-col {
+  max-width: 200px;       /* ajustá el ancho máximo a tu gusto */
+  white-space: nowrap;    /* evita salto de línea */
+  overflow: hidden;       /* oculta el texto que se pasa */
+  text-overflow: ellipsis;/* agrega los "..." */
+}
+
 .historial-table th {
   background: #f2f2f2;
   font-weight: 600;
@@ -109,4 +116,43 @@
 
 .search-container input[type="date"]:focus {
   border-color: #000;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+  color: #000;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.historial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 998;
 }

@@ -1,119 +1,133 @@
 .dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  width: 100vw;
+display: flex;
+min-height: 100vh;
+width: 100vw;
 }
 
 .hamburger {
-  position: fixed;
-  top: 24px;
-  z-index: 300;
-  width: 36px;
-  height: 36px;
-  background: none;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-  padding: 6px;
-  transition: left 0.3s;
+position: fixed;
+top: 10px;
+z-index: 6000;
+background: none;
+border: none;
+cursor: pointer;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+width: 22px;
+height: 16px;
+padding: 0;
+transition: left 0.3s ease, transform 0.3s ease, background 0.25s ease;
 }
-
 
 .hamburger span {
-  display: block;
-  height: 4px;
-  width: 100%;
-  background: #000000;
-  border-radius: 2px;
-  transition: 0.7s;
+display: block;
+height: 2px;
+width: 100%;
+background: #000;
+border-radius: 2px;
+transition: all 0.25s ease;
 }
 
-.sidebar.open ~ .hamburger span,
-.hamburger.open span {
-  background: #ffffff;
+.hamburger.open {
+padding: 4px;
+border-radius: 6px;
+background: rgba(0,0,0,0.22);
+width: 22px;
+height: 16px;
 }
 
-.sidebar.open ~ .hamburger {
-  left: 24px;
+.hamburger.open span:nth-child(1) {
+transform: rotate(45deg) translate(2px, 2px);
+background: #fff;
 }
-
+.hamburger.open span:nth-child(2) {
+opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+transform: rotate(-45deg) translate(2px, -2px);
+background: #fff;
+}
 
 .sidebar {
-  width: 220px;
-  background: #222;
-  color: #fff;
-  padding: 32px 0 0 0;
-  min-height: 100vh;
-  position: fixed;
-  left: -220px;
-  top: 0;
-  bottom: 0;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: left 0.3s;
+width: 220px;
+background: #222;
+color: #fff;
+padding: 32px 0 0 0;
+min-height: 100vh;
+position: fixed;
+left: -220px;
+top: 0;
+bottom: 0;
+z-index: 4000;
+display: flex;
+flex-direction: column;
+align-items: center;
+transition: left 0.35s cubic-bezier(.2,.9,.2,1);
 }
 .sidebar.open {
-  left: 0;
+left: 0;
 }
 
 .dashboard-content {
-  flex: 1;
-  padding: 40px;
-  background: #f5f6fa;
-  margin-left: 0;
-  min-height: 100vh;
-  transition: margin-left 0.3s;
+flex: 1;
+padding: 80px 40px 40px 40px;
+background: #f5f6fa;
+margin-left: 0;
+min-height: 100vh;
+transition: margin-left 0.3s ease;
 }
 .sidebar.open ~ .dashboard-content {
-  margin-left: 220px;
+margin-left: 220px;
 }
 
 .sidebar-title {
-  text-align: center;
-  margin-bottom: 32px;
-  font-size: 1.5rem;
-  letter-spacing: 2px;
+text-align: center;
+margin-bottom: 32px;
+font-size: 1.5rem;
+letter-spacing: 2px;
 }
 
 .sidebar ul {
-  list-style: none;
-  padding: 0;
+list-style: none;
+padding: 0;
 }
 
 .sidebar li {
-  margin: 18px 0;
-  text-align: center;
+margin: 18px 0;
+text-align: center;
 }
 
 .sidebar a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.1rem;
-  transition: 
-    color 0.2s,
-    background 0.2s,
-    border 0.2s;
-  padding: 8px 18px;
-  border-radius: 18px;
-  display: inline-block;
-  border: 2px solid transparent;
+color: #fff;
+text-decoration: none;
+font-size: 1.1rem;
+transition: color 0.2s, background 0.2s, border 0.2s;
+padding: 8px 18px;
+border-radius: 18px;
+display: inline-block;
+border: 2px solid transparent;
 }
 
 .sidebar a:hover {
-  color: #222;
-  background: #fff;
-  border: 2px solid #fff;
-  border-radius: 18px;
+color: #222;
+background: #fff;
+border: 2px solid #fff;
+border-radius: 18px;
 }
+
 .sidebar-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 18px;
-  margin-bottom: 10px;
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+padding: 0 18px;
+margin-bottom: 10px;
+}
+
+.sidebar-logout{
+margin-top: 40px;
+width: 80%;
+margin-left: 10%;
+margin-right: 10%;
 }

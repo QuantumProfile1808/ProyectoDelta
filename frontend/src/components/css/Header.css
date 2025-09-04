@@ -1,40 +1,96 @@
+/* src/css/Header.css */
+
 .admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  background: white;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #f2f2f2;
-  padding: 8px 16px;
-  border-bottom: 1px solid #ccc;
+  padding: 0 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.35s cubic-bezier(.2,.9,.2,1);
+  z-index: 3000; /* menor que la sidebar, pero mayor que contenido */
+  overflow: visible;
 }
 
+/* compact = sidebar abierto -> header reduce el espacio y el botón se achica */
+.admin-header.compact {
+  height: 50px;
+  padding: 0 8px;
+}
+
+/* expanded = sidebar cerrado -> back button grande y se mueve al extremo derecho */
+.admin-header.expanded {
+  height: 60px;
+  padding: 0 16px;
+}
+
+/* Back button: animación de tamaño y posicionamiento */
 .admin-header__back {
-  background: #d32f2f;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 16px; /* default */
+  background: none;
   border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  color: #fff;
   font-size: 20px;
+  cursor: pointer;
+  margin-right: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  transition: all 0.35s cubic-bezier(.2,.9,.2,1);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
+/* Cuando el sidebar está abierto (compact), achicamos y acercamos al hamburger */
+.admin-header.compact .admin-header__back {
+  left: 64px; /* lo acercamos al hamburger */
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+}
+
+/* Cuando el sidebar está cerrado (expanded), movemos el back al extremo derecho y lo agrandamos */
+.admin-header.expanded .admin-header__back {
+  left: auto;
+  right: 16px; /* extremo derecho */
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+}
+
+/* Title centrado (ocupa el centro ajustándose al tamaño del botón) */
 .admin-header__title {
-  flex: 1;
+  margin: 0 auto;
   text-align: center;
-  font-weight: bold;
+  font-weight: 700;
   font-size: 18px;
+  pointer-events: none;
 }
 
+/* Icons a la derecha (quedan detrás del back cuando este se mueve a la derecha) */
 .admin-header__icons {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
+  gap: 12px;
+  z-index: 1;
 }
 
 .admin-header__icon {
-  font-size: 22px;
-  margin-left: 16px;
+  font-size: 20px;
   cursor: pointer;
 }
+
+/* cuando el back se manda a la derecha, ocultamos íconos por debajo para evitar superposición visual
+   (si querés que no ocurra, podés ajustar los right/left y los paddings) */

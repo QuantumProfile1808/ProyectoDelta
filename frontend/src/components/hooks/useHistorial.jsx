@@ -9,10 +9,10 @@ export default function useHistorial() {
       .then(res => res.json())
       .then(data => {
         const ordenados = [...data].sort((a, b) => {
-          if (a.fecha < b.fecha) return -1;
-          if (a.fecha > b.fecha) return 1;
-          if (a.hora < b.hora) return -1;
-          if (a.hora > b.hora) return 1;
+          if (a.fecha > b.fecha) return -1;
+          if (a.fecha < b.fecha) return 1;
+          if (a.hora > b.hora) return -1;
+          if (a.hora < b.hora) return 1;
           return 0;
         });
         setMovimientos(ordenados);
@@ -22,3 +22,4 @@ export default function useHistorial() {
 
   return { movimientos, loading };
 }
+

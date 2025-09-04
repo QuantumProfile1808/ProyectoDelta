@@ -8,7 +8,7 @@ import { useDashboardData } from "../hooks/useDashboardData";
   const ultimosMovimientos = [...movimientos]
   .filter(m => m.tipo_de_movimiento !== "total")
   .sort((a, b) => {
-    const fechaHoraA = new Date(`${a.fecha || "1970-01-01"}T${a.hora || "00:00:00"}`);
+    const fechaHoraA = new Date(`${a.fecha || "1970-01-01"}T${a.hora || "00:00:00"}`); //epoch de Unix
     const fechaHoraB = new Date(`${b.fecha || "1970-01-01"}T${b.hora || "00:00:00"}`);
     return fechaHoraB - fechaHoraA;
   })

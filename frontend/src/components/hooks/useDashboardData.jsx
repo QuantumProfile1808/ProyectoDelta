@@ -1,4 +1,3 @@
-// src/hooks/useDashboardData.js
 import { useEffect, useState } from "react";
 
 export function useDashboardData() {
@@ -10,18 +9,19 @@ export function useDashboardData() {
     fetch("http://localhost:8000/api/movimiento/")
       .then(res => res.json())
       .then(data => {
-        console.log("Movimientos:", data);
-        setMovimientos(data);
+        const parsed = data.map(m => ({
+          ...m,
+          usuario: m.usuario_nombre || m.usuario, // prioriza el nombre
+          producto: m.producto_nombre || m.producto // prioriza el nombre
+        }));
+        setMovimientos(parsed);
       })
       .catch(err => console.error("Error cargando movimientos:", err));
 
     // Fetch productos
     fetch("http://localhost:8000/api/producto/")
       .then(res => res.json())
-      .then(data => {
-        console.log("Productos:", data);
-        setProductos(data);
-      })
+      .then(data => setProductos(data))
       .catch(err => console.error("Error cargando productos:", err));
   }, []);
 

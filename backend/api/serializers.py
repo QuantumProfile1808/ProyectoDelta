@@ -52,13 +52,19 @@ class PerfilSerializer(serializers.ModelSerializer):
 
 class MovimientoSerializer(serializers.ModelSerializer):
     subtotal = serializers.SerializerMethodField()
+    producto_nombre = serializers.SerializerMethodField()
+    precio_unitario = serializers.DecimalField(source='producto.precio', max_digits=10, decimal_places=2, read_only=True)
+    usuario_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = Movimiento
         fields = [
             'id',
             'producto',
+            'producto_nombre',
+            'precio_unitario',
             'usuario',
+            'usuario_nombre',
             'fecha',
             'hora',
             'tipo_de_movimiento',
@@ -68,9 +74,15 @@ class MovimientoSerializer(serializers.ModelSerializer):
             'subtotal',
         ]
 
+    def get_producto_nombre(self, obj):
+        return str(obj.producto) if obj.producto else None
+
+    def get_usuario_nombre(self, obj):
+        return obj.usuario.get_full_name() if obj.usuario else None
+
     def get_subtotal(self, obj):
         if obj.producto and obj.cantidad:
             return float(obj.producto.precio) * obj.cantidad
-        return obj.subtotal if hasattr(obj, 'subtotal') else None
+        return None
 
 

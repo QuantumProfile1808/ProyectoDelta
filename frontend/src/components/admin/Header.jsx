@@ -1,3 +1,4 @@
+// src/components/admin/Header.jsx
 import React from "react";
 import { useLocation } from "react-router-dom";
 import usePerfilyProductos from "../hooks/usePerfilyProductos";
@@ -13,10 +14,9 @@ const PESTANIA_MAP = {
   tablaproductos: "Productos",
 };
 
-export default function Header() {
+export default function Header({ sidebarOpen }) {
   const location = useLocation();
   const { perfil, loading } = usePerfilyProductos();
-
   const sucursal = perfil?.sucursal?.localidad || "Sucursal";
 
   const getPestania = () => {
@@ -28,16 +28,24 @@ export default function Header() {
   if (loading) return null;
 
   return (
-    <header className="admin-header">
-      <button className="admin-header__back" title="Volver" onClick={() => window.history.back()}>
-        &#8592;
+    <header className={`admin-header ${sidebarOpen ? "compact" : "expanded"}`}>
+      <button
+        className="admin-header__back"
+        title="Volver"
+        onClick={() => window.history.back()}
+        aria-label="Volver"
+      >
+        ←
       </button>
+
       <div className="admin-header__title">
-        Sucursal:{sucursal} - {getPestania()}
+        {`Sucursal: ${sucursal} - ${getPestania()}`}
       </div>
+
       <div className="admin-header__icons">
-        <span className="admin-header__icon" title="Notificaciones">&#128276;</span>
-        <span className="admin-header__icon" title="Opciones">&#128196;</span>
+        {/* Ejemplo de iconos a la derecha */}
+        <span className="admin-header__icon" title="Notificaciones">🔔</span>
+        <span className="admin-header__icon" title="Perfil">👤</span>
       </div>
     </header>
   );

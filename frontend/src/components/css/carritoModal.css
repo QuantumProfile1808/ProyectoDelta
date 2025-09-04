@@ -18,16 +18,16 @@
   width: 95%;
   box-shadow: 0 4px 24px rgba(0,0,0,0.12);
   position: relative;
+
+  /* Nuevo: limitar altura y permitir scroll interno */
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-.modal-close {
-  position: absolute;
-  top: 0.7rem; right: 0.7rem;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #888;
+/* Nuevo: contenedor para scroll horizontal de la tabla */
+.table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .table-modal {
@@ -35,16 +35,40 @@
   border-collapse: collapse;
   margin: 1rem 0;
   font-size: 1rem;
+
+  /* Nuevo: columnas con ancho fijo */
+  table-layout: fixed;
 }
+
 .table-modal th, .table-modal td {
   border: 1px solid #e0e0e0;
   padding: 0.6rem;
   text-align: left;
   background: #fafbfc;
+  word-wrap: break-word; /* Nuevo: cortar palabras largas */
 }
+
 .table-modal th {
   background: #f2f2f2;
   font-weight: 600;
+}
+
+.table-modal .desc-cell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Nuevo: columnas numéricas más controladas */
+.table-modal th:nth-child(3),
+.table-modal td:nth-child(3),
+.table-modal th:nth-child(4),
+.table-modal td:nth-child(4) {
+  width: 120px;
+  text-align: right;
+  white-space: nowrap;
+  font-size: 0.9rem;
 }
 
 .modal-total {
@@ -91,6 +115,7 @@
   align-items: center;
   gap: 1rem;
   margin-top: 1.2rem;
+  flex-wrap: wrap;
 }
 .modal-buttons button {
   border-radius: 8px;
@@ -99,6 +124,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
+  min-width: 110px;
+  padding: 0.6rem 1rem;
+  text-align: center;
 }
 .modal-buttons .btn-cancel {
   background: #d32f2f;
