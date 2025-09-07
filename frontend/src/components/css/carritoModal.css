@@ -14,12 +14,11 @@
   background: #fff;
   padding: 2rem 1.5rem;
   border-radius: 12px;
-  max-width: 420px;
+  max-width: 640px;
   width: 95%;
   box-shadow: 0 4px 24px rgba(0,0,0,0.12);
   position: relative;
-
-  /* Nuevo: limitar altura y permitir scroll interno */
+  animation: fadeInModal 0.3s ease-out;
   max-height: 80vh;
   overflow-y: auto;
 }
@@ -45,7 +44,9 @@
   padding: 0.6rem;
   text-align: left;
   background: #fafbfc;
-  word-wrap: break-word; /* Nuevo: cortar palabras largas */
+  word-wrap: break-word;
+  vertical-align: middle;
+  border-radius: 4px;
 }
 
 .table-modal th {
@@ -54,7 +55,7 @@
 }
 
 .table-modal .desc-cell {
-  max-width: 200px;
+  max-width: 240px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -76,6 +77,14 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 1rem;
+}
+
+.table-modal th:nth-child(5),
+.table-modal td:nth-child(5) {
+  width: 120px;
+  text-align: right;
+  white-space: nowrap;
+  font-size: 0.9rem;
 }
 
 .payment-section { margin: 1.2rem 0 0.5rem 0; }
@@ -154,4 +163,18 @@
   text-align: center;
   font-size: 1.1rem;
   color: #388e3c;
+}
+.badge-descuento {
+  background-color: #1976d2;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+  display: inline-block;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }

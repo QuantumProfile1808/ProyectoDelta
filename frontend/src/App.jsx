@@ -14,6 +14,8 @@ import User from "./components/noadmin/User";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/admin/Header";
 import MenuDashboard from "./components/admin/menudashboard";
+import { useContext, useState } from 'react';
+import Promociones from './components/admin/promociones';
 
 function AdminLayout() {
   return (
@@ -52,6 +54,8 @@ function App() {
               <Route path="tablausuario" element={<TablaUsuario />} />
               <Route path="TablaProductos" element={<TablaProductos />} />
               <Route index element={<MenuDashboard />} />
+              <Route path="promociones" element={<Promociones />} />
+              
             </Route>
           </Route>
 

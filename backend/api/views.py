@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from rest_framework import viewsets
 from django.contrib.auth.models import User
-from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento
-from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer, MovimientoSerializer
+from .models import Perfil, Sucursal, Permiso, Categoria, Producto, Movimiento, Descuento
+from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, PermisoSerializer, CategoriaSerializer, ProductoSerializer, MovimientoSerializer, DescuentoSerializer
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -121,7 +121,16 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 
         movimiento = serializer.save()
 
+        # Actualizar stock según el tipo de movimiento
         if movimiento.tipo_de_movimiento == 'salida':
             producto.stock -= movimiento.cantidad
-            producto.save()
+        elif movimiento.tipo_de_movimiento == 'entrada':
+            producto.stock += movimiento.cantidad
 
+        producto.save()
+
+
+
+class DescuentoViewSet(viewsets.ModelViewSet):
+    queryset = Descuento.objects.all()
+    serializer_class = DescuentoSerializer

@@ -18,6 +18,11 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
   if (!isOpen) return null;
 
   const totalVenta = lineas.reduce((acc, item) => acc + item.lineTotal, 0);
+  const totalDescuento = lineas.reduce(
+    (acc, item) => acc + (item.descuentoAplicado || 0) * item.qty,
+    0
+  );
+
   const esEfectivo = metodoPago === "Efectivo";
   const recibido = parseFloat(montoRecibido) || 0;
 
@@ -55,6 +60,7 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
                 <th>Desc.</th>
                 <th>Cant.</th>
                 <th>Precio</th>
+                <th>Descuento</th>
                 <th>Total</th>
               </tr>
             </thead>
@@ -63,17 +69,25 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
                 <tr key={item.id}>
                   <td className="desc-cell" title={item.descripcion}>
                     {item.descripcion}
+                    {item.nombreDescuento && (
+                      <span className="badge-descuento">
+                        {item.nombreDescuento}
+                      </span>
+                    )}
                   </td>
                   <td>{item.qty}</td>
                   <td>
-                    $
-                    {item.unitPrice.toLocaleString("es-AR", {
+                    ${item.unitPrice.toLocaleString("es-AR", {
                       minimumFractionDigits: 2,
                     })}
                   </td>
                   <td>
-                    $
-                    {item.lineTotal.toLocaleString("es-AR", {
+                    {item.descuentoAplicado
+                      ? `-$${item.descuentoAplicado.toFixed(2)}`
+                      : "—"}
+                  </td>
+                  <td>
+                    ${item.lineTotal.toLocaleString("es-AR", {
                       minimumFractionDigits: 2,
                     })}
                   </td>
@@ -86,6 +100,12 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
         <div className="modal-total">
           Total: <strong>${totalVenta.toFixed(2)}</strong>
         </div>
+
+        {totalDescuento > 0 && (
+          <div className="modal-discount">
+            Descuentos aplicados: <strong>${totalDescuento.toFixed(2)}</strong>
+          </div>
+        )}
 
         <label>
           Forma de pago:

@@ -122,6 +122,13 @@ export const Historial = () => {
         <div>Realizada por: <b>{selected.usuario_nombre || "-"}</b></div>
         <div>Método de pago: <b>{selected.metodo_de_pago || "-"}</b></div>
         <div>Descripción: <b>{selected.descripcion}</b></div>
+        {selected.descuentos_aplicados && (
+          <div>
+            <div>Descuento aplicado: <b>{selected.descuentos_aplicados.nombre}</b></div>
+            <div>Tipo de descuento: <b>{selected.descuentos_aplicados.tipo}</b></div>
+          </div>
+)}
+        
       </div>
     </div>
   </div>

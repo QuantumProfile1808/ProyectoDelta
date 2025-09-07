@@ -3,6 +3,7 @@ import usePerfilyProductos from "../hooks/usePerfilyProductos";
 import useCategoriasNoadmin from "../hooks/useCategoriasNoadmin";
 import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
+import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 
 export default function User() {
   const { perfil, productos, loading, error } = usePerfilyProductos();
@@ -13,7 +14,8 @@ export default function User() {
   const [showModal, setShowModal] = useState(false);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
 
-  const lineas = prepararLineas();
+  const productosSeleccionados = prepararProductosSeleccionados();
+  const lineas = useDescuentosAplicados(productosSeleccionados);
 
   function toggleSelect(id) {
     setCarrito(prev => {
@@ -49,19 +51,17 @@ export default function User() {
 
   const totalItems = Object.values(carrito).reduce((sum, n) => sum + (n || 0), 0);
 
-  function prepararLineas() {
-    return Object.entries(carrito).map(([id, qty]) => {
-      const producto = productos.find(p => p.id === parseInt(id));
-      const precioUnitario = Number(producto.precio);
-      return {
-        id,
-        descripcion: producto.descripcion,
-        qty,
-        unitPrice: precioUnitario,
-        lineTotal: precioUnitario * qty
-      };
-    });
-  }
+  function prepararProductosSeleccionados() {
+  return Object.entries(carrito).map(([id, qty]) => {
+    const producto = productos.find(p => p.id === parseInt(id));
+    return {
+      id: producto.id,
+      descripcion: producto.descripcion,
+      precio: Number(producto.precio),
+      cantidad: qty
+    };
+  });
+}
 
   const grandTotal = lineas.reduce((sum, l) => sum + l.lineTotal, 0);
 
@@ -76,7 +76,8 @@ export default function User() {
       cantidad: l.qty,
       tipo_de_movimiento: "salida",
       metodo_de_pago: paymentMethod.toLowerCase(),
-      descripcion: `Venta de ${l.qty} unidad/es a $${l.unitPrice} c/u`,
+      descripcion: `Venta de ${l.qty} unidad/es a $${l.unitPrice} c/u` +
+      (l.descuentoAplicado ? ` con descuento de $${l.descuentoAplicado.toFixed(2)} por unidad` : ""),
       fecha,
       hora
     }));
@@ -203,15 +204,6 @@ export default function User() {
       disabled={grandTotal === 0}>
       🛒 Ver Carrito
     </button>
-
-    <CarritoModal
-      isOpen={showModal}
-      onClose={() => setShowModal(false)}
-      onConfirm={({ paymentMethod, amountReceived, change }) =>
-        handleConfirmSale({ paymentMethod, amountReceived, change })
-      }
-      lineas={lineas}
-    />
     </div>
 
       <CarritoModal

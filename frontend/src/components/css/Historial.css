@@ -156,3 +156,12 @@
   align-items: center;
   z-index: 998;
 }
+.badge-descuento {
+  background-color: #1976d2;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+  display: inline-block;
+}
