@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../components/css/Usuario.css";
 import { useSucursales } from "../hooks/useSucursales";
 import { usePermisos } from "../hooks/usePermisos";
+import "../css/inputs.css";
 
 const Usuarios = () => {
   const [form, setForm] = useState({
@@ -84,43 +85,63 @@ const Usuarios = () => {
 
   // Render form and page
   return (
-    <form className="form"onSubmit={handleSubmit}>
-      <div>
-        <label>DNI</label>
-        <input name="dni" value={form.dni} onChange={handleChange} required />
-        <label>Nombre</label>
-        <input name="first_name" value={form.first_name} onChange={handleChange} required />
-        <label>Apellido</label>
-        <input name="last_name" value={form.last_name} onChange={handleChange} required />
-        <label>
+    <form className="form" onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <label>
+            DNI
+            <input name="dni" value={form.dni} onChange={handleChange} required />
+          </label>
+
+          <label>
+            Nombre
+            <input name="first_name" value={form.first_name} onChange={handleChange} required />
+          </label>
+
+          <label>
+            Apellido
+            <input name="last_name" value={form.last_name} onChange={handleChange} required />
+          </label>
+
+          <label>
+            Usuario
+            <input name="username" value={form.username} onChange={handleChange} required />
+          </label>
+
+          <label>
+            Contraseña
+            <input name="password" type="password" value={form.password} onChange={handleChange} required />
+          </label>
+
+          <label>
+            Sucursal
+            <select name="sucursal" value={form.sucursal} onChange={handleChange} required>
+              <option value="">Seleccione una sucursal</option>
+              {sucursales.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.localidad} - {s.direccion}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <label className="checkbox-label">
           <input
             type="checkbox"
             name="is_staff"
             checked={form.is_staff}
             onChange={handleChange}
-          />¿Es administrador?</label>
-      </div>
+          />
+          ¿Es administrador?
+        </label>
 
-      <div>
-        <label>Usuario</label>
-        <input name="username" value={form.username} onChange={handleChange} required />
-        <label>Contraseña</label>
-        <input name="password" type="password" value={form.password} onChange={handleChange} required />
-        <label>Sucursal</label>
-        <select name="sucursal" value={form.sucursal} onChange={handleChange} required>
-          <option value="">Seleccione una sucursal</option>
-          {sucursales.map(s => (
-            <option key={s.id} value={s.id}>{s.localidad} - {s.direccion}</option>
-          ))}
-        </select>
-      </div>
-      
-      <div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Guardando..." : "Guardar"}
-        </button>
-      </div>
-    </form>
+        <div className="form-actions">
+          <button type="submit" disabled={loading}>
+            {loading ? "Guardando..." : "Guardar"}
+          </button>
+        </div>
+      </form>
+
   );
 };
 

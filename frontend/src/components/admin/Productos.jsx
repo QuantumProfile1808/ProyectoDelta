@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCategorias } from "../hooks/useCategorias";
 import { useSucursales } from "../hooks/useSucursales";
+import "../../components/css/Usuario.css";
 
 const Productos = () => {
   const [form, setForm] = useState({
@@ -59,62 +60,66 @@ const handleSubmit = async e => {
     <div>
       <h1>Productos</h1>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="descripcion"
-          placeholder="Descripción"
-          value={form.descripcion}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="precio"
-          placeholder="Precio"
-          value={form.precio}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="stock"
-          placeholder="Stock"
-          value={form.stock}
-          onChange={handleChange}
-        />
-        <select
-          name="sucursal"
-          value={form.sucursal}
-          onChange={handleChange}
-        >
-          <option value="">Seleccione una sucursal</option>
-          {sucursales.map(s => (
-            <option key={s.id} value={s.id}>
-              {s.localidad} - {s.direccion}
-            </option>
-          ))}
-        </select>
-        <select
-          name="categoria"
-          value={form.categoria}
-          onChange={handleChange}
-        >
-          <option value="">Seleccione una categoría</option>
-          {categorias.map(c => (
-            <option key={c.id} value={c.id}>
-              {c.descripcion}
-            </option>
-          ))}
-        </select>
-        <select
-          name="medicion"
-          value={form.medicion}
-          onChange={handleChange}
-        >
-          <option value="">Seleccione un tipo de medición</option>
-          <option value="false">Unidad</option>
-          <option value="true">KG</option>
-        </select>
+        <div className="form-grid">
+          <input
+            type="text"
+            name="descripcion"
+            placeholder="Descripción"
+            value={form.descripcion}
+            onChange={handleChange}
+          />
+          <input
+            type="number"
+            name="precio"
+            placeholder="Precio"
+            value={form.precio}
+            onChange={handleChange}
+          />
+          <input
+            type="number"
+            name="stock"
+            placeholder="Stock"
+            value={form.stock}
+            onChange={handleChange}
+          />
+          <select
+            name="sucursal"
+            value={form.sucursal}
+            onChange={handleChange}
+          >
+            <option value="">Seleccione una sucursal</option>
+            {sucursales.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.localidad} - {s.direccion}
+              </option>
+            ))}
+          </select>
+          <select
+            name="categoria"
+            value={form.categoria}
+            onChange={handleChange}
+          >
+            <option value="">Seleccione una categoría</option>
+            {categorias.map(c => (
+              <option key={c.id} value={c.id}>
+                {c.descripcion}
+              </option>
+            ))}
+          </select>
+          <select
+            name="medicion"
+            value={form.medicion}
+            onChange={handleChange}
+          >
+            <option value="">Seleccione un tipo de medición</option>
+            <option value="false">Unidad</option>
+            <option value="true">KG</option>
+          </select>
+        </div>
+
         <button type="submit">Crear Producto</button>
       </form>
+
     </div>
   );
 };

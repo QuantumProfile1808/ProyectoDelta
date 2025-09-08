@@ -12,59 +12,55 @@ const EditUserModal = ({ show, onClose, onSubmit, formValues, onChange }) => {
         <h3>Editar usuario</h3>
         <p>¿Qué deseas editar del usuario?</p>
         <form onSubmit={onSubmit}>
-          <label>
-            DNI
-            <input
-              type="text"
-              value={formValues.dni}
-              onChange={e => onChange({ ...formValues, dni: e.target.value })}
-            />
-          </label>
+          <div className="form-grid">
+            <label>
+              DNI
+              <input
+                type="text"
+                value={formValues.dni}
+                onChange={e => onChange({ ...formValues, dni: e.target.value })}
+              />
+            </label>
 
-          <label>
-            Nombre
-            <input
-              type="text"
-              value={formValues.first_name}
-              onChange={e =>
-                onChange({ ...formValues, first_name: e.target.value })
-              }
-            />
-          </label>
+            <label>
+              Nombre
+              <input
+                type="text"
+                value={formValues.first_name}
+                onChange={e => onChange({ ...formValues, first_name: e.target.value })}
+              />
+            </label>
 
-          <label>
-            Apellido
-            <input
-              type="text"
-              value={formValues.last_name}
-              onChange={e =>
-                onChange({ ...formValues, last_name: e.target.value })
-              }
-            />
-          </label>
+            <label>
+              Apellido
+              <input
+                type="text"
+                value={formValues.last_name}
+                onChange={e => onChange({ ...formValues, last_name: e.target.value })}
+              />
+            </label>
 
-          <label>
-            Usuario
-            <input
-              type="text"
-              value={formValues.username}
-              onChange={e =>
-                onChange({ ...formValues, username: e.target.value })
-              }
-            />
-          </label>
+            <label>
+              Usuario
+              <input
+                type="text"
+                value={formValues.username}
+                onChange={e => onChange({ ...formValues, username: e.target.value })}
+              />
+            </label>
 
-          <label>
-            Rol
-            <select
-              value={formValues.role}
-              onChange={e => onChange({ ...formValues, role: e.target.value })}
-            >
-              <option value="">Selecciona un rol</option>
-              <option value="usuario">Usuario</option>
-              <option value="administrador">Administrador</option>
-            </select>
-          </label>
+            <label>
+              Rol
+              <select
+                value={formValues.role}
+                onChange={e => onChange({ ...formValues, role: e.target.value })}
+              >
+                <option value="">Selecciona un rol</option>
+                <option value="usuario">Usuario</option>
+                <option value="administrador">Administrador</option>
+              </select>
+            </label>
+          </div>
 
           <div className="modal-buttons edit-modal-buttons">
             <button type="button" className="btn-cancel" onClick={onClose}>

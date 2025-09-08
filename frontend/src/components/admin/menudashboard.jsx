@@ -36,55 +36,59 @@ import { useDashboardData } from "../hooks/useDashboardData";
   const sinStock = productos.filter(p => p.stock === 0).length;
   const bajoStock = productos.filter(p => p.stock > 0 && p.stock < 5).length;
 
-  return (
-    <div className="grid">
-      {/* Últimos movimientos */}
-      <section className="card">
-        <h3>Últimos Movimientos</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Usuario</th>
-              <th>Tipo</th>
-              <th>Producto</th>
-              <th>Cant</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ultimosMovimientos.map((m, i) => (
-              <tr key={i}>
-                <td>{m.fecha}</td>
-                <td>{m.usuario}</td>
-                <td>{m.tipo_de_movimiento}</td>
-                <td>{m.producto}</td>
-                <td>{m.cantidad}</td>
+return (
+  <div className="menu-dashboard">
+    <div className="dashboard-content">
+      <div className="grid">
+        {/* Últimos movimientos */}
+        <section className="card">
+          <h3>Últimos Movimientos</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+                <th>Producto</th>
+                <th>Cant</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+            </thead>
+            <tbody>
+              {ultimosMovimientos.map((m, i) => (
+                <tr key={i}>
+                  <td>{m.fecha}</td>
+                  <td>{m.usuario}</td>
+                  <td>{m.tipo_de_movimiento}</td>
+                  <td>{m.producto}</td>
+                  <td>{m.cantidad}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
 
-      {/* Ganancia del mes */}
-      <section className="card">
-        <h3>Ganancia del mes</h3>
-        <p>${gananciaMes.toFixed(2)}</p>
-      </section>
+        {/* Ganancia del mes */}
+        <section className="card">
+          <h3>Ganancia del mes</h3>
+          <p>${gananciaMes.toFixed(2)}</p>
+        </section>
 
-      {/* Informes ventas */}
-      <section className="card">
-        <h3>Informes ventas</h3>
-        <p>Hoy: {ventasHoy} productos</p>
-        <p>Semana: {ventasSemana} productos</p>
-        <p>Mes: {ventasMes} productos</p>
-      </section>
+        {/* Informes ventas */}
+        <section className="card">
+          <h3>Informes ventas</h3>
+          <p>Hoy: {ventasHoy} productos</p>
+          <p>Semana: {ventasSemana} productos</p>
+          <p>Mes: {ventasMes} productos</p>
+        </section>
 
-      {/* Avisos stock */}
-      <section className="card">
-        <h3>Avisos Stock</h3>
-        <p>Sin stock: {sinStock}</p>
-        <p>Bajo stock: {bajoStock}</p>
-      </section>
+        {/* Avisos stock */}
+        <section className="card">
+          <h3>Avisos Stock</h3>
+          <p>Sin stock: {sinStock}</p>
+          <p>Bajo stock: {bajoStock}</p>
+        </section>
+      </div>
     </div>
-  );
+  </div>
+);
 }

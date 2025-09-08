@@ -5,6 +5,7 @@ import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 import Header from "../../components/admin/Header";
+import "../css/inputs.css";
 
 export default function User() {
   const { perfil, productos, loading, error } = usePerfilyProductos();

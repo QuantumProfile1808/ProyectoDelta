@@ -146,17 +146,13 @@ const TablaUsuarios = () => {
                 </label>
               </td>
               <td className="tabla-acciones">
-                <button
-                  className="boton-editar"
-                  onClick={() => openEditModal(u)}
-                >
+                <button className="boton-editar" onClick={() => openEditModal(u)}>
                   <FaEdit />
                 </button>
                 {u.user.is_staff && (
-                  <FaUserShield
-                    className="icono-admin"
-                    title="Administrador"
-                  />
+                  <span className="icono-admin" title="Administrador">
+                    <FaUserShield />
+                  </span>
                 )}
               </td>
             </tr>
