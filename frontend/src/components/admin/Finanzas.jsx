@@ -59,8 +59,6 @@ function ResumenFinanzas() {
     const balance = lista.reduce((acc, m) => acc + (m.subtotal || 0), 0);
     return { ventas, balance };
   };
-
-  // Definimos el orden y los nombres personalizados
   const orden = [
     { key: "dia", label: "Día" },
     { key: "semana", label: "Semana" },

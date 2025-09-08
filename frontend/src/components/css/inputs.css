@@ -1,0 +1,103 @@
+/* Etiquetas */
+label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Inputs y selects */
+input,
+select {
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #000;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #555;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  appearance: none; /* quita el estilo nativo del select */
+}
+
+/* Focus visual */
+input:focus,
+select:focus {
+  border-color: #d21919;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(210, 25, 25, 0.2);
+  outline: none;
+}
+
+/* Placeholder (solo aplica a inputs) */
+input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Flecha personalizada para select (opcional) */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg fill='333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px; /* espacio para la flecha */
+}
+/* Estilo base del contenedor */
+.react-select__control {
+  border: 1.5px solid #000;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #555;
+  font-size: 1rem;
+  padding: 4px 8px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus visual */
+.react-select__control--is-focused {
+  border-color: #d21919;
+  box-shadow: 0 0 0 3px rgba(210, 25, 25, 0.2);
+}
+
+/* Input interno */
+.react-select__input input {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Placeholder */
+.react-select__placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Opciones del menú */
+.react-select__option {
+  font-size: 0.95rem;
+  padding: 10px 14px;
+}
+
+/* Valor seleccionado */
+.react-select__multi-value {
+  background-color: #f0f0f0;
+  border-radius: 12px;
+}
+
+.react-select__multi-value__label {
+  color: #333;
+}
+
+.react-select__multi-value__remove {
+  color: #d21919;
+}
+.react-select__multi-value__remove:hover {
+  background-color: #ffdada;
+  color: #a00;
+}

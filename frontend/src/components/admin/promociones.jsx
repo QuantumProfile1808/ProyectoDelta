@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import "../css/Promociones.css";
+import "../css/inputs.css";
+
 
 
 export default function promociones() {
@@ -132,15 +134,17 @@ export default function promociones() {
           />
         </>
       )}
-
-      <label style={{ marginTop: 10 }}>Productos aplicables:</label>
-      <Select
-        isMulti
-        options={productosDisponibles}
-        value={form.productos}
-        onChange={(selected) => setForm({ ...form, productos: selected })}
-        placeholder="Buscar productos..."
-      />
+        <label style={{ marginTop: 10 }}>Productos aplicables:</label>
+        <div className="select-wrapper">
+          <Select
+            isMulti
+            options={productosDisponibles}
+            value={form.productos}
+            onChange={(selected) => setForm({ ...form, productos: selected })}
+            placeholder="Buscar productos..."
+            classNamePrefix="react-select"
+          />
+        </div>
 
       <button type="submit" disabled={loading}>
         {loading ? "Guardando..." : "Guardar descuento"}

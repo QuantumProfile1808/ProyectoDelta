@@ -14,7 +14,9 @@ router.register(r'movimiento', MovimientoViewSet)
 router.register(r'descuento', DescuentoViewSet)
 
 
+
 urlpatterns = [
     path('', home, name='home'),  # Si tienes una vista de inicio
     path('api/', include(router.urls)),  # Incluye las URLs del enrutador
+    
 ]

@@ -1,8 +1,4 @@
-:root {
-  --card-bg: #f5f5f5;
-  --card-radius: 8px;
-  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+
 
 .user-container {
   max-width: 1200px;

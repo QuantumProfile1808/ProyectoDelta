@@ -3,6 +3,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import usePerfilyProductos from "../hooks/usePerfilyProductos";
 import "../css/Header.css";
+import { FaArrowLeft } from "react-icons/fa"; // ⬅️ Ícono moderno
 
 const PESTANIA_MAP = {
   "": "Inicio",
@@ -12,6 +13,8 @@ const PESTANIA_MAP = {
   usuarios: "Usuarios",
   tablausuario: "Usuarios",
   tablaproductos: "Productos",
+  promociones: "Promociones",
+  User: "Usuarios"
 };
 
 export default function Header({ sidebarOpen }) {
@@ -30,12 +33,12 @@ export default function Header({ sidebarOpen }) {
   return (
     <header className={`admin-header ${sidebarOpen ? "compact" : "expanded"}`}>
       <button
-        className="admin-header__back"
+        className="stylish-back-btn"
         title="Volver"
         onClick={() => window.history.back()}
         aria-label="Volver"
       >
-        ←
+        <FaArrowLeft />
       </button>
 
       <div className="admin-header__title">
@@ -43,9 +46,8 @@ export default function Header({ sidebarOpen }) {
       </div>
 
       <div className="admin-header__icons">
-        {/* Ejemplo de iconos a la derecha */}
-        <span className="admin-header__icon" title="Notificaciones">🔔</span>
-        <span className="admin-header__icon" title="Perfil">👤</span>
+        <span className="admin-header__icon" title="Notificaciones"></span>
+        <span className="admin-header__icon" title="Perfil"></span>
       </div>
     </header>
   );

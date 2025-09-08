@@ -84,7 +84,7 @@ const Usuarios = () => {
 
   // Render form and page
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="form"onSubmit={handleSubmit}>
       <div>
         <label>DNI</label>
         <input name="dni" value={form.dni} onChange={handleChange} required />

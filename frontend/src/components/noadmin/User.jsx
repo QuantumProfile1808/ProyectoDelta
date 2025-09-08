@@ -4,6 +4,7 @@ import useCategoriasNoadmin from "../hooks/useCategoriasNoadmin";
 import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
+import Header from "../../components/admin/Header";
 
 export default function User() {
   const { perfil, productos, loading, error } = usePerfilyProductos();
@@ -125,29 +126,30 @@ export default function User() {
   }
 
   return (
+
     <div className="user-container">
+      <Header />
       <h1>
-        Bienvenido, {perfil.user.first_name} — Sucursal: {perfil.sucursal.localidad}
       </h1>
     <div className="user-card">
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Buscar…"
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-        <select
-          className="search-select"
-          value={categoriaSeleccionada}
-          onChange={e => setCategoriaSeleccionada(e.target.value)}>
-          <option value="">Todas las categorías</option>
-          {categorias.map(c => (
-            <option key={c.id} value={c.id}>
-              {c.descripcion}
-            </option>
-          ))}
-        </select>
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Buscar…"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+          <select
+            className="search-select"
+            value={categoriaSeleccionada}
+            onChange={e => setCategoriaSeleccionada(e.target.value)}>
+            <option value="">Todas las categorías</option>
+            {categorias.map(c => (
+              <option key={c.id} value={c.id}>
+                {c.descripcion}
+              </option>
+            ))}
+          </select>
       </div>
 
       <table className="product-table">
@@ -198,14 +200,6 @@ export default function User() {
         </tbody>
       </table>
 
-      <button
-      className="cart-btn-floating"
-      onClick={() => setShowModal(true)}
-      disabled={grandTotal === 0}>
-      🛒 Ver Carrito
-    </button>
-    </div>
-
       <CarritoModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -214,6 +208,23 @@ export default function User() {
         }
         lineas={lineas}
       />
+
+        <footer className="user-footer">
+          <div className="footer-buttons">
+            <button className="refresh-btn" onClick={() => window.location.reload()}>
+              ⟳
+            </button>
+            <button
+              className="cart-btn-footer"
+              onClick={() => setShowModal(true)}
+              disabled={grandTotal === 0}
+            >
+              🛒 Ver Carrito
+            </button>
+          </div>
+        </footer>
     </div>
+    </div>
+    
   );
 }
