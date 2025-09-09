@@ -33,7 +33,7 @@ export default function Header({ sidebarOpen }) {
   return (
     <header className={`admin-header ${sidebarOpen ? "compact" : "expanded"}`}>
       <button
-        className="stylish-back-btn"
+        className="admin-header__back"
         title="Volver"
         onClick={() => window.history.back()}
         aria-label="Volver"

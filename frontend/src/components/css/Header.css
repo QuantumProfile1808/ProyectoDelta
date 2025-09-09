@@ -1,5 +1,9 @@
 /* src/css/Header.css */
 
+root {
+  background-color: #0080ff;
+}
+
 .admin-header {
   position: fixed;
   top: 0;
@@ -114,3 +118,4 @@
 .stylish-back-btn:hover {
   background-color: #c62828;
 }
+

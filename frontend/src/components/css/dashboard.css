@@ -1,3 +1,5 @@
+
+
 .dashboard-container {
 display: flex;
 min-height: 100vh;
@@ -123,6 +125,7 @@ align-items: center;
 justify-content: flex-start;
 padding: 0 18px;
 margin-bottom: 10px;
+margin-left: 80px;
 }
 
 .sidebar-logout{

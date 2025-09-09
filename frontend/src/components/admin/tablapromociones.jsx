@@ -4,9 +4,11 @@ import { FaPlus } from "react-icons/fa";
 import "../../components/css/promociones.css";
 
 export const ListaPromociones = () => {
-  const [todas, setTodas] = useState([]); // todas las promociones desde el backend
+  const [todas, setTodas] = useState([]);
   const [selected, setSelected] = useState(null);
   const [mostrarInactivas, setMostrarInactivas] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const navigate = useNavigate();
 
   const cargarPromociones = useCallback(async () => {
@@ -15,6 +17,7 @@ export const ListaPromociones = () => {
       const data = await res.json();
       const lista = Array.isArray(data) ? data : data.results || [];
       setTodas(lista);
+      setCurrentPage(1);
     } catch (err) {
       console.error("Error cargando promociones:", err);
     }
@@ -22,12 +25,17 @@ export const ListaPromociones = () => {
 
   useEffect(() => {
     cargarPromociones();
-  }, [cargarPromociones]);
+    setCurrentPage(1);
+  }, [cargarPromociones, mostrarInactivas]);
 
-  // Filtrado en memoria según el toggle
-  const descuentos = todas.filter(d =>
+  const descuentosFiltrados = todas.filter(d =>
     mostrarInactivas ? d.activo === false : d.activo === true
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const descuentosPaginados = descuentosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(descuentosFiltrados.length / itemsPerPage);
 
   const toggleActivo = async (id, curr) => {
     const nuevo = !curr;
@@ -38,7 +46,7 @@ export const ListaPromociones = () => {
         body: JSON.stringify({ activo: nuevo }),
       });
       if (!res.ok) throw new Error("Error al actualizar estado");
-      await cargarPromociones(); // refrescamos todas para mantener coherencia
+      await cargarPromociones();
     } catch (err) {
       console.error(err);
     }
@@ -46,16 +54,32 @@ export const ListaPromociones = () => {
 
   return (
     <div className="historial-container">
-        <div className="historial-header">
-            <button
-            onClick={() => setMostrarInactivas(prev => !prev)}
-            className="btn-toggle"
-            >
-            {mostrarInactivas ? "Mostrar activas" : "Mostrar inactivas"}
-            </button>
-            <h2>Promociones</h2>
-    </div>
+      <div className="historial-header">
+        <button
+          onClick={() => setMostrarInactivas(prev => !prev)}
+          className="btn-toggle"
+        >
+          {mostrarInactivas ? "Mostrar activas" : "Mostrar inactivas"}
+        </button>
+        <h2>Promociones</h2>
+      </div>
 
+      {/* 🔢 Paginación arriba */}
+      <div className="pagination">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </button>
+        <span>Página {currentPage} de {totalPages}</span>
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Siguiente
+        </button>
+      </div>
 
       <table className="historial-table">
         <thead>
@@ -66,42 +90,44 @@ export const ListaPromociones = () => {
             <th>Etiqueta</th>
           </tr>
         </thead>
-      <tbody>
-        {descuentos.map((d) => (
+        <tbody>
+          {descuentosPaginados.map((d) => (
             <tr key={d.id} className={selected?.id === d.id ? "selected-row" : ""}>
-            <td onClick={() => setSelected(d)} title="Ver detalles">
-                {d.nombre}
-            </td>
-            <td onClick={() => setSelected(d)}>{d.tipo}</td>
-            <td>
+              <td onClick={() => setSelected(d)} title="Ver detalles">{d.nombre}</td>
+              <td onClick={() => setSelected(d)}>{d.tipo}</td>
+              <td>
                 <label className="switch" onClick={(e) => e.stopPropagation()}>
-                <input
+                  <input
                     type="checkbox"
                     checked={d.activo}
                     onChange={(e) => {
-                    e.stopPropagation();
-                    toggleActivo(d.id, d.activo);
+                      e.stopPropagation();
+                      toggleActivo(d.id, d.activo);
                     }}
-                />
-                <span className="slider round"></span>
+                  />
+                  <span className="slider round"></span>
                 </label>
-            </td>
-            <td>
+              </td>
+              <td>
                 <span
-                style={{ color: d.activo ? "green" : "red", cursor: "pointer" }}
-                onClick={() => setSelected(d)}
+                  style={{ color: d.activo ? "green" : "red", cursor: "pointer" }}
+                  onClick={() => setSelected(d)}
                 >
-                {d.activo ? "Activa" : "Inactiva"}
+                  {d.activo ? "Activa" : "Inactiva"}
                 </span>
-            </td>
+              </td>
             </tr>
-        ))}
+          ))}
         </tbody>
       </table>
 
       {selected && (
         <div className="historial-overlay" onClick={() => setSelected(null)}>
-          <div className="historial-popup" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="historial-popup"
+            onClick={(e) => e.stopPropagation()}
+            style={{ transform: "translate(-50%, -52%)" }} // 👈 sube el modal
+          >
             <div className="historial-popup-header">
               <strong>Detalles de la promoción</strong>
               <button
@@ -112,30 +138,47 @@ export const ListaPromociones = () => {
                 &#10006;
               </button>
             </div>
+
             <div className="historial-popup-details">
-              <div>ID: <b>{selected.id}</b></div>
-              <div>Nombre: <b>{selected.nombre}</b></div>
-              <div>Tipo: <b>{selected.tipo}</b></div>
+              <div><b>ID:</b> {selected.id}</div>
+              <div><b>Nombre:</b> {selected.nombre}</div>
+              <div><b>Tipo:</b> {selected.tipo}</div>
+
               {selected.tipo === "PORCENTAJE" && (
-                <div>Porcentaje: <b>{selected.porcentaje ?? "-"}</b></div>
+                <div><b>Porcentaje:</b> {selected.porcentaje ?? "-"}</div>
               )}
+
               {selected.tipo === "PRECIO_FIJO" && (
-                <div>Precio fijo: <b>{selected.precio_fijo ?? "-"}</b></div>
+                <div><b>Precio fijo:</b> ${selected.precio_fijo ?? "-"}</div>
               )}
+
               {selected.tipo === "CANTIDAD" && (
                 <>
-                  <div>Cantidad requerida: <b>{selected.cantidad_requerida ?? "-"}</b></div>
-                  <div>Cantidad pagada: <b>{selected.cantidad_pagada ?? "-"}</b></div>
+                  <div><b>Promoción:</b> Llevás {selected.cantidad_requerida} y pagás {selected.cantidad_pagada}</div>
+                  <div><b>Items incluidos:</b></div>
+                  <ul style={{ paddingLeft: "1.2rem", marginBottom: "1rem" }}>
+                    {Array.isArray(selected.items) && selected.items.length > 0 ? (
+                      selected.items.map(item => (
+                        <li key={item.id}>
+                          {item.descripcion} (ID producto: {item.producto}, cantidad: {item.cantidad})
+                        </li>
+                      ))
+                    ) : (
+                      <li>No hay items asignados</li>
+                    )}
+                  </ul>
                 </>
               )}
-              <div>Estado: <b style={{ color: selected.activo ? "green" : "red" }}>
+
+              <div><b>Estado:</b> <span style={{ color: selected.activo ? "green" : "red" }}>
                 {selected.activo ? "Activa" : "Inactiva"}
-              </b></div>
-              <div>Productos aplicables: <b>
-                {Array.isArray(selected.productos) && selected.productos.length > 0
+              </span></div>
+
+              <div><b>Productos aplicables:</b> {
+                Array.isArray(selected.productos) && selected.productos.length > 0
                   ? selected.productos.join(", ")
-                  : "No asignados"}
-              </b></div>
+                  : "No asignados"
+              }</div>
             </div>
           </div>
         </div>

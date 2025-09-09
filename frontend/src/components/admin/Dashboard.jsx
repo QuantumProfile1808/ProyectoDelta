@@ -64,8 +64,7 @@ export const Dashboard = () => {
       <main className="dashboard-content">
         {isDashboardRoot && (
           <div className="dashboard-welcome">
-            <h1>Bienvenido al Dashboard</h1>
-            <p>Selecciona una opción del menú para comenzar.</p>
+            <h1><center>Bienvenido al Dashboard</center></h1>
           </div>
         )}
         <Outlet />

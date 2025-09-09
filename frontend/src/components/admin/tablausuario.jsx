@@ -6,9 +6,7 @@ import "../../components/css/TablaUsuario.css";
 import { usePerfiles } from "../hooks/usePerfiles";
 
 const TablaUsuarios = () => {
-  // Usamos el hook que devuelve perfiles y el setter para actualizarlos
   const [perfiles, setPerfiles] = usePerfiles();
-
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [formValues, setFormValues] = useState({
@@ -20,20 +18,25 @@ const TablaUsuarios = () => {
     role: ""
   });
 
+  // 🔢 Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const perfilesPaginados = perfiles.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(perfiles.length / itemsPerPage);
+
   const toggleActivo = async (userId, curr) => {
     const nuevo = !curr;
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/users/${userId}/`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ is_active: nuevo })
-        }
-      );
+      const res = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: nuevo })
+      });
       if (!res.ok) throw new Error("Patch falló");
 
-      // Actualizamos el estado local para reflejar el cambio
       setPerfiles(prev =>
         prev.map(u =>
           u.user.id === userId
@@ -46,7 +49,6 @@ const TablaUsuarios = () => {
     }
   };
 
-  // Abre modal para editar usuario
   const openEditModal = userObj => {
     setSelectedUser(userObj);
     setFormValues({
@@ -60,7 +62,6 @@ const TablaUsuarios = () => {
     setShowModal(true);
   };
 
-  // Maneja el submit de edición
   const handleSubmit = async e => {
     e.preventDefault();
     if (!selectedUser) return;
@@ -73,14 +74,11 @@ const TablaUsuarios = () => {
     };
 
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/users/${selectedUser.user.id}/`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }
-      );
+      const res = await fetch(`http://127.0.0.1:8000/api/users/${selectedUser.user.id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
       if (!res.ok) throw new Error("Falló la edición");
       const updated = await res.json();
 
@@ -116,7 +114,7 @@ const TablaUsuarios = () => {
           </tr>
         </thead>
         <tbody>
-          {perfiles.map(u => (
+          {perfilesPaginados.map(u => (
             <tr key={u.id}>
               <td>{u.dni || "-"}</td>
               <td className={u.user.is_active ? "" : "texto-inactivo"}>
@@ -159,6 +157,23 @@ const TablaUsuarios = () => {
           ))}
         </tbody>
       </table>
+
+      {/* 🔢 Controles de paginación estilo TablaProductos */}
+      <div className="pagination">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </button>
+        <span>Página {currentPage} de {totalPages}</span>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Siguiente
+        </button>
+      </div>
 
       <Link to="/dashboard/usuarios" className="fab-boton">
         <FaPlus />

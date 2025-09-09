@@ -70,6 +70,7 @@
 .user-card {
   background: var(--card-bg);
   border-radius: var(--card-radius);
+  border-radius: 16px;
   box-shadow: var(--card-shadow);
   padding: 20px;
   margin: 20px auto;
@@ -87,7 +88,7 @@
 
 .user-card .product-table th,
 .user-card .product-table td {
-  padding: 12px;
+  padding: 0px;
   border: 1px solid #ddd;
 }
 
@@ -172,3 +173,4 @@
   cursor: not-allowed;
   opacity: 0.7;
 }
+

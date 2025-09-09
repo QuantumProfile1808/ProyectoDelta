@@ -5,7 +5,6 @@ import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 import Header from "../../components/admin/Header";
-import "../css/inputs.css";
 
 export default function User() {
   const { perfil, productos, loading, error } = usePerfilyProductos();
@@ -15,6 +14,10 @@ export default function User() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
+
+  // 🔢 Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const productosSeleccionados = prepararProductosSeleccionados();
   const lineas = useDescuentosAplicados(productosSeleccionados);
@@ -29,14 +32,14 @@ export default function User() {
   }
 
   function handleQtyChange(id, e) {
-  const value = e.target.value;
-  const qty = parseInt(value, 10);
+    const value = e.target.value;
+    const qty = parseInt(value, 10);
 
-  setCarrito(prev => ({
-    ...prev,
-    [id]: value === "" ? "" : (qty > 0 ? qty : undefined)
-  }));
-}
+    setCarrito(prev => ({
+      ...prev,
+      [id]: value === "" ? "" : (qty > 0 ? qty : undefined)
+    }));
+  }
 
   if (loading) return <p>Cargando…</p>;
   if (error) return <p>Error: {error}</p>;
@@ -51,19 +54,25 @@ export default function User() {
     return coincideTexto && coincideCategoria;
   });
 
+  // 🔢 Lógica de paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const productosPaginados = productosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
+
   const totalItems = Object.values(carrito).reduce((sum, n) => sum + (n || 0), 0);
 
   function prepararProductosSeleccionados() {
-  return Object.entries(carrito).map(([id, qty]) => {
-    const producto = productos.find(p => p.id === parseInt(id));
-    return {
-      id: producto.id,
-      descripcion: producto.descripcion,
-      precio: Number(producto.precio),
-      cantidad: qty
-    };
-  });
-}
+    return Object.entries(carrito).map(([id, qty]) => {
+      const producto = productos.find(p => p.id === parseInt(id));
+      return {
+        id: producto.id,
+        descripcion: producto.descripcion,
+        precio: Number(producto.precio),
+        cantidad: qty
+      };
+    });
+  }
 
   const grandTotal = lineas.reduce((sum, l) => sum + l.lineTotal, 0);
 
@@ -79,7 +88,7 @@ export default function User() {
       tipo_de_movimiento: "salida",
       metodo_de_pago: paymentMethod.toLowerCase(),
       descripcion: `Venta de ${l.qty} unidad/es a $${l.unitPrice} c/u` +
-      (l.descuentoAplicado ? ` con descuento de $${l.descuentoAplicado.toFixed(2)} por unidad` : ""),
+        (l.descuentoAplicado ? ` con descuento de $${l.descuentoAplicado.toFixed(2)} por unidad` : ""),
       fecha,
       hora
     }));
@@ -127,12 +136,9 @@ export default function User() {
   }
 
   return (
-
     <div className="user-container">
       <Header />
-      <h1>
-      </h1>
-    <div className="user-card">
+      <div className="user-card">
         <div className="search-container">
           <input
             type="text"
@@ -143,7 +149,8 @@ export default function User() {
           <select
             className="search-select"
             value={categoriaSeleccionada}
-            onChange={e => setCategoriaSeleccionada(e.target.value)}>
+            onChange={e => setCategoriaSeleccionada(e.target.value)}
+          >
             <option value="">Todas las categorías</option>
             {categorias.map(c => (
               <option key={c.id} value={c.id}>
@@ -151,64 +158,85 @@ export default function User() {
               </option>
             ))}
           </select>
-      </div>
+        </div>
 
-      <table className="product-table">
-        <thead>
-          <tr>
-            <th>Sel</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th>Categoría</th>
-            <th>Cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productosFiltrados.map(p => {
-            const qty = carrito[p.id] || "";
-            const catObj = categorias.find(c => c.id === p.categoria);
-            return (
-              <tr key={p.id} className={carrito[p.id] ? "selected-row" : ""}>
-                <td>
-                  <label className="switch">
+        <table className="product-table">
+          <thead>
+            <tr>
+              <th>Sel</th>
+              <th>Descripción</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Categoría</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {productosPaginados.map(p => {
+              const qty = carrito[p.id] || "";
+              const catObj = categorias.find(c => c.id === p.categoria);
+              return (
+                <tr key={p.id} className={carrito[p.id] ? "selected-row" : ""}>
+                  <td>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={carrito[p.id] !== undefined && carrito[p.id] !== ""}
+                        onChange={() => toggleSelect(p.id)}
+                        disabled={p.stock === 0}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </td>
+                  <td>{p.descripcion}</td>
+                  <td>${p.precio}</td>
+                  <td>{p.stock}</td>
+                  <td>{catObj ? catObj.descripcion : "—"}</td>
+                  <td>
                     <input
-                      type="checkbox"
-                      checked={!!carrito[p.id]}
-                      onChange={() => toggleSelect(p.id)}
-                      disabled={p.stock === 0}
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </td>
-                <td>{p.descripcion}</td>
-                <td>${p.precio}</td>
-                <td>{p.stock}</td>
-                <td>{catObj ? catObj.descripcion : "—"}</td>
-                <td>
-                  <input
                       type="number"
                       min="1"
                       max={p.stock}
-                      value={carrito[p.id] === undefined ? "" : carrito[p.id]}
+                      value={
+                        carrito[p.id] !== undefined && carrito[p.id] !== ""
+                          ? carrito[p.id]
+                          : ""
+                      }
                       onChange={e => handleQtyChange(p.id, e)}
-                      disabled={!carrito[p.id] && carrito[p.id] !== ""}
+                      disabled={carrito[p.id] === undefined || carrito[p.id] === ""}
                     />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
-      <CarritoModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onConfirm={({ paymentMethod, amountReceived, change }) =>
-          handleConfirmSale({ paymentMethod, amountReceived, change })
-        }
-        lineas={lineas}
-      />
+        {/* 🔢 Controles de paginación */}
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </div>
+
+        <CarritoModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onConfirm={({ paymentMethod, amountReceived, change }) =>
+            handleConfirmSale({ paymentMethod, amountReceived, change })
+          }
+          lineas={lineas}
+        />
 
         <footer className="user-footer">
           <div className="footer-buttons">
@@ -224,8 +252,7 @@ export default function User() {
             </button>
           </div>
         </footer>
+      </div>
     </div>
-    </div>
-    
   );
 }

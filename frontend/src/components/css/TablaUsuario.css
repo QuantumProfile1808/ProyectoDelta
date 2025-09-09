@@ -23,7 +23,7 @@
 }
 
 .tabla-usuarios td {
-  padding: 12px;
+  padding: 1px;
   border-bottom: 1px solid #eee;
 }
 
@@ -203,3 +203,4 @@ input:checked + .slider:before {
   background: #2ecc71;
   color: #fff;
 }
+
