@@ -18,7 +18,6 @@ const TablaUsuarios = () => {
     role: ""
   });
 
-  // 🔢 Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -97,43 +96,42 @@ const TablaUsuarios = () => {
   };
 
   return (
-    <div className="tabla-container">
-      <h2 className="tabla-titulo">Gestión de Usuarios</h2>
+    <div className="historial-container">
+      <h2>Gestión de Usuarios</h2>
 
-      <table className="tabla-usuarios">
-        <thead>
-          <tr>
-            <th>DNI</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Usuario</th>
-            <th>Rol</th>
-            <th>Sucursal</th>
-            <th>Activo</th>
-            <th>Acciones</th>
+      <table className="historial-tabla">
+        <thead className="historial-tabla-encabezado">
+          <tr className="historial-fila-encabezado">
+            <th className="historial-columna">DNI</th>
+            <th className="historial-columna">Nombre</th>
+            <th className="historial-columna">Apellido</th>
+            <th className="historial-columna">Usuario</th>
+            <th className="historial-columna">Rol</th>
+            <th className="historial-columna">Sucursal</th>
+            <th className="historial-columna">Activo</th>
+            <th className="historial-columna">Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="historial-tabla-cuerpo">
           {perfilesPaginados.map(u => (
-            <tr key={u.id}>
-              <td>{u.dni || "-"}</td>
-              <td className={u.user.is_active ? "" : "texto-inactivo"}>
+            <tr key={u.id} className="historial-fila">
+              <td className="historial-celda">{u.dni || "-"}</td>
+              <td className={`historial-celda ${u.user.is_active ? "" : "texto-inactivo"}`}>
                 {u.user.first_name || "-"}
               </td>
-              <td className={u.user.is_active ? "" : "texto-inactivo"}>
+              <td className={`historial-celda ${u.user.is_active ? "" : "texto-inactivo"}`}>
                 {u.user.last_name || "-"}
               </td>
-              <td>{u.user.username || "-"}</td>
-              <td>
-                {u.permiso?.descripcion ||
-                  (u.user.is_staff ? "Administrador" : "Usuario")}
+              <td className="historial-celda">{u.user.username || "-"}</td>
+              <td className="historial-celda">
+                {u.permiso?.descripcion || (u.user.is_staff ? "Administrador" : "Usuario")}
               </td>
-              <td>
+              <td className="historial-celda">
                 {u.sucursal
                   ? `${u.sucursal.localidad} - ${u.sucursal.direccion}`
                   : "-"}
               </td>
-              <td>
+              <td className="historial-celda">
                 <label className="switch">
                   <input
                     type="checkbox"
@@ -143,7 +141,7 @@ const TablaUsuarios = () => {
                   <span className="slider round"></span>
                 </label>
               </td>
-              <td className="tabla-acciones">
+              <td className="historial-celda">
                 <button className="boton-editar" onClick={() => openEditModal(u)}>
                   <FaEdit />
                 </button>
@@ -158,7 +156,6 @@ const TablaUsuarios = () => {
         </tbody>
       </table>
 
-      {/* 🔢 Controles de paginación estilo TablaProductos */}
       <div className="pagination">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

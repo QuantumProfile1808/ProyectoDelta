@@ -30,10 +30,10 @@ function AddStock({ producto, onClose, onGuardar }) {
           onChange={(e) => setCantidad(e.target.value)}
         />
         <div className="popup-buttons">
-          <button onClick={onClose} className="btn-cancel">
+          <button onClick={onClose} className="btn-cancel" title="Cancelar">
             <FaTimes />
           </button>
-          <button onClick={handleSubmit} className="btn-confirm">
+          <button onClick={handleSubmit} className="btn-confirm" title="Confirmar">
             <FaCheck />
           </button>
         </div>
@@ -59,7 +59,12 @@ const TablaProductos = () => {
   const categoria = useCategorias();
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
 
-  // 🔢 Estados para paginación
+  // Filtros
+  const [filtroId, setFiltroId] = useState("");
+  const [filtroNombre, setFiltroNombre] = useState("");
+  const [filtroCategoria, setFiltroCategoria] = useState("");
+
+  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -70,7 +75,7 @@ const TablaProductos = () => {
     const res = await fetch(url);
     const data = await res.json();
     setProductos(data);
-    setCurrentPage(1); // resetear página al recargar
+    setCurrentPage(1);
   }, [mostrarInactivos]);
 
   useEffect(() => {
@@ -176,11 +181,26 @@ const TablaProductos = () => {
     }
   };
 
-  // 🔢 Lógica de paginación
+  // Filtrado combinado
+  const productosFiltrados = productos.filter((p) => {
+    const matchId = filtroId ? p.id.toString().includes(filtroId) : true;
+    const matchNombre = filtroNombre
+      ? p.descripcion?.toLowerCase().includes(filtroNombre.toLowerCase())
+      : true;
+    const matchCategoria = filtroCategoria
+      ? p.categoria === parseInt(filtroCategoria, 10)
+      : true;
+    return matchId && matchNombre && matchCategoria;
+  });
+
+  // Paginación sobre filtrados
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const productosPaginados = productos.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(productos.length / itemsPerPage);
+  const productosPaginados = productosFiltrados.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.max(1, Math.ceil(productosFiltrados.length / itemsPerPage));
 
   return (
     <div className="tabla-container">
@@ -190,7 +210,60 @@ const TablaProductos = () => {
       >
         {mostrarInactivos ? "Mostrar activos" : "Mostrar desactivados"}
       </button>
+
       <h2 className="tabla-titulo">Lista de Productos</h2>
+
+      {/* Filtros */}
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Filtrar por nombre"
+          value={filtroNombre}
+          onChange={(e) => {
+            setFiltroNombre(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+        <select
+          value={filtroCategoria}
+          onChange={(e) => {
+            setFiltroCategoria(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Todas las categorías</option>
+          {categoria.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.descripcion}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Paginación arriba */}
+      <div className="pagination">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </button>
+
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
+
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+        >
+          Siguiente
+        </button>
+      </div>
+
+      {/* Tabla */}
       <table className="tabla-productos">
         <thead>
           <tr>
@@ -214,47 +287,56 @@ const TablaProductos = () => {
                 {sucursal.find((s) => s.id === p.sucursal)?.localidad} -{" "}
                 {sucursal.find((s) => s.id === p.sucursal)?.direccion}
               </td>
-              <td>
-                {categoria.find((c) => c.id === p.categoria)?.descripcion}
-              </td>
+              <td>{categoria.find((c) => c.id === p.categoria)?.descripcion}</td>
               <td>
                 <div className="acciones">
                   {mostrarInactivos ? (
-                    <button className="btn-reactivar" onClick={() => reactivarProducto(p.id)}>Reactivar</button>
+                    <button
+                      className="btn-reactivar"
+                      onClick={() => reactivarProducto(p.id)}
+                    >
+                      Reactivar
+                    </button>
                   ) : (
                     <>
-                      <button className="btn-delete" onClick={() => desactivarProducto(p.id)}><FaMinus /></button>
-                      <button className="btn-edit" onClick={() => openEditModal(p)}><FaEdit /></button>
-                      <button className="btn-add" onClick={() => abrirPopup(p)}><FaPlus /></button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => desactivarProducto(p.id)}
+                        title="Desactivar"
+                      >
+                        <FaMinus />
+                      </button>
+                      <button
+                        className="btn-edit"
+                        onClick={() => openEditModal(p)}
+                        title="Editar"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="btn-add"
+                        onClick={() => abrirPopup(p)}
+                        title="Agregar stock"
+                      >
+                        <FaPlus />
+                      </button>
                     </>
                   )}
                 </div>
               </td>
             </tr>
           ))}
+          {productosPaginados.length === 0 && (
+            <tr>
+              <td colSpan="7" style={{ textAlign: "center", padding: "12px" }}>
+                Sin resultados
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
 
-        {/* 🔢 Controles de paginación */}
-      <div className="pagination">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-
-        <span>Página {currentPage} de {totalPages}</span>
-
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          Siguiente
-        </button>
-      </div>
-
-      <Link to="/dashboard/productos" className="fab-boton">
+      <Link to="/dashboard/productos" className="fab-boton" title="Nuevo producto">
         <FaPlus />
       </Link>
 

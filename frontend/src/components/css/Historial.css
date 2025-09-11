@@ -1,60 +1,65 @@
 /* Contenedor principal */
 .historial-container {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 40px 24px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #333;
 }
 
 /* Título */
 .historial-container h2 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
   text-align: center;
+  color: #2c3e50;
 }
 
-/* Tabla de movimientos */
-.historial-table {
+.historial-tabla {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
-.historial-table th,
-.historial-table td {
-  padding: 12px 8px;
+.historial-tabla-encabezado {
+  background-color: #f5f7fa;
+}
+
+.historial-columna {
+  padding: 14px 10px;
+  color: #555;
   border-bottom: 1px solid #e0e0e0;
-  text-align: left;
+  font-weight: bold
 }
 
-.historial-table td.producto-col {
-  max-width: 200px;       /* ajustá el ancho máximo a tu gusto */
-  white-space: nowrap;    /* evita salto de línea */
-  overflow: hidden;       /* oculta el texto que se pasa */
-  text-overflow: ellipsis;/* agrega los "..." */
-}
-
-.historial-table th {
-  background: #f2f2f2;
-  font-weight: 600;
-}
-
-.historial-table tr {
-  transition: background 0.2s;
+.historial-tabla-cuerpo .historial-fila {
+  transition: background 0.2s ease;
   cursor: pointer;
 }
 
-.historial-table tr:hover {
-  background: #e3f2fd;
+.historial-tabla-cuerpo .historial-fila:hover {
+  background-color: #eef6fc;
 }
 
-.historial-table tr.selected-row {
-  background: #e3f2fd !important;
+.historial-fila-seleccionada {
+  background-color: #dbeeff !important;
 }
 
+.historial-celda {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.historial-producto {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 /* Pop-up de detalles */
 .historial-popup {
   position: fixed;
@@ -228,4 +233,100 @@
 
 .input:checked + .slider.round:before {
   transform: translateX(18px);
+}
+
+.historial-tabla-cuerpo .historial-fila:nth-child(odd) {
+  background-color: #ffffff; /* blanco */
+}
+
+.historial-tabla-cuerpo .historial-fila:nth-child(even) {
+  background-color: #ddd;
+}
+
+/* Encabezado más oscuro */
+.historial-tabla-encabezado {
+  background-color: #eaeef3; /* gris más oscuro que el cuerpo */
+}
+
+/* Zebra striping: blanco y gris claro */
+.historial-tabla-cuerpo .historial-fila:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.historial-tabla-cuerpo .historial-fila:nth-child(even) {
+  background-color: #f7f9fc;
+}
+
+/* Hover azul claro */
+.historial-tabla-cuerpo .historial-fila:hover {
+  background-color: #e3f2fd;
+}
+
+/* Fila seleccionada */
+.historial-fila-seleccionada {
+  background-color: #dbeeff !important;
+}
+
+/* Hover sobre fila seleccionada */
+.historial-fila-seleccionada:hover {
+  background-color: #cce4fc !important;
+}
+
+/* Opcional: cambio de color de texto al hacer hover */
+.historial-tabla-cuerpo .historial-fila:hover td {
+  color: #1a1a1a;
+  font-weight: 500;}
+
+.historial-tabla th,
+.historial-tabla td,
+.historial-columna,
+.historial-celda {
+  text-align: center;
+  vertical-align: middle;
+}
+
+@media (max-width: 1445px) {
+  .historial-container {
+    padding: 24px 12px;
+  }
+
+  .historial-tabla {
+    font-size: 0.9rem;
+  }
+
+  .historial-columna,
+  .historial-celda {
+    padding: 10px 6px;
+    
+  }
+
+  .historial-producto {
+    max-width: 140px;
+  }
+
+  .search-container input[type="date"] {
+    width: 100%;
+    max-width: 240px;
+  }
+
+  .pagination {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .historial-popup {
+    max-width: 90vw;
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 1445px) {
+  .historial-tabla-wrapper {
+    overflow-x: auto;
+  }
+
+  .historial-tabla {
+    min-width: 800px;
+  }
 }

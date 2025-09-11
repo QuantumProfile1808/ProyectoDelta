@@ -81,21 +81,28 @@ export const ListaPromociones = () => {
         </button>
       </div>
 
-      <table className="historial-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Estado</th>
-            <th>Etiqueta</th>
+      <table className="historial-tabla">
+        <thead className="historial-tabla-encabezado">
+          <tr className="historial-fila-encabezado">
+            <th className="historial-columna">Nombre</th>
+            <th className="historial-columna">Tipo</th>
+            <th className="historial-columna">Estado</th>
+            <th className="historial-columna">Etiqueta</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="historial-tabla-cuerpo">
           {descuentosPaginados.map((d) => (
-            <tr key={d.id} className={selected?.id === d.id ? "selected-row" : ""}>
-              <td onClick={() => setSelected(d)} title="Ver detalles">{d.nombre}</td>
-              <td onClick={() => setSelected(d)}>{d.tipo}</td>
-              <td>
+            <tr
+              key={d.id}
+              className={`historial-fila ${selected?.id === d.id ? "historial-fila-seleccionada" : ""}`}
+            >
+              <td className="historial-celda" onClick={() => setSelected(d)} title="Ver detalles">
+                {d.nombre}
+              </td>
+              <td className="historial-celda" onClick={() => setSelected(d)}>
+                {d.tipo}
+              </td>
+              <td className="historial-celda">
                 <label className="switch" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
@@ -108,7 +115,7 @@ export const ListaPromociones = () => {
                   <span className="slider round"></span>
                 </label>
               </td>
-              <td>
+              <td className="historial-celda">
                 <span
                   style={{ color: d.activo ? "green" : "red", cursor: "pointer" }}
                   onClick={() => setSelected(d)}
@@ -120,6 +127,7 @@ export const ListaPromociones = () => {
           ))}
         </tbody>
       </table>
+
 
       {selected && (
         <div className="historial-overlay" onClick={() => setSelected(null)}>

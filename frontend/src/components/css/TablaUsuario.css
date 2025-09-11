@@ -17,12 +17,13 @@
 
 .tabla-usuarios th {
   padding: 12px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #ddd;
   background-color: #f5f5f5;
 }
 
 .tabla-usuarios td {
+  text-align: center;
   padding: 1px;
   border-bottom: 1px solid #eee;
 }
@@ -202,5 +203,63 @@ input:checked + .slider:before {
 .btn-save {
   background: #2ecc71;
   color: #fff;
+}
+
+/* Encabezado centrado */
+.historial-tabla th {
+  text-align: center;
+}
+
+/* Celdas alineadas por tipo */
+.historial-tabla td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+/* Alineación específica */
+.historial-tabla td:first-child, 
+.historial-tabla td:last-child,  
+.historial-tabla td:nth-child(7) 
+{
+  text-align: center;
+}
+
+.historial-tabla td:nth-child(2), 
+.historial-tabla td:nth-child(3), 
+.historial-tabla td:nth-child(4), 
+.historial-tabla td:nth-child(5), 
+.historial-tabla td:nth-child(6) 
+{
+  text-align: center;
+}
+
+/* Zebra striping: alternancia de filas */
+.historial-tabla-cuerpo .historial-fila:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.historial-tabla-cuerpo .historial-fila:nth-child(even) {
+  background-color: #f7f9fc;
+}
+
+/* Hover azul claro */
+.historial-tabla-cuerpo .historial-fila:hover {
+  background-color: #e3f2fd;
+}
+
+/* Fila seleccionada (si usás selección visual) */
+.historial-fila-seleccionada {
+  background-color: #dbeeff !important;
+}
+
+.historial-fila-seleccionada:hover {
+  background-color: #cce4fc !important;
+}
+
+/* Hover con cambio de texto */
+.historial-tabla-cuerpo .historial-fila:hover td {
+  color: #1a1a1a;
+  font-weight: 500;
 }
 
