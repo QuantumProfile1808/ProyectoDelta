@@ -283,6 +283,13 @@
 .historial-celda {
   text-align: center;
   vertical-align: middle;
+  color: black;
+}
+
+.historial-popup-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000000;
 }
 
 @media (max-width: 1445px) {

@@ -15,6 +15,7 @@
   cursor: pointer;
   font-size: 24px;
   color: #000;
+  padding: 1px;
 }
 
 /* Botón hamburguesa dentro del sidebar */
@@ -27,6 +28,7 @@
   cursor: pointer;
   font-size: 24px;
   color: #fff;
+  padding: 1px;
 }
 
 .hamburger:hover {
