@@ -169,8 +169,45 @@
 .switch input:checked + .slider { background: #1976d2; }
 .switch input:checked + .slider:before { transform: translateX(20px); }
 .switch input:disabled + .slider {
-  background: #eee;
+  background: #48ff00;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.increment-btn  {
+  padding: 4px 8px;
+  font-size: 16px;
+  background-color: green;
+  border: 1px solid green;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.decrement-btn {
+  padding: 4px 8px;
+  font-size: 16px;
+  background-color: red;
+  border: 1px solid red;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.qty-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qty-controls input {
+  width: 50px;
+  text-align: center;
+  padding: 4px;
+  border: 1px solid #00ff15;
+  border-radius: 4px;
+}
