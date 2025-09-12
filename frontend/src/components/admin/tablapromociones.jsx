@@ -1,14 +1,20 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import "../../components/css/promociones.css";
+import "../css/Historial.css";
 
 export const ListaPromociones = () => {
   const [todas, setTodas] = useState([]);
   const [selected, setSelected] = useState(null);
   const [mostrarInactivas, setMostrarInactivas] = useState(false);
+
+  // Filtros (combobox) con mismas clases que Historial
+  const [searchPromoTipo, setSearchPromoTipo] = useState("");
+  const [searchProducto, setSearchProducto] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const navigate = useNavigate();
 
   const cargarPromociones = useCallback(async () => {
@@ -25,17 +31,60 @@ export const ListaPromociones = () => {
 
   useEffect(() => {
     cargarPromociones();
-    setCurrentPage(1);
   }, [cargarPromociones, mostrarInactivas]);
 
-  const descuentosFiltrados = todas.filter(d =>
-    mostrarInactivas ? d.activo === false : d.activo === true
-  );
+  // Tipos y productos únicos para los combobox
+  const tiposPromocion = ["PORCENTAJE", "PRECIO_FIJO", "CANTIDAD"];
 
+  const productosUnicos = useMemo(() => {
+    const fromItems = todas.flatMap(d =>
+      Array.isArray(d.items) ? d.items.map(i => i.descripcion).filter(Boolean) : []
+    );
+    const fromProductos = todas.flatMap(d =>
+      Array.isArray(d.productos)
+        ? d.productos.map(p =>
+            typeof p === "string"
+              ? p
+              : typeof p === "object" && p !== null
+              ? (p.descripcion || p.nombre || String(p.id || ""))
+              : String(p)
+          )
+        : []
+    );
+    return [...new Set([...fromItems, ...fromProductos])].filter(Boolean).sort();
+  }, [todas]);
+
+  // Aplicación de filtros
+  const descuentosFiltrados = useMemo(() => {
+    return todas
+      .filter(d => (searchPromoTipo ? d.tipo === searchPromoTipo : true))
+      .filter(d => {
+        if (!searchProducto) return true;
+        const matchItems =
+          Array.isArray(d.items) &&
+          d.items.some(i => i.descripcion === searchProducto);
+        const matchProductos =
+          Array.isArray(d.productos) &&
+          d.productos.some(p => {
+            if (typeof p === "string") return p === searchProducto;
+            if (typeof p === "object" && p !== null) {
+              return (
+                p.descripcion === searchProducto ||
+                p.nombre === searchProducto ||
+                String(p.id) === searchProducto
+              );
+            }
+            return String(p) === searchProducto;
+          });
+        return matchItems || matchProductos;
+      });
+  }, [todas, mostrarInactivas, searchPromoTipo, searchProducto]);
+
+  // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const descuentosPaginados = descuentosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(descuentosFiltrados.length / itemsPerPage);
+  const totalPages = Math.ceil(descuentosFiltrados.length / itemsPerPage) || 1;
 
   const toggleActivo = async (id, curr) => {
     const nuevo = !curr;
@@ -55,16 +104,45 @@ export const ListaPromociones = () => {
   return (
     <div className="historial-container">
       <div className="historial-header">
-        <button
-          onClick={() => setMostrarInactivas(prev => !prev)}
-          className="btn-toggle"
-        >
-          {mostrarInactivas ? "Mostrar activas" : "Mostrar inactivas"}
-        </button>
         <h2>Promociones</h2>
       </div>
 
-      {/* 🔢 Paginación arriba */}
+      {/* Filtros con mismas clases que Historial */}
+      <div className="search-container">
+        <select
+          className="search-select"
+          value={searchPromoTipo}
+          onChange={e => {
+            setSearchPromoTipo(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Todos los tipos de promoción</option>
+          {tiposPromocion.map(tipo => (
+            <option key={tipo} value={tipo}>
+              {tipo}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="search-select"
+          value={searchProducto}
+          onChange={e => {
+            setSearchProducto(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Todos los productos</option>
+          {productosUnicos.map(prod => (
+            <option key={prod} value={prod}>
+              {prod}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Paginación arriba */}
       <div className="pagination">
         <button
           onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -72,7 +150,9 @@ export const ListaPromociones = () => {
         >
           Anterior
         </button>
-        <span>Página {currentPage} de {totalPages}</span>
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
         <button
           onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
           disabled={currentPage === totalPages}
@@ -91,7 +171,7 @@ export const ListaPromociones = () => {
           </tr>
         </thead>
         <tbody className="historial-tabla-cuerpo">
-          {descuentosPaginados.map((d) => (
+          {descuentosPaginados.map(d => (
             <tr
               key={d.id}
               className={`historial-fila ${selected?.id === d.id ? "historial-fila-seleccionada" : ""}`}
@@ -103,11 +183,11 @@ export const ListaPromociones = () => {
                 {d.tipo}
               </td>
               <td className="historial-celda">
-                <label className="switch" onClick={(e) => e.stopPropagation()}>
+                <label className="switch" onClick={e => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={d.activo}
-                    onChange={(e) => {
+                    onChange={e => {
                       e.stopPropagation();
                       toggleActivo(d.id, d.activo);
                     }}
@@ -128,13 +208,13 @@ export const ListaPromociones = () => {
         </tbody>
       </table>
 
-
+      {/* Modal de detalles */}
       {selected && (
         <div className="historial-overlay" onClick={() => setSelected(null)}>
           <div
             className="historial-popup"
-            onClick={(e) => e.stopPropagation()}
-            style={{ transform: "translate(-50%, -52%)" }} // 👈 sube el modal
+            onClick={e => e.stopPropagation()}
+            style={{ transform: "translate(-50%, -52%)" }}
           >
             <div className="historial-popup-header">
               <strong>Detalles de la promoción</strong>
@@ -178,15 +258,29 @@ export const ListaPromociones = () => {
                 </>
               )}
 
-              <div><b>Estado:</b> <span style={{ color: selected.activo ? "green" : "red" }}>
-                {selected.activo ? "Activa" : "Inactiva"}
-              </span></div>
+              <div>
+                <b>Estado:</b>{" "}
+                <span style={{ color: selected.activo ? "green" : "red" }}>
+                  {selected.activo ? "Activa" : "Inactiva"}
+                </span>
+              </div>
 
-              <div><b>Productos aplicables:</b> {
-                Array.isArray(selected.productos) && selected.productos.length > 0
-                  ? selected.productos.join(", ")
-                  : "No asignados"
-              }</div>
+              <div>
+                <b>Productos aplicables:</b>{" "}
+                {Array.isArray(selected.productos) && selected.productos.length > 0
+                  ? Array.isArray(selected.productos)
+                    ? selected.productos
+                        .map(p =>
+                          typeof p === "string"
+                            ? p
+                            : typeof p === "object" && p !== null
+                            ? (p.descripcion || p.nombre || String(p.id || ""))
+                            : String(p)
+                        )
+                        .join(", ")
+                    : "No asignados"
+                  : "No asignados"}
+              </div>
             </div>
           </div>
         </div>

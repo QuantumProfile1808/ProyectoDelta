@@ -57,6 +57,7 @@
   width: 36px;
   height: 36px;
   font-size: 16px;
+  background: red;
 }
 
 /* Cuando el sidebar está cerrado (expanded), movemos el back al extremo derecho y lo agrandamos */
@@ -66,7 +67,12 @@
   width: 56px;
   height: 56px;
   font-size: 22px;
+  background: red;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
 }
+
+
 
 /* Title centrado (ocupa el centro ajustándose al tamaño del botón) */
 .admin-header__title {
