@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import EditUserModal from "./EditUserModal";
 import "../../components/css/TablaUsuario.css";
 import { usePerfiles } from "../hooks/usePerfiles";
+import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageUsuarios";
 
 const TablaUsuarios = () => {
   const [perfiles, setPerfiles] = usePerfiles();
@@ -19,7 +20,9 @@ const TablaUsuarios = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+
+  // Hook que ajusta itemsPerPage según el alto de la ventana
+  const itemsPerPage = useResponsiveItemsPerPage();
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -96,8 +99,23 @@ const TablaUsuarios = () => {
   };
 
   return (
-    <div className="historial-container">
+    <div className="historial-container" style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
       <h2>Gestión de Usuarios</h2>
+      <div className="pagination pagination-superior">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </button>
+        <span>Página {currentPage} de {totalPages}</span>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Siguiente
+        </button>
+      </div>
 
       <table className="historial-tabla">
         <thead className="historial-tabla-encabezado">
@@ -155,22 +173,6 @@ const TablaUsuarios = () => {
           ))}
         </tbody>
       </table>
-
-      <div className="pagination">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-        <span>Página {currentPage} de {totalPages}</span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          Siguiente
-        </button>
-      </div>
 
       <Link to="/dashboard/usuarios" className="fab-boton">
         <FaPlus />

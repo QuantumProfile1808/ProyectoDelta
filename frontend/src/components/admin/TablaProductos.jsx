@@ -6,6 +6,7 @@ import "../css/TablaProductos.css";
 import EditProductModal from "./EditProductModal";
 import { useSucursales } from "../hooks/useSucursales";
 import { useCategorias } from "../hooks/useCategorias";
+import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageProductos";
 
 function AddStock({ producto, onClose, onGuardar }) {
   const [cantidad, setCantidad] = useState("");
@@ -66,7 +67,7 @@ const TablaProductos = () => {
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = useResponsiveItemsPerPage();
 
   const reloadProductos = useCallback(async () => {
     const url = mostrarInactivos

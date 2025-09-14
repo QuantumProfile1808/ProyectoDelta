@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import "../../components/css/promociones.css";
 import "../css/Historial.css";
+import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPagePromociones";
 
 export const ListaPromociones = () => {
   const [todas, setTodas] = useState([]);
@@ -14,7 +15,7 @@ export const ListaPromociones = () => {
   const [searchProducto, setSearchProducto] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = useResponsiveItemsPerPage();
   const navigate = useNavigate();
 
   const cargarPromociones = useCallback(async () => {
@@ -33,7 +34,6 @@ export const ListaPromociones = () => {
     cargarPromociones();
   }, [cargarPromociones, mostrarInactivas]);
 
-  // Tipos y productos únicos para los combobox
   const tiposPromocion = ["PORCENTAJE", "PRECIO_FIJO", "CANTIDAD"];
 
   const productosUnicos = useMemo(() => {
@@ -54,7 +54,6 @@ export const ListaPromociones = () => {
     return [...new Set([...fromItems, ...fromProductos])].filter(Boolean).sort();
   }, [todas]);
 
-  // Aplicación de filtros
   const descuentosFiltrados = useMemo(() => {
     return todas
       .filter(d => (searchPromoTipo ? d.tipo === searchPromoTipo : true))

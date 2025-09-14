@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../css/Historial.css";
 import useHistorial from "../hooks/useHistorial.jsx";
+import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageUsuarios.jsx";
 
 export const Historial = () => {
   const { movimientos, loading } = useHistorial();
@@ -9,7 +10,7 @@ export const Historial = () => {
   const [searchTipo, setSearchTipo] = useState("");
   const [searchUsuario, setSearchUsuario] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = useResponsiveItemsPerPage();
 
   // Filtrado combinado
   const movimientosFiltrados = movimientos.filter(m => {
@@ -119,7 +120,7 @@ export const Historial = () => {
                   </td>
                   <td className="historial-celda">{m.cantidad}</td>
                   <td className="historial-celda">{m.metodo_de_pago}</td>
-                  <td className="historial-celda">${Number(m.subtotal).toFixed(2)}</td>
+                  <td className="historial-celda"> {m.tipo_de_movimiento === "entrada" ? "-" : `$${Number(m.subtotal).toFixed(2)}`} </td>
                   <td className="historial-celda">{m.descripcion}</td>
                 </tr>
               ))}
@@ -143,7 +144,11 @@ export const Historial = () => {
               <div>Producto vendido: <b>{selected.producto_nombre}</b></div>
               <div>Cantidad vendida: <b>{selected.cantidad}</b></div>
               <div>Precio por unidad: <b>{selected.precio_unitario ? `$${Number(selected.precio_unitario).toFixed(2)}` : "-"}</b></div>
-              <div>Total de la venta: <b>{selected.subtotal ? `$${Number(selected.subtotal).toFixed(2)}` : "-"}</b></div>
+              {selected.tipo_de_movimiento === "entrada" ? (
+                  <div>Total de la venta: <b>-</b></div>
+                ) : (
+                  <div>Total de la venta: <b>{selected.subtotal ? `$${Number(selected.subtotal).toFixed(2)}` : "-"}</b></div>
+                )}
               <div>Realizada por: <b>{selected.usuario_nombre || "-"}</b></div>
               <div>Método de pago: <b>{selected.metodo_de_pago || "-"}</b></div>
               <div>Descripción: <b>{selected.descripcion}</b></div>

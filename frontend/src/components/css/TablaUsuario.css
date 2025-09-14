@@ -263,3 +263,21 @@ input:checked + .slider:before {
   font-weight: 500;
 }
 
+
+
+@media (max-height: 800px) {
+  .historial-tabla td,
+  .historial-tabla th {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
+@media (max-height: 600px) {
+  .historial-tabla td,
+  .historial-tabla th {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 0.85rem;
+  }
+}
