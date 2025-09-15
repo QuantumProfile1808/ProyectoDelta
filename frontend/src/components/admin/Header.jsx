@@ -3,7 +3,8 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import usePerfilyProductos from "../hooks/usePerfilyProductos";
 import "../css/Header.css";
-import { FaArrowLeft } from "react-icons/fa"; // ⬅️ Ícono moderno
+import { FaArrowLeft } from "react-icons/fa";
+import { SlArrowLeft } from "react-icons/sl";
 
 const PESTANIA_MAP = {
   "": "Inicio",
@@ -38,7 +39,7 @@ export default function Header({ sidebarOpen }) {
         onClick={() => window.history.back()}
         aria-label="Volver"
       >
-        <FaArrowLeft />
+        <SlArrowLeft />
       </button>
 
       <div className="admin-header__title">
