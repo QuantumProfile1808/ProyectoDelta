@@ -52,7 +52,7 @@ export default function MenuDashboard() {
     <div className="menu-dashboard">
       <div className="grid">
         {/* Últimos movimientos */}
-        <section className="card">
+        <section className="dashboard-card">
           <h3>Últimos Movimientos</h3>
           <table>
             <thead>
@@ -79,13 +79,13 @@ export default function MenuDashboard() {
         </section>
 
         {/* Ganancia del mes */}
-        <section className="card">
+        <section className="dashboard-card">
           <h3>Ganancia del mes</h3>
           <p>${gananciaMes.toFixed(2)}</p>
         </section>
 
         {/* Informes ventas */}
-        <section className="card">
+        <section className="dashboard-card">
           <h3>Informes ventas</h3>
           <p>Hoy: {ventasHoy} productos</p>
           <p>Semana: {ventasSemana} productos</p>
@@ -93,7 +93,7 @@ export default function MenuDashboard() {
         </section>
 
         {/* Avisos stock */}
-        <section className="card">
+        <section className="dashboard-card">
           <h3>Avisos Stock</h3>
           <p
             onClick={() => handleOpenModal("sin")}

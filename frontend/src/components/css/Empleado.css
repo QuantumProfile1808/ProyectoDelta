@@ -1,3 +1,12 @@
+body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  background-color: #f5f6fa;
+}
+
 
 
 .user-container {
@@ -5,6 +14,7 @@
   margin: 0 auto;
   padding: 20px;
   text-align: center;
+  background-color: #f5f6fa;
 }
 
 .search-container {
