@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Select from "react-select";
 import "../css/Promociones.css";
 import "../css/inputs.css";
+import useProductosDisponibles from "../hooks/useProductosDisponibles";
 
 export default function promociones() {
   const [form, setForm] = useState({
@@ -14,22 +15,9 @@ export default function promociones() {
     productos: [],
   });
 
-  const [productosDisponibles, setProductosDisponibles] = useState([]);
+  const { productosDisponibles, loadingProductos, errorProductos } = useProductosDisponibles();
   const [loading, setLoading] = useState(false);
   const [errorForm, setErrorForm] = useState(null);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/producto/")
-      .then((res) => res.json())
-      .then((data) => {
-        const productos = Array.isArray(data) ? data : data.results || [];
-        const options = productos.map((p) => ({
-          value: p.id,
-          label: p.descripcion || ` ${p.id}`,
-        }));
-        setProductosDisponibles(options);
-      });
-  }, []);
 
   const validarFormulario = () => {
     if (!form.nombre.trim()) return "El nombre es obligatorio.";
