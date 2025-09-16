@@ -1,0 +1,187 @@
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.menu-dashboard {
+  background: #ffffff;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  color: #f3f4f6;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  min-height: auto;
+}
+
+.menu-dashboard .grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 580px));
+  justify-content: center;
+  gap: 24px;
+  padding-bottom: 32px;
+}
+
+
+
+.historial-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* Título */
+.historial-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+
+
+.menu-dashboard .dashboard-card {
+  background: linear-gradient(135deg, #4b5563, #374151);
+  border-radius: 14px;
+  box-shadow: 0 1px 1px rgba(17, 24, 39, 0.35),
+              0 4px 1px rgba(17, 24, 39, 0.3);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 250px;
+  flex-direction: column;
+  justify-content: center; /* centra verticalmente */
+  align-items: center;     /* centra horizontalmente */
+  text-align: center;      /* centra el texto */
+  min-width: 500px;
+}
+
+
+
+.dashboard-card h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 8px;
+}
+
+.dashboard-card p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dashboard-card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.dashboard-card table thead {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-card table th,
+.dashboard-card table td {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.dashboard-card table th {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.dashboard-card table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dashboard-card table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+
+
+@media screen and (max-width: 1460px) {
+
+  .menu-dashboard .dashboard-card {
+    min-width: 400px;
+  }
+  
+}
+
+@media screen and (max-width: 1320px) {
+  .menu-dashboard .grid {
+    grid-template-columns: repeat(2, minmax(280px, 580px));
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .menu-dashboard .dashboard-card {
+    flex: 1 1 500px;
+    max-width: 500px;
+    min-width: 300px;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .dashboard-card table {
+    font-size: 0.9rem;
+  }
+
+  .dashboard-card h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 1200px) and (min-width: 901px) {
+  .menu-dashboard .grid {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .menu-dashboard .dashboard-card {
+    padding: 16px;
+    min-height: 200px;
+  }
+
+  .dashboard-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .dashboard-card p,
+  .dashboard-card table {
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 1080px) {
+  .menu-dashboard .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .menu-dashboard .dashboard-card {
+    padding: 14px;
+    min-height: auto;
+  }
+
+  .dashboard-card h3 {
+    font-size: 1rem;
+  }
+
+  .dashboard-card p,
+  .dashboard-card table {
+    font-size: 0.85rem;
+  }
+}

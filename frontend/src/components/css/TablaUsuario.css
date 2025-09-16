@@ -1,0 +1,283 @@
+.tabla-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tabla-titulo {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-usuarios th {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  background-color: #f5f5f5;
+}
+
+.tabla-usuarios td {
+  text-align: center;
+  padding: 1px;
+  border-bottom: 1px solid #eee;
+}
+
+.tabla-acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.boton-eliminar {
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.boton-editar {
+  background: #4285f4;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.icono-admin {
+  color: #0f9d58;
+  font-size: 20px;
+  padding: 5px;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+.texto-inactivo {
+  color: red;
+  font-weight: bold;
+}
+
+.texto-inactivo {
+  color: #d32f2f;
+  font-weight: 600;
+  opacity: 0.8;
+}
+.fab-boton {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.fab-boton:hover {
+  background-color: #218838;
+}
+
+/* Contenedor general del modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenido del modal */
+.custom-edit-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 360px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Título */
+.custom-edit-modal h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+/* Subtítulo */
+.custom-edit-modal p {
+  margin: 0.5rem 0 1rem;
+  color: #555;
+}
+
+/* Inputs y select */
+.custom-edit-modal label {
+  display: block;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+
+.custom-edit-modal input,
+.custom-edit-modal select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-cancel,
+.btn-save {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cancel {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.btn-save {
+  background: #2ecc71;
+  color: #fff;
+}
+
+/* Encabezado centrado */
+.historial-tabla th {
+  text-align: center;
+}
+
+/* Celdas alineadas por tipo */
+.historial-tabla td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+/* Alineación específica */
+.historial-tabla td:first-child, 
+.historial-tabla td:last-child,  
+.historial-tabla td:nth-child(7) 
+{
+  text-align: center;
+}
+
+.historial-tabla td:nth-child(2), 
+.historial-tabla td:nth-child(3), 
+.historial-tabla td:nth-child(4), 
+.historial-tabla td:nth-child(5), 
+.historial-tabla td:nth-child(6) 
+{
+  text-align: center;
+}
+
+/* Zebra striping: alternancia de filas */
+.historial-tabla-cuerpo .historial-fila:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.historial-tabla-cuerpo .historial-fila:nth-child(even) {
+  background-color: #f7f9fc;
+}
+
+/* Hover azul claro */
+.historial-tabla-cuerpo .historial-fila:hover {
+  background-color: #e3f2fd;
+}
+
+/* Fila seleccionada (si usás selección visual) */
+.historial-fila-seleccionada {
+  background-color: #dbeeff !important;
+}
+
+.historial-fila-seleccionada:hover {
+  background-color: #cce4fc !important;
+}
+
+/* Hover con cambio de texto */
+.historial-tabla-cuerpo .historial-fila:hover td {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+
+
+@media (max-height: 800px) {
+  .historial-tabla td,
+  .historial-tabla th {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
+@media (max-height: 600px) {
+  .historial-tabla td,
+  .historial-tabla th {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 0.85rem;
+  }
+}

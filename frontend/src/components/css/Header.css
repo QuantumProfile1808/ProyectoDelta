@@ -1,0 +1,128 @@
+/* src/css/Header.css */
+
+
+
+.admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.35s cubic-bezier(.2,.9,.2,1);
+  z-index: 3000; /* menor que la sidebar, pero mayor que contenido */
+  overflow: visible;
+}
+
+/* compact = sidebar abierto -> header reduce el espacio y el botón se achica */
+.admin-header.compact {
+  height: 50px;
+  padding: 0 8px;
+  font-size: 20px;
+  color: rgb(17, 0, 255);
+}
+
+/* expanded = sidebar cerrado -> back button grande y se mueve al extremo derecho */
+.admin-header.expanded {
+  height: 60px;
+  padding: 0 16px;
+}
+
+/* Back button: animación de tamaño y posicionamiento */
+.admin-header__back {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 16px; /* default */
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  transition: all 0.35s cubic-bezier(.2,.9,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  font-size: 20px;
+  color: rgb(0, 68, 255);
+}
+
+/* Cuando el sidebar está abierto (compact), achicamos y acercamos al hamburger */
+.admin-header.compact .admin-header__back {
+  left: 64px; /* lo acercamos al hamburger */
+  width: 36px;
+  height: 36px;
+  background: red;
+  font-size: 20px;
+  color: rgb(119, 0, 255);
+}
+
+/* Cuando el sidebar está cerrado (expanded), movemos el back al extremo derecho y lo agrandamos */
+.admin-header.expanded .admin-header__back {
+  left: auto;
+  right: 16px; /* extremo derecho */
+  width: 56px;
+  height: 56px;
+  background: rgb(255, 0, 0);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  font-size: 20px;
+  color: rgb(255, 255, 255);
+
+}
+
+/* Title centrado (ocupa el centro ajustándose al tamaño del botón) */
+.admin-header__title {
+  margin: 0 auto;
+  text-align: center;
+  font-weight: 700;
+  font-size: 38px;
+  pointer-events: none;
+}
+
+/* Icons a la derecha (quedan detrás del back cuando este se mueve a la derecha) */
+.admin-header__icons {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
+}
+
+.admin-header__icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.stylish-back-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
+
+.stylish-back-btn:hover {
+  background-color: #c62828;
+}
+

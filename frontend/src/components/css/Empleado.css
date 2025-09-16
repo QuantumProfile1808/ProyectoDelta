@@ -1,0 +1,223 @@
+body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  background-color: #f5f6fa;
+}
+
+
+
+.user-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  background-color: #f5f6fa;
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin: 20px 0;
+}
+
+.search-container input[type="text"],
+.search-container select {
+  width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.search-container input[type="text"]:focus,
+.search-container select:focus {
+  border-color: #000;
+}
+
+.search-select {
+  appearance: none;
+  background: url("data:image/svg+xml,%3Csvg fill='333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E") no-repeat right 0.75rem center/1rem;
+  padding-right: 2rem;
+}
+
+.product-table input[type="number"] {
+  width: 70px;
+  padding: 6px 10px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  font-size: 0.95rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.product-table input[type="number"]:focus {
+  border-color: #4a90e2;
+}
+
+.product-table input[type="number"]::-webkit-outer-spin-button,
+.product-table input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.product-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.user-card {
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.user-card .product-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+.user-card .product-table th,
+.user-card .product-table td {
+  padding: 0px;
+  border: 1px solid #ddd;
+}
+
+.user-card .product-table tr:nth-child(odd) { background: #fff; }
+.user-card .product-table tr:nth-child(even) { background: #fafafa; }
+.user-card .product-table tr:hover { background: #e6f7ff; }
+
+.selected-row { background: #e3f2fd !important; }
+
+.user-card .cart-btn-container,
+.cart-btn-floating {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: var(--card-radius);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-card .cart-btn-container {
+  align-self: flex-end;
+  padding: 10px 20px;
+}
+
+.user-card .cart-btn-container:disabled,
+.cart-btn-floating:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #888;
+}
+
+.cart-btn-floating {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
+  padding: 16px 28px;
+  font-size: 1.15rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  border-radius: 24px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #ccc;
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.switch input:checked + .slider { background: #1976d2; }
+.switch input:checked + .slider:before { transform: translateX(20px); }
+.switch input:disabled + .slider {
+  background: #48ff00;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.increment-btn  {
+  padding: 4px 8px;
+  font-size: 16px;
+  background-color: green;
+  border: 1px solid green;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.decrement-btn {
+  padding: 4px 8px;
+  font-size: 16px;
+  background-color: red;
+  border: 1px solid red;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.qty-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qty-controls input {
+  width: 50px;
+  text-align: center;
+  padding: 4px;
+  border: 1px solid #00ff15;
+  border-radius: 4px;
+}
