@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import usePerfilyProductos from "../hooks/usePerfilyProductos";
 import useCategoriasNoadmin from "../hooks/useCategoriasNoadmin";
 import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 import Header from "../../components/admin/Header";
+
 
 export default function User() {
   const { perfil, productos, loading, error } = usePerfilyProductos();
@@ -16,6 +17,37 @@ export default function User() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+    const [mensajeBackup, setMensajeBackup] = useState("");
+  const fileInputRef = useRef(null);
+
+  function exportar() {
+    // descarga directa del backup
+    window.location.href = "http://localhost:8000/api/backup/exportar/";
+  }
+
+  async function handleImport(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("archivo", file);
+
+    try {
+      const res = await fetch("http://localhost:8000/api/backup/importar/", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      });
+      const data = await res.json().catch(() => ({}));
+      setMensajeBackup(data.mensaje || (res.ok ? "Importación completada" : "Error al importar datos"));
+    } catch (err) {
+      console.error(err);
+      setMensajeBackup("Error al importar datos");
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
 
   function handleQtyChange(id, e) {
     const value = e.target.value;
@@ -275,6 +307,21 @@ export default function User() {
             <button className="refresh-btn" onClick={() => window.location.reload()}>
               ⟳
             </button>
+            
+            <button className="export-btn" onClick={exportar}>
+              Exportar
+            </button>
+            <button className="import-btn" onClick={() => fileInputRef.current?.click()}>
+              Importar
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleImport}
+            />
+
+
             <button
               className="cart-btn-footer"
               onClick={() => setShowModal(true)}

@@ -1,6 +1,7 @@
 from django.urls import path, include
 from .views import home
 import rest_framework.routers as routers
+from .backupviews import BackupExportView, BackupImportView
 from .views import UserViewSet, PerfilViewSet, SucursalViewSet, PermisoViewSet, CategoriaViewSet, ProductoViewSet, MovimientoViewSet, DescuentoViewSet
 
 router = routers.DefaultRouter()
@@ -18,5 +19,6 @@ router.register(r'descuento', DescuentoViewSet)
 urlpatterns = [
     path('', home, name='home'),  # Si tienes una vista de inicio
     path('api/', include(router.urls)),  # Incluye las URLs del enrutador
-    
+    path('backup/exportar/', BackupExportView.as_view(), name='backup-export'),
+    path('backup/importar/', BackupImportView.as_view(), name='backup-import')
 ]

@@ -17,6 +17,7 @@ import MenuDashboard from "./components/admin/menudashboard";
 import { useContext, useState } from 'react';
 import TablaPromociones from './components/admin/tablapromociones';
 import Promociones from './components/admin/promociones';
+import BackupPage from "./components/admin/BackupPage";
 
 function AdminLayout() {
   return (
@@ -57,6 +58,7 @@ function App() {
               <Route index element={<MenuDashboard />} />
               <Route path="tablaPromociones" element={<TablaPromociones />} />
               <Route path="promociones" element={<Promociones />} />
+              <Route path="backup" element={<BackupPage />} />
             </Route>
           </Route>
 
