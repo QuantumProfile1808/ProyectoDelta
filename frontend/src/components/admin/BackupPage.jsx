@@ -5,7 +5,7 @@ function BackupPage() {
 
   const exportar = () => {
     // Descarga directa del archivo
-    window.location.href = "http://localhost:8000/api/backup/exportar/";
+    window.location.href = "http://127.0.0.1:8000/api/backup/exportar/";
   };
 
   const importar = async (e) => {
@@ -16,7 +16,7 @@ function BackupPage() {
     formData.append("archivo", file);
 
     try {
-      const response = await fetch("http://localhost:8000/api/backup/importar/", {
+      const response = await fetch("http://127.0.0.1:8000/api/backup/importar/", {
         method: "POST",
         body: formData,
       });

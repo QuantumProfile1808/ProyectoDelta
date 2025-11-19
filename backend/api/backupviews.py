@@ -1,11 +1,11 @@
 from django.http import HttpResponse
 from django.core import serializers
-from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.apps import apps
 from django.http import JsonResponse
+from django.db import transaction, connection, transaction
 
 from .models import Producto, Categoria, Movimiento, Sucursal, Perfil, Permiso, Descuento
 
@@ -36,14 +36,44 @@ class BackupImportView(APIView):
         archivo = request.FILES["archivo"].read().decode("utf-8")
         objetos = list(serializers.deserialize("json", archivo))
 
-        with transaction.atomic():
-            # Borrar datos previos de los modelos que quieras resetear
-            for model_name in ["Producto", "Categoria", "Movimiento", "Sucursal", "Perfil", "Permiso", "Descuento"]:
-                model = apps.get_model("api", model_name)
-                model.objects.all().delete()
+        # Model names list (se eliminarán antes de importar).
+        # Orden de borrado: hijos primero para evitar FK conflicts (si PRAGMA no está desactivado)
+        model_names = [
+            "Movimiento",
+            "ProductoDescuento",  # si existe en tu app
+            "Descuento",
+            "Perfil",
+            "Producto",
+            "Permiso",
+            "Sucursal",
+            "Categoria"
+        ]
 
-            # Cargar los objetos del backup
-            for obj in objetos:
-                obj.save()
+        try:
+            with transaction.atomic():
+                # Desactivar FK checks en SQLite para permitir restaurar en cualquier orden
+                using_sqlite = connection.vendor == "sqlite"
+                if using_sqlite:
+                    with connection.cursor() as cursor:
+                        cursor.execute("PRAGMA foreign_keys = OFF;")
+
+                # Borrar datos previos de los modelos indicados
+                for model_name in model_names:
+                    try:
+                        model = apps.get_model("api", model_name)
+                        model.objects.all().delete()
+                    except LookupError:
+                        # Si un modelo no existe (p. ej. ProductoDescuento), seguimos
+                        continue
+
+                # Guardar los objetos del backup
+                for obj in objetos:
+                    obj.save()
+
+        finally:
+            # Volver a activar FK checks si usamos SQLite
+            if connection.vendor == "sqlite":
+                with connection.cursor() as cursor:
+                    cursor.execute("PRAGMA foreign_keys = ON;")
 
         return Response({"status": "ok", "mensaje": "Datos restaurados desde backup"})

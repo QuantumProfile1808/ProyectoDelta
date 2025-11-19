@@ -19,54 +19,69 @@ const Usuarios = () => {
   const permisos = usePermisos();
   const [loading, setLoading] = useState(false);
 
-  //Handle form changes
-  const handleChange = e => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
-  };
 
-  //Handle form
+  const handleChange = e => {
+  const { name, value, type, checked } = e.target;
+  setForm(prevForm => ({
+    ...prevForm,
+    [name]: type === "checkbox" ? checked : value,
+  }));
+};
+  //Handle form changes
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
 
-    // Create user
-    const userRes = await fetch("http://127.0.0.1:8000/api/users/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: form.username,
-        password: form.password,
-        first_name: form.first_name,
-        last_name: form.last_name,
-        is_staff: form.is_staff,
-      }),
-    });
+    try {
+      // Crear usuario
+      const userRes = await fetch("http://127.0.0.1:8000/api/users/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.username,
+          password: form.password,
+          first_name: form.first_name,
+          last_name: form.last_name,
+          is_staff: form.is_staff,
+        }),
+      });
 
-    if (!userRes.ok) {
-      const errorText = await userRes.text();
-      console.error("Error al crear usuario:", errorText);
-      alert("Error al crear usuario");
-      setLoading(false);
-      return;
-    }
+      const userText = await userRes.text();
+      let userData = null;
+      try { userData = JSON.parse(userText); } catch(e){ /* not json */ }
 
-    const user = await userRes.json();
-    console.log(form.sucursal);
+      if (!userRes.ok) {
+        setLoading(false); // ← esto es lo nuevo
+        console.error("Error al crear usuario:", userText);
+        alert("Error al crear usuario: " + (userData?.detail || userText || userRes.status));
+        return;
+      }
 
-    // Create perfil
-    const perfilRes = await fetch("http://127.0.0.1:8000/api/perfil/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user: user.id,
-        sucursal: Number(form.sucursal),
-        permiso: form.is_staff ? 1 : 2,
-        dni: form.dni,
-      }),
-    });
+      const user = userData || JSON.parse(userText);
 
-    if (perfilRes.ok) {
+      // Crear perfil
+      const perfilRes = await fetch("http://127.0.0.1:8000/api/perfil/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user: user.id,
+          sucursal: Number(form.sucursal) || null,
+          permiso: form.is_staff ? 1 : 2,
+          dni: form.dni,
+        }),
+      });
+
+      const perfilText = await perfilRes.text();
+      let perfilData = null;
+      try { perfilData = JSON.parse(perfilText); } catch(e){}
+
+      if (!perfilRes.ok) {
+        setLoading(false); // ← esto también
+        console.error("Error al crear perfil:", perfilText);
+        alert("Error al crear perfil: " + (perfilData?.detail || perfilRes.status || perfilText));
+        return;
+      }
+
       alert("Usuario creado correctamente");
       setForm({
         username: "",
@@ -77,10 +92,13 @@ const Usuarios = () => {
         sucursal: "",
         is_staff: false,
       });
-    } else {
-      alert("Error al crear perfil");
+
+    } catch (err) {
+      console.error("Error de red o excepción:", err);
+      alert("Error de red: " + (err.message || err));
+    } finally {
+      setLoading(false); // Siempre liberar bloqueo
     }
-    setLoading(false);
   };
 
   // Render form and page

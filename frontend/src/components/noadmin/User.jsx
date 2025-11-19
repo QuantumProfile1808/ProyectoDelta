@@ -22,7 +22,7 @@ export default function User() {
 
   function exportar() {
     // descarga directa del backup
-    window.location.href = "http://localhost:8000/api/backup/exportar/";
+    window.location.href = "http://127.0.0.1:8000/api/backup/exportar/";
   }
 
   async function handleImport(e) {
@@ -33,7 +33,7 @@ export default function User() {
     formData.append("archivo", file);
 
     try {
-      const res = await fetch("http://localhost:8000/api/backup/importar/", {
+      const res = await fetch("http://127.0.0.1:8000/api/backup/importar/", {
         method: "POST",
         body: formData,
         credentials: "include"

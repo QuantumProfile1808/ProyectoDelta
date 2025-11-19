@@ -19,15 +19,15 @@ export const AuthProvider = ({ children }) => {
       const refresh = localStorage.getItem("refresh");
       if (!access) return;
 
-      let res = await fetch("http://localhost:8000/api-auth/users/me/", {
+      let res = await fetch("http://127.0.0.1:8000/api-auth/users/me/", {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `JWT ${access}`,  
+          "Authorization": `JWT ${access}`,
         },
       });
 
       if (res.status === 401 && refresh) {
-        const refreshRes = await fetch("http://localhost:8000/api-auth/jwt/refresh/", {
+        const refreshRes = await fetch("hthttp://127.0.0.1:8000/api-auth/jwt/refresh/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refresh }),
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
         access = newAccess;
         localStorage.setItem("token", newAccess);
 
-        res = await fetch("http://localhost:8000/api-auth/users/me/", {
+        res = await fetch("http://127.0.0.1:8000/api-auth/users/me/", {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `JWT ${newAccess}`,
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
       const refresh = localStorage.getItem("refresh");
       if (!refresh) return;
 
-      const response = await fetch("http://localhost:8000/api-auth/jwt/blacklist/", {
+      const response = await fetch("http://127.0.0.1:8000/api-auth/jwt/blacklist/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch("http://localhost:8000/api-auth/jwt/create/", {
+      const response = await fetch("http://127.0.0.1:8000/api-auth/jwt/create/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,22 +90,28 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ username, password }),
       });
 
+      const text = await response.text();
+      console.log('Login response status', response.status, 'body:', text);
+
+      let data = null;
+      try { data = JSON.parse(text); } catch (e) { /* not json */ }
+
       if (!response.ok) {
-        throw new Error("Login failed");
+        // log server message if existe
+        console.error('Login error body:', data ?? text);
+        return null;
       }
 
-      const data = await response.json();
-
-      if (data.access && data.refresh) {
+      if (data && data.access && data.refresh) {
         localStorage.setItem("token", data.access);
         localStorage.setItem("refresh", data.refresh);
 
         // Fetch user data
-        const userResponse = await fetch("http://localhost:8000/api-auth/users/me/", {
+        const userResponse = await fetch("http://127.0.0.1:8000/api-auth/users/me/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `JWT ${data.access}`,
+            "Authorization": `JWT ${data.access}`, // o 'Bearer' si tu backend lo requiere
           },
         });
 
@@ -125,7 +131,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-   if (loading) {
+  if (loading) {
     return <div>Cargando...</div>;
   }
 

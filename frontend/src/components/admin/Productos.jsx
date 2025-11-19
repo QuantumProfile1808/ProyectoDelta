@@ -1,7 +1,12 @@
+// ...existing code...
 import React, { useState } from "react";
 import { useCategorias } from "../hooks/useCategorias";
 import { useSucursales } from "../hooks/useSucursales";
 import "../../components/css/Usuario.css";
+import "../css/fab.css"
+
+import CreateSucursal from "./CreateSucursal";
+import CreateCategoria from "./CreateCategoria";
 
 const Productos = () => {
   const [form, setForm] = useState({
@@ -12,49 +17,56 @@ const Productos = () => {
       categoria: "",
       medicion: "",
   });
-const sucursales= useSucursales();
-const categorias = useCategorias();
+  const sucursales= useSucursales();
+  const categorias = useCategorias();
 
-const handleChange = e => {
-  const { name, value, type, checked } = e.target;
-  setForm({ ...form, [name]: type === "checkbox" ? checked : value });
-};
+  const [showSucursal, setShowSucursal] = useState(false);
+  const [showCategoria, setShowCategoria] = useState(false);
 
-const handleSubmit = async e => {
-  e.preventDefault();
+  const handleChange = e => {
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+  };
 
-  const productRes = await fetch("http://127.0.0.1:8000/api/producto/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(
-      {
-        descripcion: form.descripcion,
-        precio: form.precio,
-        stock: form.stock,
-        sucursal: form.sucursal,
-        categoria: form.categoria,
-        medicion: form.medicion,
-      }
-    ),
-  });
+  const handleSubmit = async e => {
+    e.preventDefault();
 
-  if (!productRes.ok) {
-    throw new Error("Failed to create product");
-  }
+    const productRes = await fetch("http://127.0.0.1:8000/api/producto/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        {
+          descripcion: form.descripcion,
+          precio: form.precio,
+          stock: form.stock,
+          sucursal: form.sucursal,
+          categoria: form.categoria,
+          medicion: form.medicion,
+        }
+      ),
+    });
 
+    if (!productRes.ok) {
+      throw new Error("Failed to create product");
+    }
 
-  setForm({
-    descripcion: "",
-    precio: "",
-    stock: "",
-    sucursal: "",
-    categoria: "",
-    medicion: "",
-  });
+    setForm({
+      descripcion: "",
+      precio: "",
+      stock: "",
+      sucursal: "",
+      categoria: "",
+      medicion: "",
+    });
+  };
 
-};
+  // simple handler after create: recarga para actualizar listas
+  const handleCreated = () => {
+    // puedes reemplazar por re-fetch en el futuro
+    window.location.reload();
+  };
 
   return (
     <div>
@@ -120,8 +132,50 @@ const handleSubmit = async e => {
         <button type="submit">Crear Producto</button>
       </form>
 
+      {/* FABs */}
+      <div className="fab-container" aria-hidden={false}>
+        <div className="fab-row">
+          <div style={{display:'flex', alignItems:'center'}}>
+            <span className="fab-label">Nueva categoría</span>
+            <button
+              className="fab"
+              title="Crear categoría"
+              onClick={() => setShowCategoria(true)}
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div className="fab-row">
+          <div style={{display:'flex', alignItems:'center'}}>
+            <span className="fab-label">Nueva sucursal</span>
+            <button
+              className="fab small"
+              title="Crear sucursal"
+              onClick={() => setShowSucursal(true)}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showSucursal && (
+        <CreateSucursal
+          onClose={() => setShowSucursal(false)}
+          onCreated={handleCreated}
+        />
+      )}
+      {showCategoria && (
+        <CreateCategoria
+          onClose={() => setShowCategoria(false)}
+          onCreated={handleCreated}
+        />
+      )}
     </div>
   );
 };
-  
+
 export default Productos;
+// ...existing code...

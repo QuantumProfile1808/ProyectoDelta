@@ -6,7 +6,7 @@ export function useDashboardData() {
 
   useEffect(() => {
     // Fetch movimientos
-    fetch("http://localhost:8000/api/movimiento/")
+    fetch("http://127.0.0.1:8000/api/movimiento/")
       .then(res => res.json())
       .then(data => {
         const parsed = data.map(m => ({
@@ -19,7 +19,7 @@ export function useDashboardData() {
       .catch(err => console.error("Error cargando movimientos:", err));
 
     // Fetch productos
-    fetch("http://localhost:8000/api/producto/")
+    fetch("http://127.0.0.1:8000/api/producto/")
       .then(res => res.json())
       .then(data => setProductos(data))
       .catch(err => console.error("Error cargando productos:", err));
