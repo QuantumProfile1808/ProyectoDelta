@@ -31,7 +31,8 @@ function createWindow() {
   });
 
   const indexPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'frontend', 'dist', 'index.html')
+    // ⬇⬇⬇ CAMBIO 1 (agregamos "app")
+    ? path.join(process.resourcesPath, 'app', 'frontend', 'dist', 'index.html')
     : path.join(__dirname, '..', 'frontend', 'dist', 'index.html');
 
   console.log(`📂 Cargando frontend desde: ${indexPath}`);
@@ -40,7 +41,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   const backendPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'backend')
+    ? path.join(process.resourcesPath, 'app', 'backend')
     : path.join(__dirname, '..', 'backend');
 
   const pythonPath = getPythonPath();
@@ -51,11 +52,13 @@ app.whenReady().then(() => {
 
   console.log(`🚀 Iniciando Django desde: ${backendPath}`);
 
-  // 🔹 Importante: igual que tu comando manual
-  djangoProcess = spawn(pythonPath, ['manage.py', 'runserver', '127.0.0.1:8000'], {
-    cwd: backendPath,
-    shell: true,
-    detached: false,
+  const backendExecutable = app.isPackaged
+    ? path.join(process.resourcesPath, 'app', 'backend', 'run_embedded_backend.bat')
+    : path.join(__dirname, '..', 'backend', 'run_embedded_backend.bat');
+
+  djangoProcess = spawn(backendExecutable, [], {
+    cwd: path.dirname(backendExecutable),
+    shell: true
   });
 
   djangoProcess.stdout.on('data', (data) => console.log(`Django: ${data}`));
@@ -66,7 +69,17 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-app.on('window-all-closed', () => {
-  if (djangoProcess) djangoProcess.kill();
-  if (process.platform !== 'darwin') app.quit();
+// TODO: El proceso no se cierra, queda en segundo plano y se abre la cantyidad de veces que quieras.
+app.on("window-all-closed", () => {
+  if (djangoProcess) {
+    try {
+      const pid = djangoProcess.pid;
+      require("child_process").exec(`taskkill /PID ${pid} /T /F`);
+    } catch (e) {
+      console.error("Error al cerrar backend:", e);
+    }
+  }
+
+  if (process.platform !== "darwin") app.quit();
+  app.quit();
 });

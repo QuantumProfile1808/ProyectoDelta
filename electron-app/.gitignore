@@ -22,3 +22,6 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+__pycache__/
+*.pyc
+*.pyo
