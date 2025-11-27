@@ -1,0 +1,14 @@
+Django==5.2.1
+djangorestframework==3.15.1
+djoser==2.2.2
+django-cors-headers==4.5.0
+
+# Autenticación JWT
+djangorestframework-simplejwt==5.3.1
+
+# PostgreSQL driver
+psycopg2==2.9.9
+
+# Utilidades requeridas por Django
+pytz==2024.1
+sqlparse==0.5.1

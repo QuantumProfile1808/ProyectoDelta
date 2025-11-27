@@ -6,17 +6,14 @@ const fs = require('fs');
 let djangoProcess;
 let win;
 
+// ✅ CAMBIO 1 — Usar python-embed SIEMPRE (y no el python del sistema)
 function getPythonPath() {
-  try {
-    const pythonPath = execSync('where python', { encoding: 'utf-8' })
-      .split('\n')[0]
-      .trim();
-    console.log(`✅ Python detectado en: ${pythonPath}`);
-    return pythonPath;
-  } catch (e) {
-    console.error('❌ No se encontró Python en PATH');
-    return null;
-  }
+  const embeddedPython = app.isPackaged
+    ? path.join(process.resourcesPath, "app", "python-embed", "python.exe")
+    : path.join(__dirname, "..", "python-embed", "python.exe");
+
+  console.log("🐍 Usando Python embebido:", embeddedPython);
+  return embeddedPython;
 }
 
 function createWindow() {
@@ -31,7 +28,7 @@ function createWindow() {
   });
 
   const indexPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'frontend', 'dist', 'index.html')
+    ? path.join(process.resourcesPath, 'app', 'frontend', 'dist', 'index.html')
     : path.join(__dirname, '..', 'frontend', 'dist', 'index.html');
 
   console.log(`📂 Cargando frontend desde: ${indexPath}`);
@@ -40,22 +37,24 @@ function createWindow() {
 
 app.whenReady().then(() => {
   const backendPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'backend')
+    ? path.join(process.resourcesPath, 'app', 'backend')
     : path.join(__dirname, '..', 'backend');
 
   const pythonPath = getPythonPath();
-  if (!pythonPath || !fs.existsSync(pythonPath)) {
-    dialog.showErrorBox('Error', 'No se encontró Python en el sistema. Asegúrate de tenerlo en PATH.');
+  if (!fs.existsSync(pythonPath)) {
+    dialog.showErrorBox('Error', 'No se encontró Python embebido');
     return;
   }
 
   console.log(`🚀 Iniciando Django desde: ${backendPath}`);
 
-  // 🔹 Importante: igual que tu comando manual
-  djangoProcess = spawn(pythonPath, ['manage.py', 'runserver', '127.0.0.1:8000'], {
-    cwd: backendPath,
-    shell: true,
-    detached: false,
+  const backendExecutable = app.isPackaged
+    ? path.join(process.resourcesPath, 'app', 'backend', 'run_embedded_backend.bat')
+    : path.join(__dirname, '..', 'backend', 'run_embedded_backend.bat');
+
+  djangoProcess = spawn(backendExecutable, [], {
+    cwd: path.dirname(backendExecutable),
+    shell: true
   });
 
   djangoProcess.stdout.on('data', (data) => console.log(`Django: ${data}`));
@@ -66,7 +65,20 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-app.on('window-all-closed', () => {
-  if (djangoProcess) djangoProcess.kill();
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  try {
+    console.log("💀 Cerrando backend...");
+
+    if (djangoProcess && djangoProcess.pid) {
+      execSync(`taskkill /PID ${djangoProcess.pid} /T /F`);
+    }
+    
+    execSync(`taskkill /IM python.exe /F`, { stdio: "ignore" });
+
+  } catch (e) {
+    console.error("Error al cerrar backend:", e);
+  }
+
+  if (process.platform !== "darwin") app.quit();
+  app.quit();
 });
