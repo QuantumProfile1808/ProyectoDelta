@@ -9,10 +9,6 @@ from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-
-
-# Create your views here.
-
 def home(request):
     return HttpResponse("Hello, world! This is the API home page.")
 
@@ -89,27 +85,25 @@ class MovimientoViewSet(viewsets.ModelViewSet):
     queryset = Movimiento.objects.all()
     serializer_class = MovimientoSerializer
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        movimientos = serializer.data
+    @action(detail=False, methods=['get'], url_path='ultimos')
+    def ultimos_movimientos(self, request):
+        sucursal_id = request.query_params.get("sucursal")
 
-        total_ventas = sum(item['subtotal'] for item in movimientos)
+        if not sucursal_id:
+            return Response(
+                {"error": "Debe enviar ?sucursal=<id>"},
+                status=400
+            )
 
-        movimientos.append({
-            'id': None,
-            'producto': None,
-            'usuario': None,
-            'fecha': None,
-            'hora': None,
-            'tipo_de_movimiento': 'total',
-            'metodo_de_pago': None,
-            'cantidad': None,
-            'descripcion': f'Total de ventas: ${total_ventas:.2f}',
-            'subtotal': total_ventas,
-        })
+        movimientos = (
+            Movimiento.objects
+            .filter(producto__sucursal_id=sucursal_id, tipo_de_movimiento='salida')
+            .select_related("producto", "usuario")
+            .order_by('-fecha', '-hora')[:3]
+        )
 
-        return Response(movimientos)
+        serializer = self.get_serializer(movimientos, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         producto = serializer.validated_data['producto']

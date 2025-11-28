@@ -16,10 +16,13 @@ function BackupPage() {
     formData.append("archivo", file);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/backup/importar/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/backup/importar/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
       setMensaje(data.mensaje || "Importación completada");
@@ -32,7 +35,8 @@ function BackupPage() {
     <div style={{ padding: "20px" }}>
       <h2>Gestión de Backup</h2>
       <button onClick={exportar}>Exportar datos</button>
-      <br /><br />
+      <br />
+      <br />
       <input type="file" onChange={importar} />
       {mensaje && <p>{mensaje}</p>}
     </div>

@@ -1,25 +1,27 @@
 import React, { useState } from "react";
 import "../css/menuDashboard.css";
 import { useDashboardData } from "../hooks/useDashboardData";
+import { useContext } from "react";
+import AuthContext from "../../AuthContext";
 
 export default function MenuDashboard() {
-  const { movimientos, productos } = useDashboardData();
+  const { user } = useContext(AuthContext);
+  const sucursalID = user?.perfil?.sucursal;
+  const { movimientos, productos } = useDashboardData(sucursalID);
   const [selectedStockType, setSelectedStockType] = useState(null);
 
-  // Últimos 3 movimientos
-  const ultimosMovimientos = [...movimientos]
-    .filter(m => m.tipo_de_movimiento !== "total")
-    .sort((a, b) => {
-      const fechaHoraA = new Date(`${a.fecha || "1970-01-01"}T${a.hora || "00:00:00"}`);
-      const fechaHoraB = new Date(`${b.fecha || "1970-01-01"}T${b.hora || "00:00:00"}`);
-      return fechaHoraB - fechaHoraA;
-    })
-    .slice(0, 3);
+  const ultimosMovimientos = movimientos.filter(
+    (m) => m.tipo_de_movimiento === "salida"
+  );
 
   // Ganancia del mes
   const mesActual = new Date().getMonth();
   const gananciaMes = movimientos
-    .filter(m => m.tipo_de_movimiento === "salida" && new Date(m.fecha).getMonth() === mesActual)
+    .filter(
+      (m) =>
+        m.tipo_de_movimiento === "salida" &&
+        new Date(m.fecha).getMonth() === mesActual
+    )
     .reduce((acc, m) => acc + (m.subtotal || 0), 0);
 
   // Informes ventas
@@ -27,16 +29,24 @@ export default function MenuDashboard() {
   const inicioSemana = new Date();
   inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
 
-  const ventasHoy = movimientos.filter(m => m.tipo_de_movimiento === "salida" && m.fecha === hoy).length;
-  const ventasSemana = movimientos.filter(m => {
+  const ventasHoy = movimientos.filter(
+    (m) => m.tipo_de_movimiento === "salida" && m.fecha === hoy
+  ).length;
+  const ventasSemana = movimientos.filter((m) => {
     const fecha = new Date(m.fecha);
     return m.tipo_de_movimiento === "salida" && fecha >= inicioSemana;
   }).length;
-  const ventasMes = movimientos.filter(m => m.tipo_de_movimiento === "salida" && new Date(m.fecha).getMonth() === mesActual).length;
+  const ventasMes = movimientos.filter(
+    (m) =>
+      m.tipo_de_movimiento === "salida" &&
+      new Date(m.fecha).getMonth() === mesActual
+  ).length;
 
   // Avisos stock
-  const sinStockProductos = productos.filter(p => p.stock === 0);
-  const bajoStockProductos = productos.filter(p => p.stock > 0 && p.stock < 5);
+  const sinStockProductos = productos.filter((p) => p.stock === 0);
+  const bajoStockProductos = productos.filter(
+    (p) => p.stock > 0 && p.stock < 5
+  );
 
   const handleOpenModal = (type) => setSelectedStockType(type);
   const handleCloseModal = () => setSelectedStockType(null);
@@ -113,10 +123,12 @@ export default function MenuDashboard() {
       {/* Modal estilo historial */}
       {selectedStockType && (
         <div className="historial-overlay" onClick={handleCloseModal}>
-          <div className="historial-popup" onClick={e => e.stopPropagation()}>
+          <div className="historial-popup" onClick={(e) => e.stopPropagation()}>
             <div className="historial-popup-header">
               <strong className="historial-popup-title">
-                {selectedStockType === "sin" ? "Productos sin stock" : "Productos con bajo stock"}
+                {selectedStockType === "sin"
+                  ? "Productos sin stock"
+                  : "Productos con bajo stock"}
               </strong>
               <button
                 className="historial-popup-close"
@@ -138,7 +150,7 @@ export default function MenuDashboard() {
                     </tr>
                   </thead>
                   <tbody className="historial-tabla-cuerpo">
-                    {productosAMostrar.map(p => (
+                    {productosAMostrar.map((p) => (
                       <tr key={p.id} className="historial-fila">
                         <td className="historial-celda">{p.descripcion}</td>
                         <td className="historial-celda">{p.stock}</td>

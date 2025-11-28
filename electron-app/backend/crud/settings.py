@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5+mvo(3s9o95c8+=4x8=-0ja-b^)mg0_!&lr&v&&!k^e1_+3-#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
@@ -155,8 +154,8 @@ SIMPLE_JWT = {
 
 DJOSER = {
     "SERIALIZERS": {
-        "user": "api.serializers.CustomUserSerializer",
-        "current_user": "api.serializers.CustomUserSerializer",
+        'user': 'api.serializers.UserWithPerfilSerializer',
+        'current_user': 'api.serializers.UserWithPerfilSerializer',
     }
 }
 

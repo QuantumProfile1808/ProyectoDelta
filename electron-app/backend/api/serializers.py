@@ -33,6 +33,16 @@ class PerfilSerializer(serializers.ModelSerializer):
         model = Perfil
         fields = ['id', 'user', 'sucursal', 'permiso', 'dni']
 
+class UserWithPerfilSerializer(serializers.ModelSerializer):
+    perfil = PerfilSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'is_staff', 'is_active', 'perfil'
+        ]
+        
 # --- Entidades básicas ---
 
 class SucursalSerializer(serializers.ModelSerializer):
