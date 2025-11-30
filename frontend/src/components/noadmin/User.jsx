@@ -1,14 +1,16 @@
 import React, { useState, useMemo, useRef } from "react";
-import usePerfilyProductos from "../hooks/usePerfilyProductos";
 import useCategoriasNoadmin from "../hooks/useCategoriasNoadmin";
 import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 import Header from "../../components/admin/Header";
-
+import useProductosSucursal from "../hooks/useProductosSucursal";
+import { usePerfil } from "../hooks/usePerfil";
 
 export default function User() {
-  const { perfil, productos, loading, error } = usePerfilyProductos();
+  const perfil = usePerfil();
+
+  const { productos, loading } = useProductosSucursal(perfil?.sucursal?.id);
   const { categorias } = useCategoriasNoadmin();
 
   const [carrito, setCarrito] = useState({});
@@ -17,7 +19,7 @@ export default function User() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-    const [mensajeBackup, setMensajeBackup] = useState("");
+  const [mensajeBackup, setMensajeBackup] = useState("");
   const fileInputRef = useRef(null);
 
   function exportar() {
@@ -36,10 +38,13 @@ export default function User() {
       const res = await fetch("http://127.0.0.1:8000/api/backup/importar/", {
         method: "POST",
         body: formData,
-        credentials: "include"
+        credentials: "include",
       });
       const data = await res.json().catch(() => ({}));
-      setMensajeBackup(data.mensaje || (res.ok ? "Importación completada" : "Error al importar datos"));
+      setMensajeBackup(
+        data.mensaje ||
+          (res.ok ? "Importación completada" : "Error al importar datos")
+      );
     } catch (err) {
       console.error(err);
       setMensajeBackup("Error al importar datos");
@@ -48,12 +53,11 @@ export default function User() {
     }
   }
 
-
   function handleQtyChange(id, e) {
     const value = e.target.value;
     const qty = parseInt(value, 10);
 
-    setCarrito(prev => {
+    setCarrito((prev) => {
       const next = { ...prev };
       if (value === "") {
         // permitir limpiar el input mientras escribe
@@ -71,13 +75,13 @@ export default function User() {
     return Object.entries(carrito)
       .filter(([_, qty]) => typeof qty === "number" && qty > 0)
       .map(([id, qty]) => {
-        const producto = productos.find(p => p.id === parseInt(id));
+        const producto = productos.find((p) => p.id === parseInt(id));
         if (!producto) return null;
         return {
           id: producto.id,
           descripcion: producto.descripcion,
           precio: Number(producto.precio),
-          cantidad: qty
+          cantidad: qty,
         };
       })
       .filter(Boolean);
@@ -91,29 +95,32 @@ export default function User() {
   }, [lineas]);
 
   const totalItems = useMemo(() => {
-  return lineas.reduce((sum, item) => {
-    const qty = typeof item.cantidad === "number" ? item.cantidad : 0;
-    return sum + qty;
-  }, 0);
-}, [lineas]);
+    return lineas.reduce((sum, item) => {
+      const qty = typeof item.cantidad === "number" ? item.cantidad : 0;
+      return sum + qty;
+    }, 0);
+  }, [lineas]);
 
   if (loading) return <p>Cargando…</p>;
-  if (error) return <p>Error: {error}</p>;
 
-
-
-  const productosFiltrados = productos.filter(p => {
+  const productosFiltrados = productos.filter((p) => {
     const term = searchTerm.toLowerCase();
     const desc = p.descripcion?.toLowerCase() || "";
-    const catDesc = categorias.find(c => c.id === p.categoria)?.descripcion.toLowerCase() || "";
+    const catDesc =
+      categorias.find((c) => c.id === p.categoria)?.descripcion.toLowerCase() ||
+      "";
     const coincideTexto = desc.includes(term) || catDesc.includes(term);
-    const coincideCategoria = !categoriaSeleccionada || p.categoria === parseInt(categoriaSeleccionada);
+    const coincideCategoria =
+      !categoriaSeleccionada || p.categoria === parseInt(categoriaSeleccionada);
     return coincideTexto && coincideCategoria;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const productosPaginados = productosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const productosPaginados = productosFiltrados.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
 
   function handleConfirmSale({ paymentMethod, amountReceived, change }) {
@@ -121,43 +128,51 @@ export default function User() {
     const fecha = ahora.toISOString().slice(0, 10);
     const hora = ahora.toTimeString().slice(0, 8);
 
-    const movimientos = lineas.map(l => ({
+    const movimientos = lineas.map((l) => ({
       producto: parseInt(l.id),
       usuario: perfil.user.id,
       cantidad: l.cantidad ?? l.qty, // usa cantidad si existe, sino usa qty
       tipo_de_movimiento: "salida",
       metodo_de_pago: paymentMethod.toLowerCase(),
-      descripcion: `Venta de ${l.cantidad ?? l.qty} unidad/es a $${l.unitPrice ?? l.precio} c/u` +
-        (l.descuentoAplicado ? ` con descuento de $${Number(l.descuentoAplicado).toFixed(2)} por unidad` : ""),
+      descripcion:
+        `Venta de ${l.cantidad ?? l.qty} unidad/es a $${
+          l.unitPrice ?? l.precio
+        } c/u` +
+        (l.descuentoAplicado
+          ? ` con descuento de $${Number(l.descuentoAplicado).toFixed(
+              2
+            )} por unidad`
+          : ""),
       fecha,
-      hora
+      hora,
     }));
 
     Promise.all(
-      movimientos.map(m =>
+      movimientos.map((m) =>
         fetch("http://127.0.0.1:8000/api/movimiento/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify(m)
+          body: JSON.stringify(m),
         })
       )
     )
-      .then(async responses => {
+      .then(async (responses) => {
         const results = await Promise.all(
-          responses.map(async r => {
+          responses.map(async (r) => {
             const body = await r.json().catch(() => ({}));
             return { ok: r.ok, body };
           })
         );
 
-        const errores = results.filter(r => !r.ok);
+        const errores = results.filter((r) => !r.ok);
         if (errores.length > 0) {
           const mensaje = errores
-            .map(e =>
-              e.body?.non_field_errors?.[0] ||
-              (Object.values(e.body || {})[0]?.[0]) ||
-              "Error desconocido"
+            .map(
+              (e) =>
+                e.body?.non_field_errors?.[0] ||
+                Object.values(e.body || {})[0]?.[0] ||
+                "Error desconocido"
             )
             .join("\n");
           throw new Error(mensaje);
@@ -167,7 +182,7 @@ export default function User() {
         setShowModal(false);
         alert("Venta registrada con éxito.");
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         alert(`Error: ${err.message}`);
       });
@@ -182,15 +197,15 @@ export default function User() {
             type="text"
             placeholder="Buscar…"
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
             className="search-select"
             value={categoriaSeleccionada}
-            onChange={e => setCategoriaSeleccionada(e.target.value)}
+            onChange={(e) => setCategoriaSeleccionada(e.target.value)}
           >
             <option value="">Todas las categorías</option>
-            {categorias.map(c => (
+            {categorias.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.descripcion}
               </option>
@@ -201,7 +216,7 @@ export default function User() {
         <table className="historial-tabla">
           <thead className="historial-tabla-encabezado">
             <tr className="historial-fila-encabezado">
-              <th className="historial-columna">Descripción</th>  
+              <th className="historial-columna">Descripción</th>
               <th className="historial-columna">Precio</th>
               <th className="historial-columna">Stock</th>
               <th className="historial-columna">Categoría</th>
@@ -209,24 +224,25 @@ export default function User() {
             </tr>
           </thead>
           <tbody className="historial-tabla-cuerpo">
-            {productosPaginados.map(p => {
-              const catObj = categorias.find(c => c.id === p.categoria);
+            {productosPaginados.map((p) => {
+              const catObj = categorias.find((c) => c.id === p.categoria);
 
               const handleIncrement = () => {
-                setCarrito(prev => ({
+                setCarrito((prev) => ({
                   ...prev,
                   [p.id]: prev[p.id]
                     ? Math.min(
                         typeof prev[p.id] === "number" ? prev[p.id] + 1 : 1,
                         p.stock
                       )
-                    : 1
+                    : 1,
                 }));
               };
 
               const handleDecrement = () => {
-                setCarrito(prev => {
-                  const current = typeof prev[p.id] === "number" ? prev[p.id] : 0;
+                setCarrito((prev) => {
+                  const current =
+                    typeof prev[p.id] === "number" ? prev[p.id] : 0;
                   if (current <= 1) {
                     const next = { ...prev };
                     delete next[p.id];
@@ -237,16 +253,26 @@ export default function User() {
               };
 
               return (
-                <tr key={p.id} className={carrito[p.id] ? "historial-fila" : ""}>
+                <tr
+                  key={p.id}
+                  className={carrito[p.id] ? "historial-fila" : ""}
+                >
                   <td className="historial-celda">{p.descripcion}</td>
                   <td className="historial-celda">${p.precio}</td>
                   <td className="historial-celda">{p.stock}</td>
-                  <td className="historial-celda">{catObj ? catObj.descripcion : "—"}</td>
+                  <td className="historial-celda">
+                    {catObj ? catObj.descripcion : "—"}
+                  </td>
                   <td className="historial-celda">
                     <div className="qty-controls">
-                      <button className="decrement-btn"
+                      <button
+                        className="decrement-btn"
                         onClick={handleDecrement}
-                        disabled={p.stock === 0 || carrito[p.id] === undefined || carrito[p.id] === ""}
+                        disabled={
+                          p.stock === 0 ||
+                          carrito[p.id] === undefined ||
+                          carrito[p.id] === ""
+                        }
                         aria-label="Restar uno"
                       >
                         −
@@ -256,10 +282,11 @@ export default function User() {
                         min="1"
                         max={p.stock}
                         value={carrito[p.id] !== undefined ? carrito[p.id] : ""}
-                        onChange={e => handleQtyChange(p.id, e)}
+                        onChange={(e) => handleQtyChange(p.id, e)}
                         disabled={p.stock === 0}
                       />
-                      <button className="increment-btn"
+                      <button
+                        className="increment-btn"
                         onClick={handleIncrement}
                         disabled={p.stock === 0}
                         aria-label="Sumar uno"
@@ -276,14 +303,18 @@ export default function User() {
 
         <div className="pagination">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
             Anterior
           </button>
-          <span>Página {currentPage} de {totalPages}</span>
+          <span>
+            Página {currentPage} de {totalPages}
+          </span>
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             Siguiente
@@ -304,14 +335,20 @@ export default function User() {
             <span>Total: ${grandTotal.toFixed(2)}</span>
           </div>
           <div className="footer-buttons">
-            <button className="refresh-btn" onClick={() => window.location.reload()}>
+            <button
+              className="refresh-btn"
+              onClick={() => window.location.reload()}
+            >
               ⟳
             </button>
-            
+
             <button className="export-btn" onClick={exportar}>
               Exportar
             </button>
-            <button className="import-btn" onClick={() => fileInputRef.current?.click()}>
+            <button
+              className="import-btn"
+              onClick={() => fileInputRef.current?.click()}
+            >
               Importar
             </button>
             <input
@@ -321,7 +358,6 @@ export default function User() {
               onChange={handleImport}
             />
 
-
             <button
               className="cart-btn-footer"
               onClick={() => setShowModal(true)}
@@ -330,7 +366,6 @@ export default function User() {
             >
               🛒 Ver Carrito {totalItems > 0 ? `(${totalItems})` : ""}
             </button>
-
           </div>
         </footer>
       </div>

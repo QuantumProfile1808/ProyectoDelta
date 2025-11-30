@@ -20,6 +20,27 @@ class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.filter(is_active=True)
     serializer_class = ProductoSerializer
 
+    @action(detail=False, methods=['get'], url_path='stock/alertas')
+    def stock_alertas(self, request):
+        sucursal_id = request.query_params.get("sucursal")
+
+        if not sucursal_id:
+            return Response({"error": "Debe enviar ?sucursal=<id>"}, status=400)
+
+        sin_stock = Producto.objects.filter(sucursal_id=sucursal_id, stock=0)
+        bajo_stock = Producto.objects.filter(
+            sucursal_id=sucursal_id,
+            stock__gt=0,
+            stock__lt=5
+        )
+
+        return Response({
+            "sin_stock": sin_stock.count(),
+            "bajo_stock": bajo_stock.count(),
+            "items_sin_stock": ProductoSerializer(sin_stock, many=True).data,
+            "items_bajo_stock": ProductoSerializer(bajo_stock, many=True).data,
+        })
+    
     @action(detail=False, methods=['get'], url_path='inactivos')
     def productos_inactivos(self, request):
         productos = Producto.objects.filter(is_active=False)
@@ -103,6 +124,31 @@ class MovimientoViewSet(viewsets.ModelViewSet):
         )
 
         serializer = self.get_serializer(movimientos, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='resumen')
+    def resumen(self, request):
+        sucursal_id = request.query_params.get("sucursal")
+        desde = request.query_params.get("desde")
+        hasta = request.query_params.get("hasta")
+
+        if not sucursal_id:
+            return Response({"error": "Debe enviar ?sucursal="}, status=400)
+
+        queryset = Movimiento.objects.filter(
+            producto__sucursal_id=sucursal_id,
+            tipo_de_movimiento="salida"
+        )
+
+        if desde:
+            queryset = queryset.filter(fecha__gte=desde)
+        if hasta:
+            queryset = queryset.filter(fecha__lte=hasta)
+
+        queryset = queryset.select_related("producto", "usuario")
+
+        serializer = self.get_serializer(queryset, many=True)
+
         return Response(serializer.data)
 
     def perform_create(self, serializer):
