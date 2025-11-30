@@ -61,16 +61,24 @@ class CategoriaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductoSerializer(serializers.ModelSerializer):
-    sucursal = serializers.PrimaryKeyRelatedField(queryset=Sucursal.objects.all())
-    categoria = serializers.PrimaryKeyRelatedField(queryset=Categoria.objects.all())
+    stock_formateado = serializers.SerializerMethodField()
 
     class Meta:
         model = Producto
-        fields = '__all__'
+        fields = [
+            'id', 'sucursal', 'categoria', 'stock', 'stock_formateado',
+            'medida', 'descripcion', 'precio', 'is_active'
+        ]
 
+    def get_stock_formateado(self, obj):
+        if obj.stock == int(obj.stock):
+            return int(obj.stock)
+        return float(obj.stock)
+    
 # --- Movimiento con descuentos aplicados ---
 
 class MovimientoSerializer(serializers.ModelSerializer):
+    cantidad_formateada = serializers.SerializerMethodField()
     subtotal = serializers.SerializerMethodField()
     producto_nombre = serializers.SerializerMethodField()
     precio_unitario = serializers.SerializerMethodField()
@@ -82,15 +90,20 @@ class MovimientoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'producto', 'producto_nombre', 'precio_unitario',
             'usuario', 'usuario_nombre', 'fecha', 'hora',
-            'tipo_de_movimiento', 'metodo_de_pago', 'cantidad',
+            'tipo_de_movimiento', 'metodo_de_pago',
+            'cantidad', 'cantidad_formateada',
             'descripcion', 'subtotal', 'descuentos_aplicados'
         ]
 
-    def get_producto_nombre(self, obj):
-        return str(obj.producto) if obj.producto else None
+    def get_cantidad_formateada(self, obj):
+        c = obj.cantidad
+        return int(c) if c == int(c) else float(c)
 
     def get_precio_unitario(self, obj):
-        return obj.producto.precio if obj.producto and obj.producto.precio else 0
+        return float(obj.producto.precio) if obj.producto else 0
+
+    def get_producto_nombre(self, obj):
+        return str(obj.producto) if obj.producto else None
 
     def get_usuario_nombre(self, obj):
         if obj.usuario:
@@ -98,7 +111,8 @@ class MovimientoSerializer(serializers.ModelSerializer):
         return None
 
     def get_subtotal(self, obj):
-        return float(obj.total or 0)
+        total = obj.total or 0
+        return int(total) if total == int(total) else float(total)
 
     def get_descuentos_aplicados(self, obj):
         if not obj.producto:

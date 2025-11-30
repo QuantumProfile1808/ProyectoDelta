@@ -25,7 +25,9 @@ const EditProductModal = ({
               <input
                 type="text"
                 value={formValues.descripcion}
-                onChange={(e) => onChange({ ...formValues, descripcion: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...formValues, descripcion: e.target.value })
+                }
               />
             </label>
 
@@ -35,7 +37,12 @@ const EditProductModal = ({
               <input
                 type="number"
                 value={formValues.precio}
-                onChange={(e) => onChange({ ...formValues, precio: parseFloat(e.target.value) || 0 })}
+                onChange={(e) =>
+                  onChange({
+                    ...formValues,
+                    precio: parseFloat(e.target.value) || 0,
+                  })
+                }
               />
             </label>
 
@@ -44,8 +51,30 @@ const EditProductModal = ({
               Stock
               <input
                 type="number"
+                step={formValues.medida ? "0.001" : "1"}
+                min="0"
+                placeholder="Cantidad"
                 value={formValues.stock}
-                onChange={(e) => onChange({ ...formValues, stock: parseInt(e.target.value, 10) || 0 })}
+                onChange={(e) => {
+                  let v = e.target.value;
+
+                  if (!formValues.medida) {
+                    // UNIDAD → SOLO ENTEROS
+                    v = v.replace(/\D+/g, "");
+                    if (v === "") {
+                      onChange({ ...formValues, stock: "" });
+                      return;
+                    }
+                    v = parseInt(v).toString();
+                  } else {
+                    if (!/^\d*\.?\d{0,3}$/.test(v)) return;
+                  }
+
+                  onChange({
+                    ...formValues,
+                    stock: v,
+                  });
+                }}
               />
             </label>
 
@@ -54,10 +83,12 @@ const EditProductModal = ({
               Medida
               <select
                 value={formValues.medida ? "true" : "false"}
-                onChange={(e) => onChange({ ...formValues, medida: e.target.value === "true" })}
+                onChange={(e) =>
+                  onChange({ ...formValues, medida: e.target.value === "true" })
+                }
               >
                 <option value="false">Unidad</option>
-                <option value="true">Stock (peso o volumen)</option>
+                <option value="true">KG</option>
               </select>
             </label>
 
@@ -66,7 +97,9 @@ const EditProductModal = ({
               Sucursal
               <select
                 value={String(formValues.sucursal)}
-                onChange={(e) => onChange({ ...formValues, sucursal: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...formValues, sucursal: e.target.value })
+                }
               >
                 <option value="">Seleccionar sucursal</option>
                 {sucursal.map((s) => (
@@ -82,7 +115,9 @@ const EditProductModal = ({
               Categoría
               <select
                 value={String(formValues.categoria)}
-                onChange={(e) => onChange({ ...formValues, categoria: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...formValues, categoria: e.target.value })
+                }
               >
                 <option value="">Seleccionar categoría</option>
                 {categoria.map((c) => (

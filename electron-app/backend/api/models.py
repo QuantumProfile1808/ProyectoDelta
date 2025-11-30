@@ -31,7 +31,7 @@ class Permiso(models.Model):
 class Producto(models.Model):
     sucursal = models.ForeignKey(Sucursal, on_delete=models.SET_NULL, null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
-    stock = models.IntegerField(default=0)
+    stock = models.DecimalField(max_digits=10, decimal_places=3, default=0)
     medida = models.BooleanField(default=False)
     descripcion = models.CharField(max_length=255)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
@@ -72,7 +72,7 @@ class Movimiento(models.Model):
     tipo_de_movimiento = models.CharField(max_length=10, choices=TIPO_CHOICES, null=True, blank=True)
     metodo_de_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES, null=True, blank=True)
 
-    cantidad = models.FloatField()
+    cantidad = models.DecimalField(max_digits=10, decimal_places=3)
     descripcion = models.TextField(blank=True)
 
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -93,6 +93,8 @@ class Movimiento(models.Model):
 
             elif descuento.tipo == "CANTIDAD":
                 # Ejemplo: 2x1 → cantidad_requerida=2, cantidad_pagada=1
+                if self.producto.medida:
+                    continue  # no aplicar combos a productos por kilo
                 if descuento.cantidad_requerida and descuento.cantidad_pagada:
                     grupos = int(self.cantidad // descuento.cantidad_requerida)
                     resto = int(self.cantidad % descuento.cantidad_requerida)

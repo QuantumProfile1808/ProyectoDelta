@@ -5,7 +5,7 @@ import AuthContext from "../../AuthContext";
 
 export default function MenuDashboard() {
   const { user } = useContext(AuthContext);
-  const sucursalID = user?.perfil?.sucursal;
+  const sucursalID = user?.perfil?.sucursal?.id;
 
   const {
     ultimos,
@@ -17,8 +17,8 @@ export default function MenuDashboard() {
   } = useDashboardData(sucursalID);
 
   const [selectedStockType, setSelectedStockType] = useState(null);
-  const sinStock = alertasStock.items_sin_stock;
-  const bajoStock = alertasStock.items_bajo_stock;
+  const sinStock = alertasStock.items_sin_stock || [];
+  const bajoStock = alertasStock.items_bajo_stock || [];
 
   const productosAMostrar =
     selectedStockType === "sin"
@@ -49,7 +49,7 @@ export default function MenuDashboard() {
               <td>{m.usuario}</td>
               <td>{m.tipo_de_movimiento}</td>
               <td>{m.producto}</td>
-              <td>{m.cantidad}</td>
+              <td>{Number(m.cantidad)}</td>
             </tr>
           ))}
         </tbody>
@@ -119,7 +119,7 @@ export default function MenuDashboard() {
               {productosAMostrar.map((p) => (
                 <tr key={p.id}>
                   <td>{p.descripcion}</td>
-                  <td>{p.stock}</td>
+                  <td>{Number(p.stock)}</td>
                 </tr>
               ))}
             </tbody>

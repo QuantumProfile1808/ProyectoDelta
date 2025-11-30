@@ -1,22 +1,21 @@
-import { Route, Routes, Navigate, Outlet } from 'react-router-dom';
-import './App.css';
-import { AuthProvider } from './AuthContext';
-import { Login } from './components/Login';
-import { Dashboard } from './components/admin/Dashboard';
-import NoStaff from './components/noadmin/no-staff';
+import { Route, Routes, Navigate, Outlet } from "react-router-dom";
+import "./App.css";
+import { AuthProvider } from "./AuthContext";
+import { Login } from "./components/Login";
+import { Dashboard } from "./components/admin/Dashboard";
+import NoStaff from "./components/noadmin/no-staff";
 import Usuarios from "./components/admin/Usuarios";
-import Finanzas from './components/admin/Finanzas';
-import Productos from './components/admin/Productos';
-import Historial from './components/admin/Historial';
-import TablaUsuario from './components/admin/tablausuario';
-import TablaProductos from './components/admin/TablaProductos';
+import Ventas from "./components/admin/Ventas";
+import Productos from "./components/admin/Productos";
+import Historial from "./components/admin/Historial";
+import TablaUsuario from "./components/admin/tablausuario";
+import TablaProductos from "./components/admin/TablaProductos";
 import User from "./components/noadmin/User";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/admin/Header";
 import MenuDashboard from "./components/admin/menudashboard";
-import { useContext, useState } from 'react';
-import TablaPromociones from './components/admin/tablapromociones';
-import Promociones from './components/admin/promociones';
+import TablaPromociones from "./components/admin/tablapromociones";
+import Promociones from "./components/admin/promociones";
 import BackupPage from "./components/admin/BackupPage";
 
 function AdminLayout() {
@@ -31,27 +30,30 @@ function AdminLayout() {
 function App() {
   return (
     <AuthProvider>
-      {/* No envolver con otro Router aquí */}
       <Routes>
-
         <Route path="/login" element={<Login />} />
         <Route path="/no-staff" element={<NoStaff />} />
 
-        <Route path="/User" element={
-          <ProtectedRoute>
-            <User />
-          </ProtectedRoute>
-        } />
+        <Route
+          path="/User"
+          element={
+            <ProtectedRoute>
+              <User />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route element={
-          <ProtectedRoute onlyAdmin={true}>
-            <AdminLayout />
-          </ProtectedRoute>
-        }>
+        <Route
+          element={
+            <ProtectedRoute onlyAdmin={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="productos" element={<Productos />} />
             <Route path="historial" element={<Historial />} />
-            <Route path="finanzas" element={<Finanzas />} />
+            <Route path="ventas" element={<Ventas />} />
             <Route path="usuarios" element={<Usuarios />} />
             <Route path="tablausuario" element={<TablaUsuario />} />
             <Route path="TablaProductos" element={<TablaProductos />} />
@@ -63,7 +65,6 @@ function App() {
         </Route>
 
         <Route path="/" element={<Navigate to="/login" />} />
-
       </Routes>
     </AuthProvider>
   );

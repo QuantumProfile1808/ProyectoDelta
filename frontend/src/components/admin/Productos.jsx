@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useState } from "react";
 import { useCategorias } from "../hooks/useCategorias";
 import { useSucursales } from "../hooks/useSucursales";
@@ -10,42 +9,43 @@ import CreateCategoria from "./CreateCategoria";
 
 const Productos = () => {
   const [form, setForm] = useState({
-      descripcion: "",
-      precio: "",
-      stock: "",
-      sucursal: "",
-      categoria: "",
-      medicion: "",
+    descripcion: "",
+    precio: "",
+    stock: "",
+    sucursal: "",
+    categoria: "",
+    medida: "",
   });
-  const sucursales= useSucursales();
+
+  const sucursales = useSucursales();
   const categorias = useCategorias();
 
   const [showSucursal, setShowSucursal] = useState(false);
   const [showCategoria, setShowCategoria] = useState(false);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const payload = {
+      descripcion: form.descripcion,
+      precio: form.precio,
+      stock: form.stock,
+      sucursal: form.sucursal,
+      categoria: form.categoria,
+      medida: form.medida === "true",
+    };
 
     const productRes = await fetch("http://127.0.0.1:8000/api/producto/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(
-        {
-          descripcion: form.descripcion,
-          precio: form.precio,
-          stock: form.stock,
-          sucursal: form.sucursal,
-          categoria: form.categoria,
-          medicion: form.medicion,
-        }
-      ),
+      body: JSON.stringify(payload),
     });
 
     if (!productRes.ok) {
@@ -58,13 +58,11 @@ const Productos = () => {
       stock: "",
       sucursal: "",
       categoria: "",
-      medicion: "",
+      medida: "",
     });
   };
 
-  // simple handler after create: recarga para actualizar listas
   const handleCreated = () => {
-    // puedes reemplazar por re-fetch en el futuro
     window.location.reload();
   };
 
@@ -94,33 +92,36 @@ const Productos = () => {
             value={form.stock}
             onChange={handleChange}
           />
+
           <select
             name="sucursal"
             value={form.sucursal}
             onChange={handleChange}
           >
             <option value="">Seleccione una sucursal</option>
-            {sucursales.map(s => (
+            {sucursales.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.localidad} - {s.direccion}
               </option>
             ))}
           </select>
+
           <select
             name="categoria"
             value={form.categoria}
             onChange={handleChange}
           >
             <option value="">Seleccione una categoría</option>
-            {categorias.map(c => (
+            {categorias.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.descripcion}
               </option>
             ))}
           </select>
+
           <select
-            name="medicion"
-            value={form.medicion}
+            name="medida"
+            value={form.medida}
             onChange={handleChange}
           >
             <option value="">Seleccione un tipo de medición</option>
@@ -135,7 +136,7 @@ const Productos = () => {
       {/* FABs */}
       <div className="fab-container" aria-hidden={false}>
         <div className="fab-row">
-          <div style={{display:'flex', alignItems:'center'}}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <span className="fab-label">Nueva categoría</span>
             <button
               className="fab"
@@ -148,7 +149,7 @@ const Productos = () => {
         </div>
 
         <div className="fab-row">
-          <div style={{display:'flex', alignItems:'center'}}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <span className="fab-label">Nueva sucursal</span>
             <button
               className="fab small"
@@ -178,4 +179,3 @@ const Productos = () => {
 };
 
 export default Productos;
-// ...existing code...

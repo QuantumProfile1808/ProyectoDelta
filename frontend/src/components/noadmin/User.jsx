@@ -55,20 +55,28 @@ export default function User() {
 
   function handleQtyChange(id, e) {
     const value = e.target.value;
-    const qty = parseInt(value, 10);
+    const producto = productos.find((p) => p.id === id);
 
-    setCarrito((prev) => {
-      const next = { ...prev };
-      if (value === "") {
-        // permitir limpiar el input mientras escribe
-        next[id] = "";
-      } else if (!isNaN(qty) && qty > 0) {
-        next[id] = qty;
-      } else {
-        delete next[id];
-      }
-      return next;
-    });
+    if (!producto) return;
+
+    // Producto por unidad → solo enteros
+    if (!producto.medida) {
+      const soloEnteros = value.replace(/\D+/g, "");
+      setCarrito((prev) => ({
+        ...prev,
+        [id]: soloEnteros === "" ? "" : parseInt(soloEnteros, 10),
+      }));
+      return;
+    }
+
+    // Producto por KG → permitir decimales (hasta 3)
+    let val = value.replace(",", ".");
+    if (!/^\d*\.?\d{0,3}$/.test(val)) return; // evita más de 3 decimales
+
+    setCarrito((prev) => ({
+      ...prev,
+      [id]: val === "" ? "" : parseFloat(val),
+    }));
   }
 
   const productosSeleccionados = useMemo(() => {
@@ -259,7 +267,7 @@ export default function User() {
                 >
                   <td className="historial-celda">{p.descripcion}</td>
                   <td className="historial-celda">${p.precio}</td>
-                  <td className="historial-celda">{p.stock}</td>
+                  <td className="historial-celda">{Number(p.stock)}</td>
                   <td className="historial-celda">
                     {catObj ? catObj.descripcion : "—"}
                   </td>
@@ -275,15 +283,17 @@ export default function User() {
                         }
                         aria-label="Restar uno"
                       >
-                        −
+                        -
                       </button>
                       <input
                         type="number"
-                        min="1"
+                        min="0.001"
                         max={p.stock}
+                        step={p.medida ? "0.001" : "1"} // 👈 dinámico según unidad/kg
                         value={carrito[p.id] !== undefined ? carrito[p.id] : ""}
                         onChange={(e) => handleQtyChange(p.id, e)}
                         disabled={p.stock === 0}
+                        style={{ width: "70px" }}
                       />
                       <button
                         className="increment-btn"

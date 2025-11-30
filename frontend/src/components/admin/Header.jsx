@@ -10,7 +10,7 @@ const PESTANIA_MAP = {
   "": "Inicio",
   productos: "Productos",
   historial: "Historial",
-  finanzas: "Finanzas",
+  ventas: "Ventas",
   usuarios: "Usuarios",
   tablausuario: "Usuarios",
   tablaproductos: "Productos",

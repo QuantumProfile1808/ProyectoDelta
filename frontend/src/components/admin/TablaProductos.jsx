@@ -13,28 +13,54 @@ function AddStock({ producto, onClose, onGuardar }) {
   if (!producto) return null;
 
   const handleSubmit = () => {
-    const nuevoStock = parseInt(cantidad, 10);
-    if (!isNaN(nuevoStock)) {
-      onGuardar(nuevoStock);
-      setCantidad("");
+    const valor = parseFloat(cantidad);
+
+    if (isNaN(valor) || valor <= 0) {
+      alert("Ingrese un número válido");
+      return;
     }
+
+    // ❌ UNIDAD → SOLO ENTEROS
+    if (!producto.medida && !Number.isInteger(valor)) {
+      alert("Este producto solo acepta unidades enteras");
+      return;
+    }
+
+    onGuardar(valor);
+    setCantidad("");
   };
 
   return (
     <div className="popup-overlay">
       <div className="popup">
         <h3>Agregar stock a {producto.descripcion}</h3>
+
         <input
           type="number"
+          step={producto.medida ? "0.001" : "1"}
+          min="0"
           placeholder="Cantidad"
           value={cantidad}
-          onChange={(e) => setCantidad(e.target.value)}
+          onChange={(e) => {
+            let v = e.target.value;
+
+            if (!producto.medida) {
+              // UNIDAD → SOLO ENTEROS
+              v = v.replace(/\D+/g, "");
+            } else {
+              // KG → Hasta 3 decimales
+              if (!/^\d*\.?\d{0,3}$/.test(v)) return;
+            }
+
+            setCantidad(v);
+          }}
         />
+
         <div className="popup-buttons">
-          <button onClick={onClose} className="btn-cancel" title="Cancelar">
+          <button onClick={onClose} className="btn-cancel">
             <FaTimes />
           </button>
-          <button onClick={handleSubmit} className="btn-confirm" title="Confirmar">
+          <button onClick={handleSubmit} className="btn-confirm">
             <FaCheck />
           </button>
         </div>
@@ -75,7 +101,12 @@ const TablaProductos = () => {
       : "http://127.0.0.1:8000/api/producto/";
     const res = await fetch(url);
     const data = await res.json();
-    setProductos(data);
+    setProductos(
+      data.map((p) => ({
+        ...p,
+        medida: p.medida === true || p.medida === "true",
+      }))
+    );
     setCurrentPage(1);
   }, [mostrarInactivos]);
 
@@ -110,7 +141,11 @@ const TablaProductos = () => {
 
   const guardarStock = async (cantidad) => {
     const id = productoSeleccionado.id;
-    const nuevoStock = productoSeleccionado.stock + cantidad;
+
+    // Sumamos los decimales correctamente y limitamos a 3 decimales
+    const nuevoStock = parseFloat(
+      (parseFloat(productoSeleccionado.stock) + parseFloat(cantidad)).toFixed(3)
+    );
 
     try {
       await fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
@@ -126,7 +161,7 @@ const TablaProductos = () => {
           producto: id,
           usuario: 1,
           tipo_de_movimiento: "entrada",
-          cantidad,
+          cantidad: cantidad,
           descripcion: `Ingreso de stock para ${productoSeleccionado.descripcion}`,
           fecha: new Date().toISOString().split("T")[0],
           hora: new Date().toLocaleTimeString("es-AR", { hour12: false }),
@@ -145,7 +180,7 @@ const TablaProductos = () => {
     setFormValues({
       descripcion: producto.descripcion || "",
       precio: parseFloat(producto.precio) || "",
-      stock: parseInt(producto.stock, 10) || 0,
+      stock: parseFloat(producto.stock, 10) || 0,
       medida: producto.medida || false,
       sucursal: producto.sucursal || "",
       categoria: producto.categoria || "",
@@ -160,7 +195,9 @@ const TablaProductos = () => {
     const payload = {
       ...formValues,
       precio: parseFloat(formValues.precio),
-      stock: parseInt(formValues.stock, 10),
+      stock: formValues.medida
+        ? parseFloat(formValues.stock).toFixed(3)
+        : parseInt(formValues.stock, 10),
       sucursal: parseInt(formValues.sucursal, 10),
       categoria: parseInt(formValues.categoria, 10),
     };
@@ -201,7 +238,10 @@ const TablaProductos = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.max(1, Math.ceil(productosFiltrados.length / itemsPerPage));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(productosFiltrados.length / itemsPerPage)
+  );
 
   return (
     <div className="tabla-container">
@@ -283,12 +323,14 @@ const TablaProductos = () => {
               <td>{p.id}</td>
               <td>{p.descripcion}</td>
               <td>{p.precio}</td>
-              <td>{p.stock}</td>
+              <td>{Number(p.stock)}</td>
               <td>
                 {sucursal.find((s) => s.id === p.sucursal)?.localidad} -{" "}
                 {sucursal.find((s) => s.id === p.sucursal)?.direccion}
               </td>
-              <td>{categoria.find((c) => c.id === p.categoria)?.descripcion}</td>
+              <td>
+                {categoria.find((c) => c.id === p.categoria)?.descripcion}
+              </td>
               <td>
                 <div className="acciones">
                   {mostrarInactivos ? (
@@ -337,7 +379,11 @@ const TablaProductos = () => {
         </tbody>
       </table>
 
-      <Link to="/dashboard/productos" className="fab-boton" title="Nuevo producto">
+      <Link
+        to="/dashboard/productos"
+        className="fab-boton"
+        title="Nuevo producto"
+      >
         <FaPlus />
       </Link>
 

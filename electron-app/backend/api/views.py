@@ -27,18 +27,41 @@ class ProductoViewSet(viewsets.ModelViewSet):
         if not sucursal_id:
             return Response({"error": "Debe enviar ?sucursal=<id>"}, status=400)
 
-        sin_stock = Producto.objects.filter(sucursal_id=sucursal_id, stock=0)
-        bajo_stock = Producto.objects.filter(
+        # Productos por UNIDAD → bajo stock < 5
+        bajo_unidad = Producto.objects.filter(
             sucursal_id=sucursal_id,
+            medida=False,
             stock__gt=0,
             stock__lt=5
         )
 
+        # Productos por KILOS → bajo stock < 1 kg
+        bajo_kg = Producto.objects.filter(
+            sucursal_id=sucursal_id,
+            medida=True,
+            stock__gt=0,
+            stock__lt=1
+        )
+
+        # Sin stock (cualquier tipo)
+        sin_stock = Producto.objects.filter(sucursal_id=sucursal_id, stock=0)
+
+        # Combinado (para compatibilidad con el front)
+        bajo_total_count = bajo_unidad.count() + bajo_kg.count()
+        items_bajo_total = list(bajo_unidad) + list(bajo_kg)
+
         return Response({
+            # totales
             "sin_stock": sin_stock.count(),
-            "bajo_stock": bajo_stock.count(),
+            "bajo_stock": bajo_total_count,
+            "bajo_stock_unidad": bajo_unidad.count(),
+            "bajo_stock_kg": bajo_kg.count(),
+
+            # listas
             "items_sin_stock": ProductoSerializer(sin_stock, many=True).data,
-            "items_bajo_stock": ProductoSerializer(bajo_stock, many=True).data,
+            "items_bajo_stock": ProductoSerializer(items_bajo_total, many=True).data,  # 👈 combinado
+            "items_bajo_stock_unidad": ProductoSerializer(bajo_unidad, many=True).data,
+            "items_bajo_stock_kg": ProductoSerializer(bajo_kg, many=True).data,
         })
     
     @action(detail=False, methods=['get'], url_path='inactivos')
@@ -70,6 +93,13 @@ class PerfilViewSet(viewsets.ModelViewSet):
     queryset = Perfil.objects.select_related('user', 'sucursal', 'permiso').all()
     serializer_class = PerfilSerializer
 
+    def get_queryset(self):
+        user_id = self.request.query_params.get("user")
+        qs = super().get_queryset()
+        if user_id:
+            qs = qs.filter(user_id=user_id)
+        return qs
+    
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         for perfil in response.data:
@@ -162,14 +192,12 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 
         movimiento = serializer.save()
 
-        # Actualizar stock según el tipo de movimiento
         if movimiento.tipo_de_movimiento == 'salida':
             producto.stock -= movimiento.cantidad
         elif movimiento.tipo_de_movimiento == 'entrada':
             producto.stock += movimiento.cantidad
 
         producto.save()
-
 
 
 class DescuentoViewSet(viewsets.ModelViewSet):

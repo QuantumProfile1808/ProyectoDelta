@@ -7,11 +7,10 @@ export function useDashboardData(sucursalID) {
   const [ventasMes, setVentasMes] = useState([]);
   const [gananciaMes, setGananciaMes] = useState(0);
   const [alertasStock, setAlertasStock] = useState({
-    
     items_sin_stock: [],
     items_bajo_stock: [],
   });
-  
+
   useEffect(() => {
     if (!sucursalID) return;
 
@@ -20,11 +19,17 @@ export function useDashboardData(sucursalID) {
     // Fechas
     const hoy = new Date().toISOString().slice(0, 10);
 
-    const inicioSemana = new Date();
-    inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
+    // Semana desde lunes
+    const hoyObj = new Date();
+    const day = hoyObj.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+
+    const inicioSemana = new Date(hoyObj);
+    inicioSemana.setDate(hoyObj.getDate() - diff);
+
     const fechaSemana = inicioSemana.toISOString().slice(0, 10);
 
-    const hoyObj = new Date();
+    // Mes desde el día 1
     const fechaInicioMes = `${hoyObj.getFullYear()}-${String(
       hoyObj.getMonth() + 1
     ).padStart(2, "0")}-01`;
@@ -55,7 +60,7 @@ export function useDashboardData(sucursalID) {
       `http://127.0.0.1:8000/api/producto/stock/alertas/?sucursal=${sucursalID}`
     ).then(setAlertasStock);
   }, [sucursalID]);
-    
+
   return {
     ultimos,
     ventasHoy,

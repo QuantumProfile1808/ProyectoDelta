@@ -19,7 +19,8 @@ class BackupExportView(APIView):
             list(Perfil.objects.all()) +
             list(Producto.objects.all()) +
             list(Descuento.objects.all()) +
-            list(Movimiento.objects.all())
+            list(Movimiento.objects.all()) +
+            list(ProductoDescuento.objects.all())
         )
         response = HttpResponse(data, content_type="application/json")
         response['Content-Disposition'] = 'attachment; filename=\"backup.json\"'

@@ -26,16 +26,19 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
+      // Refresh token si el access venció
       if (res.status === 401 && refresh) {
         const refreshRes = await fetch(
-          "hthttp://127.0.0.1:8000/api-auth/jwt/refresh/",
+          "http://127.0.0.1:8000/api-auth/jwt/refresh/",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ refresh }),
           }
         );
+
         if (!refreshRes.ok) throw new Error("Refresh token invalido");
+
         const { access: newAccess } = await refreshRes.json();
         access = newAccess;
         localStorage.setItem("token", newAccess);
@@ -49,8 +52,20 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (!res.ok) throw new Error("User fetch fallo");
+
       const userData = await res.json();
+
+      // === NUEVO === traer perfil también en inicialización
+      const perfilResponse = await fetch(
+        `http://127.0.0.1:8000/api/perfil/?user=${userData.id}`,
+        { credentials: "include" }
+      );
+
+      const perfilData = await perfilResponse.json();
+      userData.perfil = Array.isArray(perfilData) ? perfilData[0] : perfilData;
+
       setUser(userData);
+
     } catch (error) {
       console.error("initializeUser:", error);
       setUser(null);
@@ -62,24 +77,16 @@ export const AuthProvider = ({ children }) => {
       const refresh = localStorage.getItem("refresh");
       if (!refresh) return;
 
-      const response = await fetch(
-        "http://127.0.0.1:8000/api-auth/jwt/blacklist/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ refresh }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
+      await fetch("http://127.0.0.1:8000/api-auth/jwt/blacklist/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
 
       localStorage.removeItem("token");
       localStorage.removeItem("refresh");
       setUser(null);
+
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -99,46 +106,46 @@ export const AuthProvider = ({ children }) => {
       );
 
       const text = await response.text();
-      console.log("Login response status", response.status, "body:", text);
-
       let data = null;
+
       try {
         data = JSON.parse(text);
-      } catch (e) {
-        console.error("Error parsing login response JSON:", e);
+      } catch {
+        console.error("Error parseando JSON");
       }
 
-      if (!response.ok) {
-        console.error("Login error body:", data ?? text);
-        return null;
-      }
+      if (!response.ok) return null;
 
-      if (data && data.access && data.refresh) {
-        localStorage.setItem("token", data.access);
-        localStorage.setItem("refresh", data.refresh);
+      // Guardar tokens
+      localStorage.setItem("token", data.access);
+      localStorage.setItem("refresh", data.refresh);
 
-        // Fetch user data
-        const userResponse = await fetch(
-          "http://127.0.0.1:8000/api-auth/users/me/",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `JWT ${data.access}`,
-            },
-          }
-        );
-
-        if (!userResponse.ok) {
-          throw new Error("Failed to fetch user data");
+      // Fetch user
+      const userResponse = await fetch(
+        "http://127.0.0.1:8000/api-auth/users/me/",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${data.access}`,
+          },
         }
+      );
 
-        const userData = await userResponse.json();
-        console.log("User data fetched:", userData);
-        setUser(userData);
-        return userData;
-      }
-      return null;
+      const userData = await userResponse.json();
+
+      // Fetch perfil
+      const perfilResponse = await fetch(
+        `http://127.0.0.1:8000/api/perfil/?user=${userData.id}`,
+        { credentials: "include" }
+      );
+
+      const perfilData = await perfilResponse.json();
+      userData.perfil = Array.isArray(perfilData) ? perfilData[0] : perfilData;
+
+      setUser(userData);
+      return userData;
+
     } catch (error) {
       console.error("Login failed:", error);
       return null;
