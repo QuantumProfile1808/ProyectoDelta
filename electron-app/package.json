@@ -1,5 +1,5 @@
 {
-  "name": "electron-app",
+  "name": "stockmanager",
   "version": "1.0.0",
   "author": "Lucas & Matias",
   "description": "App Electron con Django + Python Portable",
@@ -12,8 +12,8 @@
   },
   "build": {
     "asar": false,
-    "appId": "com.tuempresa.tuapp",
-    "productName": "electron-app",
+    "appId": "com.stock.myapp",
+    "productName": "StockManager",
     "files": [
       "main.js",
       "package.json",
