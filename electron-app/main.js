@@ -20,6 +20,7 @@ function createWindow() {
     width: 1200,
     height: 800,
     show: true,
+    icon: path.join(__dirname, "build", "icon.ico"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

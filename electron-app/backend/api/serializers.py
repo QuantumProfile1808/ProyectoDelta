@@ -107,7 +107,7 @@ class MovimientoSerializer(serializers.ModelSerializer):
 
     def get_usuario_nombre(self, obj):
         if obj.usuario:
-            return obj.usuario.get_full_name() or obj.usuario.username
+            return obj.usuario.first_name or obj.usuario.username
         return None
 
     def get_subtotal(self, obj):

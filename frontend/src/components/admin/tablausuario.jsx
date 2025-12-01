@@ -169,16 +169,17 @@ const TablaUsuarios = () => {
                   : "-"}
               </td>
               <td className="historial-celda">
-                <label className="switch">
+                <div className="switch">
                   <input
                     type="checkbox"
                     checked={u.user.is_active}
                     onChange={() => toggleActivo(u.user.id, u.user.is_active)}
                   />
                   <span className="slider round"></span>
-                </label>
+                </div>
               </td>
               <td className="historial-celda">
+                <div style={{ display: "flex", alignItems: "center" }}>
                 <button
                   className="boton-editar"
                   onClick={() => openEditModal(u)}
@@ -190,6 +191,7 @@ const TablaUsuarios = () => {
                     <FaUserShield />
                   </span>
                 )}
+                </div>
               </td>
             </tr>
           ))}

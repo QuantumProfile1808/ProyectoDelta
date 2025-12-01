@@ -45,10 +45,10 @@ export default function MenuDashboard() {
         <tbody>
           {ultimos.map((m) => (
             <tr key={m.id}>
-              <td>{m.fecha}</td>
-              <td>{m.usuario}</td>
+              <td>{m.hora}</td>
+              <td>{m.usuario_nombre}</td>
               <td>{m.tipo_de_movimiento}</td>
-              <td>{m.producto}</td>
+              <td>{m.producto_nombre}</td>
               <td>{Number(m.cantidad)}</td>
             </tr>
           ))}

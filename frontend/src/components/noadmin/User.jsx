@@ -54,28 +54,67 @@ export default function User() {
   }
 
   function handleQtyChange(id, e) {
-    const value = e.target.value;
+    const raw = e.target.value;
     const producto = productos.find((p) => p.id === id);
-
     if (!producto) return;
 
-    // Producto por unidad → solo enteros
-    if (!producto.medida) {
-      const soloEnteros = value.replace(/\D+/g, "");
-      setCarrito((prev) => ({
-        ...prev,
-        [id]: soloEnteros === "" ? "" : parseInt(soloEnteros, 10),
-      }));
+    // Si borra el input o pone 0 → QUITAR DEL CARRITO
+    if (raw.trim() === "" || raw === "0") {
+      setCarrito((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       return;
     }
 
-    // Producto por KG → permitir decimales (hasta 3)
-    let val = value.replace(",", ".");
-    if (!/^\d*\.?\d{0,3}$/.test(val)) return; // evita más de 3 decimales
+    // --- PRODUCTO POR UNIDAD ---
+    if (!producto.medida) {
+      const enteros = raw.replace(/\D+/g, "");
+
+      if (enteros === "" || parseInt(enteros) <= 0) {
+        // borrar si queda vacío o inválido
+        setCarrito((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        return;
+      }
+
+      // NO PERMITIR MÁS QUE EL STOCK:
+      const val = Math.min(parseInt(enteros, 10), producto.stock);
+
+      setCarrito((prev) => ({
+        ...prev,
+        [id]: val,
+      }));
+
+      return;
+    }
+
+    // --- PRODUCTO POR KG ---
+    let val = raw.replace(",", ".");
+
+    if (!/^\d*\.?\d{0,3}$/.test(val)) return;
+
+    const num = parseFloat(val);
+
+    if (isNaN(num) || num <= 0) {
+      setCarrito((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      return;
+    }
+
+    // NO PERMITIR SUPERAR STOCK
+    const limitado = Math.min(num, producto.stock);
 
     setCarrito((prev) => ({
       ...prev,
-      [id]: val === "" ? "" : parseFloat(val),
+      [id]: limitado,
     }));
   }
 
@@ -131,7 +170,7 @@ export default function User() {
   );
   const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
 
-  function handleConfirmSale({ paymentMethod, amountReceived, change }) {
+  function handleConfirmSale({ paymentMethod }) {
     const ahora = new Date();
     const fecha = ahora.toISOString().slice(0, 10);
     const hora = ahora.toTimeString().slice(0, 8);
@@ -189,6 +228,7 @@ export default function User() {
         setCarrito({});
         setShowModal(false);
         alert("Venta registrada con éxito.");
+        window.location.reload();
       })
       .catch((err) => {
         console.error(err);
@@ -236,27 +276,31 @@ export default function User() {
               const catObj = categorias.find((c) => c.id === p.categoria);
 
               const handleIncrement = () => {
-                setCarrito((prev) => ({
-                  ...prev,
-                  [p.id]: prev[p.id]
-                    ? Math.min(
-                        typeof prev[p.id] === "number" ? prev[p.id] + 1 : 1,
-                        p.stock
-                      )
-                    : 1,
-                }));
+                setCarrito((prev) => {
+                  const current =
+                    typeof prev[p.id] === "number" ? prev[p.id] : 0;
+
+                  // Si ya está al límite → no sumar más
+                  if (current >= p.stock) return prev;
+
+                  const next = current + 1;
+
+                  return { ...prev, [p.id]: next };
+                });
               };
 
               const handleDecrement = () => {
                 setCarrito((prev) => {
-                  const current =
-                    typeof prev[p.id] === "number" ? prev[p.id] : 0;
-                  if (current <= 1) {
+                  const actual = Number(prev[p.id] ?? 0);
+
+                  // Si estaba vacío o no definido → no hacer nada
+                  if (!actual || actual <= 1) {
                     const next = { ...prev };
                     delete next[p.id];
                     return next;
                   }
-                  return { ...prev, [p.id]: current - 1 };
+
+                  return { ...prev, [p.id]: actual - 1 };
                 });
               };
 
@@ -276,30 +320,26 @@ export default function User() {
                       <button
                         className="decrement-btn"
                         onClick={handleDecrement}
-                        disabled={
-                          p.stock === 0 ||
-                          carrito[p.id] === undefined ||
-                          carrito[p.id] === ""
-                        }
-                        aria-label="Restar uno"
+                        disabled={p.stock <= 0 || !carrito[p.id]}
                       >
                         -
                       </button>
+
                       <input
                         type="number"
-                        min="0.001"
+                        min={p.medida ? "0.001" : "1"}
                         max={p.stock}
-                        step={p.medida ? "0.001" : "1"} // 👈 dinámico según unidad/kg
-                        value={carrito[p.id] !== undefined ? carrito[p.id] : ""}
+                        step={p.medida ? "0.001" : "1"}
+                        disabled={p.stock <= 0}
+                        value={carrito[p.id] ?? ""}
                         onChange={(e) => handleQtyChange(p.id, e)}
-                        disabled={p.stock === 0}
                         style={{ width: "70px" }}
                       />
+
                       <button
                         className="increment-btn"
                         onClick={handleIncrement}
-                        disabled={p.stock === 0}
-                        aria-label="Sumar uno"
+                        disabled={p.stock <= 0}
                       >
                         +
                       </button>
@@ -351,23 +391,23 @@ export default function User() {
             >
               ⟳
             </button>
-
-            <button className="export-btn" onClick={exportar}>
-              Exportar
-            </button>
-            <button
-              className="import-btn"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Importar
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleImport}
-            />
-
+            <div className="backup-buttons">
+              <button className="export-btn" onClick={exportar}>
+                Exportar
+              </button>
+              <button
+                className="import-btn"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Importar
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleImport}
+              />
+            </div>
             <button
               className="cart-btn-footer"
               onClick={() => setShowModal(true)}
