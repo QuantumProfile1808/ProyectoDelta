@@ -24,9 +24,9 @@ class BackupExportView(APIView):
             list(ProductoDescuento.objects.all())
         )
 
-        now = timezone.now().strftime("%d-%m-%Y_%H-%M")
+        now = timezone.localtime().strftime("%d-%m-%Y_%H-%M")
         nombre_archivo = f"backup_{now}.json"
-
+        
         response = HttpResponse(data, content_type="application/json")
         response["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
         return response

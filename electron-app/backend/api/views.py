@@ -9,6 +9,8 @@ from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from api.services.descuentos import calcular_descuentos
+from decimal import Decimal
 
 def home(request):
     return HttpResponse("Hello, world! This is the API home page.")
@@ -204,5 +206,63 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
+
+    @action(detail=False, methods=["post"], url_path="aplicar")
+    def aplicar_descuentos(self, request):
+        """
+        Body:
+        {
+          "items": [
+            { "producto_id": 1, "cantidad": 10 },
+            { "producto_id": 2, "cantidad": 3 }
+          ]
+        }
+        """
+        items = request.data.get("items")
+
+        if not isinstance(items, list):
+            return Response(
+                {"error": "items debe ser una lista"},
+                status=400
+            )
+
+        # ids únicos de productos
+        try:
+            ids = [int(i["producto_id"]) for i in items]
+        except Exception:
+            return Response(
+                {"error": "items inválidos"},
+                status=400
+            )
+
+        # cargar productos
+        productos = Producto.objects.filter(id__in=ids)
+
+        if not productos.exists():
+            return Response(
+                {"error": "Productos no encontrados"},
+                status=404
+            )
+
+        # cargar descuentos activos
+        descuentos = (
+            Descuento.objects
+            .filter(activo=True)
+            .prefetch_related("items")
+        )
+
+        # cálculo CENTRALIZADO
+        lineas = calcular_descuentos(
+            carrito=items,
+            productos=productos,
+            descuentos=descuentos
+        )
+
+        total = sum(Decimal(str(l["line_total"])) for l in lineas)
+
+        return Response({
+            "lineas": lineas,
+            "total": float(total)
+        })
 
 

@@ -37,34 +37,38 @@ export const ListaPromociones = () => {
   const tiposPromocion = ["PORCENTAJE", "PRECIO_FIJO", "CANTIDAD"];
 
   const productosUnicos = useMemo(() => {
-    const fromItems = todas.flatMap(d =>
-      Array.isArray(d.items) ? d.items.map(i => i.descripcion).filter(Boolean) : []
+    const fromItems = todas.flatMap((d) =>
+      Array.isArray(d.items)
+        ? d.items.map((i) => i.descripcion).filter(Boolean)
+        : []
     );
-    const fromProductos = todas.flatMap(d =>
+    const fromProductos = todas.flatMap((d) =>
       Array.isArray(d.productos)
-        ? d.productos.map(p =>
+        ? d.productos.map((p) =>
             typeof p === "string"
               ? p
               : typeof p === "object" && p !== null
-              ? (p.descripcion || p.nombre || String(p.id || ""))
+              ? p.descripcion || p.nombre || String(p.id || "")
               : String(p)
           )
         : []
     );
-    return [...new Set([...fromItems, ...fromProductos])].filter(Boolean).sort();
+    return [...new Set([...fromItems, ...fromProductos])]
+      .filter(Boolean)
+      .sort();
   }, [todas]);
 
   const descuentosFiltrados = useMemo(() => {
     return todas
-      .filter(d => (searchPromoTipo ? d.tipo === searchPromoTipo : true))
-      .filter(d => {
+      .filter((d) => (searchPromoTipo ? d.tipo === searchPromoTipo : true))
+      .filter((d) => {
         if (!searchProducto) return true;
         const matchItems =
           Array.isArray(d.items) &&
-          d.items.some(i => i.descripcion === searchProducto);
+          d.items.some((i) => i.descripcion === searchProducto);
         const matchProductos =
           Array.isArray(d.productos) &&
-          d.productos.some(p => {
+          d.productos.some((p) => {
             if (typeof p === "string") return p === searchProducto;
             if (typeof p === "object" && p !== null) {
               return (
@@ -82,7 +86,10 @@ export const ListaPromociones = () => {
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const descuentosPaginados = descuentosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const descuentosPaginados = descuentosFiltrados.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(descuentosFiltrados.length / itemsPerPage) || 1;
 
   const toggleActivo = async (id, curr) => {
@@ -111,13 +118,13 @@ export const ListaPromociones = () => {
         <select
           className="search-select"
           value={searchPromoTipo}
-          onChange={e => {
+          onChange={(e) => {
             setSearchPromoTipo(e.target.value);
             setCurrentPage(1);
           }}
         >
           <option value="">Todos los tipos de promoción</option>
-          {tiposPromocion.map(tipo => (
+          {tiposPromocion.map((tipo) => (
             <option key={tipo} value={tipo}>
               {tipo}
             </option>
@@ -127,13 +134,13 @@ export const ListaPromociones = () => {
         <select
           className="search-select"
           value={searchProducto}
-          onChange={e => {
+          onChange={(e) => {
             setSearchProducto(e.target.value);
             setCurrentPage(1);
           }}
         >
           <option value="">Todos los productos</option>
-          {productosUnicos.map(prod => (
+          {productosUnicos.map((prod) => (
             <option key={prod} value={prod}>
               {prod}
             </option>
@@ -144,7 +151,7 @@ export const ListaPromociones = () => {
       {/* Paginación arriba */}
       <div className="pagination">
         <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
           Anterior
@@ -153,7 +160,9 @@ export const ListaPromociones = () => {
           Página {currentPage} de {totalPages}
         </span>
         <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
         >
           Siguiente
@@ -170,23 +179,29 @@ export const ListaPromociones = () => {
           </tr>
         </thead>
         <tbody className="historial-tabla-cuerpo">
-          {descuentosPaginados.map(d => (
+          {descuentosPaginados.map((d) => (
             <tr
               key={d.id}
-              className={`historial-fila ${selected?.id === d.id ? "historial-fila-seleccionada" : ""}`}
+              className={`historial-fila ${
+                selected?.id === d.id ? "historial-fila-seleccionada" : ""
+              }`}
             >
-              <td className="historial-celda" onClick={() => setSelected(d)} title="Ver detalles">
+              <td
+                className="historial-celda"
+                onClick={() => setSelected(d)}
+                title="Ver detalles"
+              >
                 {d.nombre}
               </td>
               <td className="historial-celda" onClick={() => setSelected(d)}>
                 {d.tipo}
               </td>
               <td className="historial-celda">
-                <label className="switch" onClick={e => e.stopPropagation()}>
+                <label className="switch" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={d.activo}
-                    onChange={e => {
+                    onChange={(e) => {
                       e.stopPropagation();
                       toggleActivo(d.id, d.activo);
                     }}
@@ -196,7 +211,10 @@ export const ListaPromociones = () => {
               </td>
               <td className="historial-celda">
                 <span
-                  style={{ color: d.activo ? "green" : "red", cursor: "pointer" }}
+                  style={{
+                    color: d.activo ? "green" : "red",
+                    cursor: "pointer",
+                  }}
                   onClick={() => setSelected(d)}
                 >
                   {d.activo ? "Activa" : "Inactiva"}
@@ -212,7 +230,7 @@ export const ListaPromociones = () => {
         <div className="historial-overlay" onClick={() => setSelected(null)}>
           <div
             className="historial-popup"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
             style={{ transform: "translate(-50%, -52%)" }}
           >
             <div className="historial-popup-header">
@@ -227,27 +245,44 @@ export const ListaPromociones = () => {
             </div>
 
             <div className="historial-popup-details">
-              <div><b>ID:</b> {selected.id}</div>
-              <div><b>Nombre:</b> {selected.nombre}</div>
-              <div><b>Tipo:</b> {selected.tipo}</div>
+              <div>
+                <b>ID:</b> {selected.id}
+              </div>
+              <div>
+                <b>Nombre:</b> {selected.nombre}
+              </div>
+              <div>
+                <b>Tipo:</b> {selected.tipo}
+              </div>
 
               {selected.tipo === "PORCENTAJE" && (
-                <div><b>Porcentaje:</b> {selected.porcentaje ?? "-"}</div>
+                <div>
+                  <b>Porcentaje:</b> {selected.porcentaje ?? "-"}
+                </div>
               )}
 
               {selected.tipo === "PRECIO_FIJO" && (
-                <div><b>Precio fijo:</b> ${selected.precio_fijo ?? "-"}</div>
+                <div>
+                  <b>Precio fijo:</b> ${selected.precio_fijo ?? "-"}
+                </div>
               )}
 
               {selected.tipo === "CANTIDAD" && (
                 <>
-                  <div><b>Promoción:</b> Llevás {selected.cantidad_requerida} y pagás {selected.cantidad_pagada}</div>
-                  <div><b>Items incluidos:</b></div>
+                  <div>
+                    <b>Promoción:</b> Llevás {selected.cantidad_requerida} y
+                    pagás {selected.cantidad_pagada}
+                  </div>
+                  <div>
+                    <b>Items incluidos:</b>
+                  </div>
                   <ul style={{ paddingLeft: "1.2rem", marginBottom: "1rem" }}>
-                    {Array.isArray(selected.items) && selected.items.length > 0 ? (
-                      selected.items.map(item => (
+                    {Array.isArray(selected.items) &&
+                    selected.items.length > 0 ? (
+                      selected.items.map((item) => (
                         <li key={item.id}>
-                          {item.descripcion} (ID producto: {item.producto}, cantidad: {item.cantidad})
+                          {item.descripcion} (ID producto: {item.producto},
+                          cantidad: {item.cantidad})
                         </li>
                       ))
                     ) : (
@@ -266,14 +301,15 @@ export const ListaPromociones = () => {
 
               <div>
                 <b>Productos aplicables:</b>{" "}
-                {Array.isArray(selected.productos) && selected.productos.length > 0
+                {Array.isArray(selected.productos) &&
+                selected.productos.length > 0
                   ? Array.isArray(selected.productos)
                     ? selected.productos
-                        .map(p =>
+                        .map((p) =>
                           typeof p === "string"
                             ? p
                             : typeof p === "object" && p !== null
-                            ? (p.descripcion || p.nombre || String(p.id || ""))
+                            ? p.descripcion || p.nombre || String(p.id || "")
                             : String(p)
                         )
                         .join(", ")

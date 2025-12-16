@@ -117,31 +117,33 @@ class Movimiento(models.Model):
 
 class Descuento(models.Model):
     TIPO_DESCUENTO = [
-        ("PORCENTAJE", "Porcentaje sobre el total"),
-        ("PRECIO_FIJO", "Precio fijo por combo"),
-        ("CANTIDAD", "Ej: 2x1, 3x2"),
+        ("PORCENTAJE", "Porcentaje"),
+        ("PRECIO_FIJO", "Combo precio fijo"),
+        ("CANTIDAD", "2x1 / 3x2"),
+        ("MAYORISTA", "Mayorista por unidades"),
     ]
 
     nombre = models.CharField(max_length=100)
     tipo = models.CharField(max_length=20, choices=TIPO_DESCUENTO)
 
-    productos = models.ManyToManyField(Producto, through="ProductoDescuento", related_name="descuentos")
+    productos = models.ManyToManyField(
+        Producto,
+        through="ProductoDescuento",
+        related_name="descuentos",
+    )
 
     porcentaje = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     precio_fijo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
     cantidad_requerida = models.PositiveIntegerField(null=True, blank=True)
     cantidad_pagada = models.PositiveIntegerField(null=True, blank=True)
 
+    min_unidades = models.PositiveIntegerField(null=True, blank=True)
+
     activo = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.nombre
-    
 class ProductoDescuento(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     descuento = models.ForeignKey(Descuento, on_delete=models.CASCADE, related_name="items")
     cantidad = models.PositiveIntegerField(default=1)
-
-    def __str__(self):
-        return f"{self.producto} x{self.cantidad} en {self.descuento.nombre}"
 
