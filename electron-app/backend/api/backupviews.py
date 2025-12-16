@@ -3,6 +3,7 @@ from django.core import serializers
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+from django.utils import timezone
 from django.apps import apps
 from django.db import transaction
 
@@ -22,8 +23,12 @@ class BackupExportView(APIView):
             list(Movimiento.objects.all()) +
             list(ProductoDescuento.objects.all())
         )
+
+        now = timezone.now().strftime("%d-%m-%Y_%H-%M")
+        nombre_archivo = f"backup_{now}.json"
+
         response = HttpResponse(data, content_type="application/json")
-        response['Content-Disposition'] = 'attachment; filename=\"backup.json\"'
+        response["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
         return response
 
 
