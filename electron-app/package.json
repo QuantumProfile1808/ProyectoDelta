@@ -12,7 +12,7 @@
   },
   "build": {
     "asar": false,
-    "appId": "com.stock.myapp",
+    "appId": "com.stockmanager.app",
     "productName": "StockManager",
     "win": {
       "target": "nsis",

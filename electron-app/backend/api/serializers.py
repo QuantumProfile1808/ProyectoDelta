@@ -82,6 +82,11 @@ class MovimientoSerializer(serializers.ModelSerializer):
     subtotal = serializers.SerializerMethodField()
     producto_nombre = serializers.SerializerMethodField()
     precio_unitario = serializers.SerializerMethodField()
+    usuario = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True
+    )
     usuario_nombre = serializers.SerializerMethodField()
     descuentos_aplicados = serializers.SerializerMethodField()
 

@@ -17,7 +17,7 @@ export default function useProductosDisponibles() {
         }));
         setProductosDisponibles(options);
       } catch (err) {
-        setErrorProductos("Error al cargar productos.");
+        setErrorProductos("Error al cargar productos.", err);
       } finally {
         setLoadingProductos(false);
       }

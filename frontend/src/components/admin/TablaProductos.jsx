@@ -7,6 +7,7 @@ import EditProductModal from "./EditProductModal";
 import { useSucursales } from "../hooks/useSucursales";
 import { useCategorias } from "../hooks/useCategorias";
 import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageProductos";
+import { usePerfil } from "../hooks/usePerfil";
 
 function AddStock({ producto, onClose, onGuardar }) {
   const [cantidad, setCantidad] = useState("");
@@ -85,7 +86,7 @@ const TablaProductos = () => {
   const sucursal = useSucursales();
   const categoria = useCategorias();
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
-
+  const perfil = usePerfil();
   // Filtros
   const [filtroId, setFiltroId] = useState("");
   const [filtroNombre, setFiltroNombre] = useState("");
@@ -140,38 +141,33 @@ const TablaProductos = () => {
   };
 
   const guardarStock = async (cantidad) => {
-    const id = productoSeleccionado.id;
-
-    // Sumamos los decimales correctamente y limitamos a 3 decimales
-    const nuevoStock = parseFloat(
-      (parseFloat(productoSeleccionado.stock) + parseFloat(cantidad)).toFixed(3)
-    );
-
     try {
-      await fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stock: nuevoStock }),
-      });
-
-      await fetch(`http://127.0.0.1:8000/api/movimiento/`, {
+      const res = await fetch("http://127.0.0.1:8000/api/movimiento/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          producto: id,
-          usuario: 1,
+          producto: productoSeleccionado.id,
+          usuario: perfil.user.id,
           tipo_de_movimiento: "entrada",
-          cantidad: cantidad,
+          cantidad,
           descripcion: `Ingreso de stock para ${productoSeleccionado.descripcion}`,
           fecha: new Date().toISOString().split("T")[0],
           hora: new Date().toLocaleTimeString("es-AR", { hour12: false }),
         }),
       });
 
-      reloadProductos();
+      if (!res.ok) {
+        const error = await res.json();
+        alert(error?.detail || "Error al guardar el movimiento");
+        return;
+      }
+
+      await reloadProductos();
       cerrarPopup();
+      alert("Stock agregado correctamente");
     } catch (err) {
-      console.error("Error actualizando stock o creando movimiento:", err);
+      console.error(err);
+      alert("Error de conexión con el servidor");
     }
   };
 

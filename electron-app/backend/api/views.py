@@ -8,6 +8,7 @@ from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, P
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 def home(request):
     return HttpResponse("Hello, world! This is the API home page.")
@@ -188,7 +189,7 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 
         if tipo == 'salida':
             if producto.stock is None or cantidad > producto.stock:
-                raise serializer.ValidationError("No hay suficiente stock para esta venta.")
+                raise ValidationError("No hay suficiente stock para esta venta.")
 
         movimiento = serializer.save()
 
