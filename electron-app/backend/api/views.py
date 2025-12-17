@@ -210,6 +210,8 @@ class DescuentoViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"], url_path="aplicar")
     def aplicar_descuentos(self, request):
         """
+        POST /api/descuento/aplicar/
+
         Body:
         {
           "items": [
@@ -218,15 +220,16 @@ class DescuentoViewSet(viewsets.ModelViewSet):
           ]
         }
         """
+
         items = request.data.get("items")
 
+        # -------- Validaciones básicas --------
         if not isinstance(items, list):
             return Response(
                 {"error": "items debe ser una lista"},
                 status=400
             )
 
-        # ids únicos de productos
         try:
             ids = [int(i["producto_id"]) for i in items]
         except Exception:
@@ -235,7 +238,7 @@ class DescuentoViewSet(viewsets.ModelViewSet):
                 status=400
             )
 
-        # cargar productos
+        # -------- Cargar productos --------
         productos = Producto.objects.filter(id__in=ids)
 
         if not productos.exists():
@@ -244,25 +247,40 @@ class DescuentoViewSet(viewsets.ModelViewSet):
                 status=404
             )
 
-        # cargar descuentos activos
+        # Mapa id → producto (para enriquecer la respuesta)
+        productos_map = {p.id: p for p in productos}
+
+        # -------- Cargar descuentos activos --------
         descuentos = (
             Descuento.objects
             .filter(activo=True)
-            .prefetch_related("items")
+            .prefetch_related("items")  # ProductoDescuento
         )
 
-        # cálculo CENTRALIZADO
+        # -------- Cálculo centralizado --------
         lineas = calcular_descuentos(
             carrito=items,
             productos=productos,
             descuentos=descuentos
         )
 
-        total = sum(Decimal(str(l["line_total"])) for l in lineas)
+        # -------- Enriquecer líneas con nombre de producto --------
+        lineas_enriquecidas = []
+
+        for l in lineas:
+            prod = productos_map.get(l["producto_id"])
+
+            lineas_enriquecidas.append({
+                **l,
+                "producto_nombre": prod.descripcion if prod else None
+            })
+
+        total = sum(
+            Decimal(str(l["line_total"]))
+            for l in lineas_enriquecidas
+        )
 
         return Response({
-            "lineas": lineas,
+            "lineas": lineas_enriquecidas,
             "total": float(total)
         })
-
-

@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import "../css/Promociones.css";
 import "../css/inputs.css";
 import useProductosDisponibles from "../hooks/useProductosDisponibles";
 
-export default function promociones() {
+export default function Promociones() {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     nombre: "",
     tipo: "PORCENTAJE",
@@ -12,10 +17,42 @@ export default function promociones() {
     precio_fijo: "",
     cantidad_requerida: "",
     cantidad_pagada: "",
+    min_unidades: "",
     productos: [],
   });
 
-  const { productosDisponibles, loadingProductos, errorProductos } = useProductosDisponibles();
+  useEffect(() => {
+    if (!isEdit) return;
+
+    const cargarPromocion = async () => {
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/descuento/${id}/`);
+        const data = await res.json();
+
+        setForm({
+          nombre: data.nombre || "",
+          tipo: data.tipo,
+          porcentaje: data.porcentaje || "",
+          precio_fijo: data.precio_fijo || "",
+          cantidad_requerida: data.cantidad_requerida || "",
+          cantidad_pagada: data.cantidad_pagada || "",
+          min_unidades: data.min_unidades || "",
+          productos: (data.items || []).map((i) => ({
+            value: i.producto,
+            label: i.descripcion,
+            cantidad: i.cantidad || 1,
+          })),
+        });
+      } catch (err) {
+        console.error("Error cargando promoción", err);
+      }
+    };
+
+    cargarPromocion();
+  }, [id, isEdit]);
+
+  const { productosDisponibles, loadingProductos, errorProductos } =
+    useProductosDisponibles();
   const [loading, setLoading] = useState(false);
   const [errorForm, setErrorForm] = useState(null);
 
@@ -37,8 +74,7 @@ export default function promociones() {
     )
       return "Debes ingresar cantidades requeridas y pagadas.";
 
-    if (form.productos.length === 0)
-      return "Seleccioná al menos un producto.";
+    if (form.productos.length === 0) return "Seleccioná al menos un producto.";
 
     return null;
   };
@@ -55,53 +91,49 @@ export default function promociones() {
     setErrorForm(null);
 
     const payload = {
-      ...form,
+      nombre: form.nombre,
+      tipo: form.tipo,
       porcentaje: form.porcentaje || null,
       precio_fijo: form.precio_fijo || null,
       cantidad_requerida: form.cantidad_requerida || null,
       cantidad_pagada: form.cantidad_pagada || null,
+      min_unidades: form.min_unidades || null,
       productos:
         form.tipo === "PRECIO_FIJO"
           ? form.productos.map((p) => ({
               id: p.value,
               cantidad: p.cantidad || 1,
             }))
-          : form.productos.map((p) => ({
-              id: p.value,
-            })),
+          : form.productos.map((p) => ({ id: p.value })),
     };
 
-    const res = await fetch("http://127.0.0.1:8000/api/descuento/", {
-      method: "POST",
+    const url = isEdit
+      ? `http://127.0.0.1:8000/api/descuento/${id}/`
+      : `http://127.0.0.1:8000/api/descuento/`;
+
+    const method = isEdit ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
       const errorData = await res.json();
-      setErrorForm(
-        errorData?.detail || "Error al crear el descuento. Verificá los datos."
-      );
+      setErrorForm(errorData?.detail || "Error al guardar el descuento.");
       setLoading(false);
       return;
     }
 
-    alert("Descuento creado!");
+    alert(isEdit ? "Descuento actualizado!" : "Descuento creado!");
     setLoading(false);
-    setForm({
-      nombre: "",
-      tipo: "PORCENTAJE",
-      porcentaje: "",
-      precio_fijo: "",
-      cantidad_requerida: "",
-      cantidad_pagada: "",
-      productos: [],
-    });
+    navigate("/dashboard/tablapromociones");
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 500, margin: "auto" }}>
-      <h2>Crear nuevo descuento</h2>
+      <h2>{isEdit ? "Editar descuento" : "Crear nuevo descuento"}</h2>
 
       <input
         name="nombre"
@@ -118,6 +150,7 @@ export default function promociones() {
         <option value="PORCENTAJE">Porcentaje</option>
         <option value="PRECIO_FIJO">Precio fijo</option>
         <option value="CANTIDAD">2x1 / 3x2</option>
+        <option value="MAYORISTA">Mayorista</option>
       </select>
 
       {form.tipo === "PORCENTAJE" && (
@@ -135,13 +168,12 @@ export default function promociones() {
             name="precio_fijo"
             placeholder="Precio fijo"
             value={form.precio_fijo}
-            onChange={(e) =>
-              setForm({ ...form, precio_fijo: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, precio_fijo: e.target.value })}
           />
           {form.productos.length < 2 && (
             <p style={{ color: "red", fontSize: "0.9em" }}>
-              Este tipo de descuento requiere al menos 2 productos para formar un combo.
+              Este tipo de descuento requiere al menos 2 productos para formar
+              un combo.
             </p>
           )}
           {form.productos.length >= 2 && (
@@ -161,8 +193,7 @@ export default function promociones() {
                       style={{ width: 60 }}
                       onChange={(e) => {
                         const nuevos = [...form.productos];
-                        nuevos[index].cantidad =
-                          parseInt(e.target.value) || 1;
+                        nuevos[index].cantidad = parseInt(e.target.value) || 1;
                         setForm({ ...form, productos: nuevos });
                       }}
                     />
@@ -173,10 +204,7 @@ export default function promociones() {
               <strong>Precio total: ${form.precio_fijo}</strong>
               <p style={{ fontStyle: "italic", marginTop: 5 }}>
                 Total unidades en combo:{" "}
-                {form.productos.reduce(
-                  (acc, p) => acc + (p.cantidad || 1),
-                  0
-                )}
+                {form.productos.reduce((acc, p) => acc + (p.cantidad || 1), 0)}
               </p>
             </div>
           )}
@@ -204,6 +232,24 @@ export default function promociones() {
         </>
       )}
 
+      {form.tipo === "MAYORISTA" && (
+        <>
+          <input
+            name="min_unidades"
+            placeholder="Cantidad mínima"
+            value={form.min_unidades}
+            onChange={(e) => setForm({ ...form, min_unidades: e.target.value })}
+          />
+
+          <input
+            name="porcentaje"
+            placeholder="% descuento mayorista"
+            value={form.porcentaje}
+            onChange={(e) => setForm({ ...form, porcentaje: e.target.value })}
+          />
+        </>
+      )}
+
       <label style={{ marginTop: 10 }}>Productos aplicables:</label>
       <div className="select-wrapper">
         <Select
@@ -226,12 +272,14 @@ export default function promociones() {
         />
       </div>
 
-      {errorForm && (
-        <p style={{ color: "red", marginTop: 10 }}>{errorForm}</p>
-      )}
+      {errorForm && <p style={{ color: "red", marginTop: 10 }}>{errorForm}</p>}
 
       <button type="submit" disabled={loading || !!errorForm}>
-        {loading ? "Guardando..." : "Guardar descuento"}
+        {loading
+          ? "Guardando..."
+          : isEdit
+          ? "Actualizar descuento"
+          : "Guardar descuento"}
       </button>
     </form>
   );

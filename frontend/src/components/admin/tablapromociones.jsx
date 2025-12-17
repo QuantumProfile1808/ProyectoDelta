@@ -7,10 +7,8 @@ import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPagePro
 
 export const ListaPromociones = () => {
   const [todas, setTodas] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [mostrarInactivas, setMostrarInactivas] = useState(false);
 
-  // Filtros (combobox) con mismas clases que Historial
+  // Filtros
   const [searchPromoTipo, setSearchPromoTipo] = useState("");
   const [searchProducto, setSearchProducto] = useState("");
 
@@ -32,10 +30,11 @@ export const ListaPromociones = () => {
 
   useEffect(() => {
     cargarPromociones();
-  }, [cargarPromociones, mostrarInactivas]);
+  }, [cargarPromociones]);
 
-  const tiposPromocion = ["PORCENTAJE", "PRECIO_FIJO", "CANTIDAD"];
+  const tiposPromocion = ["PORCENTAJE", "PRECIO_FIJO", "CANTIDAD", "MAYORISTA"];
 
+  // Productos únicos (para filtro)
   const productosUnicos = useMemo(() => {
     const fromItems = todas.flatMap((d) =>
       Array.isArray(d.items)
@@ -47,9 +46,7 @@ export const ListaPromociones = () => {
         ? d.productos.map((p) =>
             typeof p === "string"
               ? p
-              : typeof p === "object" && p !== null
-              ? p.descripcion || p.nombre || String(p.id || "")
-              : String(p)
+              : p?.descripcion || p?.nombre || String(p?.id || "")
           )
         : []
     );
@@ -63,9 +60,11 @@ export const ListaPromociones = () => {
       .filter((d) => (searchPromoTipo ? d.tipo === searchPromoTipo : true))
       .filter((d) => {
         if (!searchProducto) return true;
+
         const matchItems =
           Array.isArray(d.items) &&
           d.items.some((i) => i.descripcion === searchProducto);
+
         const matchProductos =
           Array.isArray(d.productos) &&
           d.productos.some((p) => {
@@ -77,11 +76,12 @@ export const ListaPromociones = () => {
                 String(p.id) === searchProducto
               );
             }
-            return String(p) === searchProducto;
+            return false;
           });
+
         return matchItems || matchProductos;
       });
-  }, [todas, mostrarInactivas, searchPromoTipo, searchProducto]);
+  }, [todas, searchPromoTipo, searchProducto]);
 
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -93,12 +93,11 @@ export const ListaPromociones = () => {
   const totalPages = Math.ceil(descuentosFiltrados.length / itemsPerPage) || 1;
 
   const toggleActivo = async (id, curr) => {
-    const nuevo = !curr;
     try {
       const res = await fetch(`http://127.0.0.1:8000/api/descuento/${id}/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ activo: nuevo }),
+        body: JSON.stringify({ activo: !curr }),
       });
       if (!res.ok) throw new Error("Error al actualizar estado");
       await cargarPromociones();
@@ -113,7 +112,7 @@ export const ListaPromociones = () => {
         <h2>Promociones</h2>
       </div>
 
-      {/* Filtros con mismas clases que Historial */}
+      {/* Filtros */}
       <div className="search-container">
         <select
           className="search-select"
@@ -123,7 +122,7 @@ export const ListaPromociones = () => {
             setCurrentPage(1);
           }}
         >
-          <option value="">Todos los tipos de promoción</option>
+          <option value="">Todos los tipos</option>
           {tiposPromocion.map((tipo) => (
             <option key={tipo} value={tipo}>
               {tipo}
@@ -148,10 +147,10 @@ export const ListaPromociones = () => {
         </select>
       </div>
 
-      {/* Paginación arriba */}
+      {/* Paginación */}
       <div className="pagination">
         <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
           disabled={currentPage === 1}
         >
           Anterior
@@ -160,167 +159,72 @@ export const ListaPromociones = () => {
           Página {currentPage} de {totalPages}
         </span>
         <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
           disabled={currentPage === totalPages}
         >
           Siguiente
         </button>
       </div>
 
+      {/* Tabla */}
       <table className="historial-tabla">
         <thead className="historial-tabla-encabezado">
-          <tr className="historial-fila-encabezado">
-            <th className="historial-columna">Nombre</th>
-            <th className="historial-columna">Tipo</th>
-            <th className="historial-columna">Estado</th>
-            <th className="historial-columna">Etiqueta</th>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Etiqueta</th>
+            <th>Acciones</th>
           </tr>
         </thead>
-        <tbody className="historial-tabla-cuerpo">
+        <tbody>
           {descuentosPaginados.map((d) => (
-            <tr
-              key={d.id}
-              className={`historial-fila ${
-                selected?.id === d.id ? "historial-fila-seleccionada" : ""
-              }`}
-            >
+            <tr key={d.id} className="historial-fila">
               <td
                 className="historial-celda"
-                onClick={() => setSelected(d)}
-                title="Ver detalles"
+                onClick={() => navigate(`/dashboard/promociones/${d.id}`)}
               >
                 {d.nombre}
               </td>
-              <td className="historial-celda" onClick={() => setSelected(d)}>
+
+              <td
+                className="historial-celda"
+                onClick={() => navigate(`/dashboard/promociones/${d.id}`)}
+              >
                 {d.tipo}
               </td>
-              <td className="historial-celda">
+
+              <td className="historial-celda-estado">
                 <label className="switch" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={d.activo}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      toggleActivo(d.id, d.activo);
-                    }}
+                    onChange={() => toggleActivo(d.id, d.activo)}
                   />
                   <span className="slider round"></span>
                 </label>
               </td>
+
               <td className="historial-celda">
-                <span
-                  style={{
-                    color: d.activo ? "green" : "red",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setSelected(d)}
-                >
+                <span style={{ color: d.activo ? "green" : "red" }}>
                   {d.activo ? "Activa" : "Inactiva"}
                 </span>
+              </td>
+
+              <td className="historial-celda-acciones">
+                <button
+                  className="btn-editar"
+                  onClick={() => navigate(`/dashboard/promociones/${d.id}`)}
+                >
+                  Editar
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Modal de detalles */}
-      {selected && (
-        <div className="historial-overlay" onClick={() => setSelected(null)}>
-          <div
-            className="historial-popup"
-            onClick={(e) => e.stopPropagation()}
-            style={{ transform: "translate(-50%, -52%)" }}
-          >
-            <div className="historial-popup-header">
-              <strong>Detalles de la promoción</strong>
-              <button
-                className="historial-popup-close"
-                onClick={() => setSelected(null)}
-                title="Cerrar"
-              >
-                &#10006;
-              </button>
-            </div>
-
-            <div className="historial-popup-details">
-              <div>
-                <b>ID:</b> {selected.id}
-              </div>
-              <div>
-                <b>Nombre:</b> {selected.nombre}
-              </div>
-              <div>
-                <b>Tipo:</b> {selected.tipo}
-              </div>
-
-              {selected.tipo === "PORCENTAJE" && (
-                <div>
-                  <b>Porcentaje:</b> {selected.porcentaje ?? "-"}
-                </div>
-              )}
-
-              {selected.tipo === "PRECIO_FIJO" && (
-                <div>
-                  <b>Precio fijo:</b> ${selected.precio_fijo ?? "-"}
-                </div>
-              )}
-
-              {selected.tipo === "CANTIDAD" && (
-                <>
-                  <div>
-                    <b>Promoción:</b> Llevás {selected.cantidad_requerida} y
-                    pagás {selected.cantidad_pagada}
-                  </div>
-                  <div>
-                    <b>Items incluidos:</b>
-                  </div>
-                  <ul style={{ paddingLeft: "1.2rem", marginBottom: "1rem" }}>
-                    {Array.isArray(selected.items) &&
-                    selected.items.length > 0 ? (
-                      selected.items.map((item) => (
-                        <li key={item.id}>
-                          {item.descripcion} (ID producto: {item.producto},
-                          cantidad: {item.cantidad})
-                        </li>
-                      ))
-                    ) : (
-                      <li>No hay items asignados</li>
-                    )}
-                  </ul>
-                </>
-              )}
-
-              <div>
-                <b>Estado:</b>{" "}
-                <span style={{ color: selected.activo ? "green" : "red" }}>
-                  {selected.activo ? "Activa" : "Inactiva"}
-                </span>
-              </div>
-
-              <div>
-                <b>Productos aplicables:</b>{" "}
-                {Array.isArray(selected.productos) &&
-                selected.productos.length > 0
-                  ? Array.isArray(selected.productos)
-                    ? selected.productos
-                        .map((p) =>
-                          typeof p === "string"
-                            ? p
-                            : typeof p === "object" && p !== null
-                            ? p.descripcion || p.nombre || String(p.id || "")
-                            : String(p)
-                        )
-                        .join(", ")
-                    : "No asignados"
-                  : "No asignados"}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Botón flotante */}
       <button
         className="boton-flotante"
         onClick={() => navigate("/dashboard/promociones")}

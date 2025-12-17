@@ -1,5 +1,4 @@
 from decimal import Decimal, ROUND_HALF_UP
-from collections import defaultdict
 
 # =========================
 # CONFIGURACIÓN
@@ -34,20 +33,18 @@ def calcular_descuentos(carrito, productos, descuentos):
         for i in carrito
     }
 
-    # combos primero (pero NO se aplican todavía)
     combos = calcular_combos_precio_fijo(cantidades, precios, descuentos)
-
     lineas = []
 
     for pid, cantidad in cantidades.items():
         precio_unitario = precios.get(pid, d2(0))
         candidatos = []
 
-        # --- candidato combo ---
+        # --- combo precio fijo ---
         if pid in combos:
             candidatos.append(combos[pid])
 
-        # --- otros descuentos ---
+        # --- descuentos individuales ---
         for d in descuentos:
             if not aplica_a_producto(d, pid):
                 continue
@@ -64,18 +61,14 @@ def calcular_descuentos(carrito, productos, descuentos):
             if c:
                 candidatos.append(c)
 
-        # --- elegir UNO SOLO ---
         elegido = elegir_promocion(candidatos)
 
-        descuento_unitario = (
-            elegido["descuento_unitario"] if elegido else d2(0)
-        )
-
+        descuento_unitario = elegido["descuento_unitario"] if elegido else d2(0)
         line_total = (precio_unitario - descuento_unitario) * cantidad
 
         lineas.append({
             "producto_id": pid,
-            "cantidad": float(cantidad) if cantidad != int(cantidad) else int(cantidad),
+            "cantidad": int(cantidad) if cantidad == int(cantidad) else float(cantidad),
             "precio_unitario": float(precio_unitario),
             "descuento_unitario": float(descuento_unitario),
             "line_total": float(d2(line_total)),
@@ -107,7 +100,7 @@ def elegir_promocion(candidatos):
 
 
 # =========================
-# VALIDACIONES
+# VALIDACIÓN
 # =========================
 
 def aplica_a_producto(descuento, producto_id):
@@ -125,6 +118,7 @@ def cand_mayorista(d, precio, cantidad):
         return None
 
     du = precio * (d2(d.porcentaje) / d2(100))
+
     return {
         "id": d.id,
         "nombre": d.nombre,
@@ -161,6 +155,7 @@ def cand_porcentaje(d, precio, cantidad):
         return None
 
     du = precio * (d2(d.porcentaje) / d2(100))
+
     return {
         "id": d.id,
         "nombre": d.nombre,
@@ -175,9 +170,6 @@ def cand_porcentaje(d, precio, cantidad):
 # =========================
 
 def calcular_combos_precio_fijo(cantidades, precios, descuentos):
-    """
-    Devuelve candidatos tipo PRECIO_FIJO prorrateados por producto
-    """
     resultado = {}
 
     for d in descuentos:
@@ -188,7 +180,6 @@ def calcular_combos_precio_fijo(cantidades, precios, descuentos):
         if not items:
             continue
 
-        # cuántas veces se puede aplicar
         veces = min(
             int(cantidades.get(i.producto_id, 0) // i.cantidad)
             for i in items

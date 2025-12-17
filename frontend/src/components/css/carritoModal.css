@@ -17,7 +17,7 @@
   background: #fff;
   padding: 2rem 1.5rem;
   border-radius: 12px;
-  max-width: 640px;
+  max-width: 960px;
   width: 95%;
   box-shadow: 0 4px 24px rgba(0,0,0,0.12);
   position: relative;
@@ -65,6 +65,8 @@
 }
 
 /* Nuevo: columnas numéricas más controladas */
+.table-modal th:nth-child(2),
+.table-modal td:nth-child(2),
 .table-modal th:nth-child(3),
 .table-modal td:nth-child(3),
 .table-modal th:nth-child(4),

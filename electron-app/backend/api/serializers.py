@@ -143,7 +143,7 @@ class MovimientoSerializer(serializers.ModelSerializer):
             grupos = cantidad // descuento.cantidad_requerida
             unidadesGratis = grupos * (descuento.cantidad_requerida - descuento.cantidad_pagada)
             monto = (Decimal(unidadesGratis) * precio) / Decimal(cantidad)
-
+        
         return {
             "nombre": nombre,
             "tipo": tipo,
@@ -166,17 +166,24 @@ class DescuentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Descuento
         fields = [
-            "id", "nombre", "tipo", "porcentaje", "precio_fijo",
-            "cantidad_requerida", "cantidad_pagada", "activo",
-            "productos", "items"
+            "id",
+            "nombre",
+            "tipo",
+            "porcentaje",
+            "precio_fijo",
+            "cantidad_requerida",
+            "cantidad_pagada",
+            "min_unidades",
+            "activo",
+            "productos",
+            "items",
         ]
 
     def validate(self, data):
         tipo = data.get("tipo", getattr(self.instance, "tipo", None))
         productos = data.get("productos", [])
 
-        # Evitar validación completa en PATCH parcial
-        if self.partial or (self.instance and not productos and "productos" not in self.initial_data):
+        if self.partial:
             return data
 
         if not productos:
@@ -190,18 +197,20 @@ class DescuentoSerializer(serializers.ModelSerializer):
             for p in productos:
                 if "id" not in p or "cantidad" not in p:
                     raise serializers.ValidationError("Cada producto debe tener id y cantidad.")
+
         elif tipo == "PORCENTAJE":
             if not data.get("porcentaje"):
                 raise serializers.ValidationError("Debes ingresar un porcentaje.")
-            for p in productos:
-                if "id" not in p:
-                    raise serializers.ValidationError("Cada producto debe tener un id.")
+
         elif tipo == "CANTIDAD":
             if not data.get("cantidad_requerida") or not data.get("cantidad_pagada"):
                 raise serializers.ValidationError("Debes ingresar cantidades requeridas y pagadas.")
-            for p in productos:
-                if "id" not in p:
-                    raise serializers.ValidationError("Cada producto debe tener un id.")
+
+        elif tipo == "MAYORISTA":
+            if not data.get("min_unidades"):
+                raise serializers.ValidationError("Mayorista requiere mínimo de unidades.")
+            if not data.get("porcentaje"):
+                raise serializers.ValidationError("Mayorista requiere porcentaje.")
 
         return data
 
@@ -209,24 +218,39 @@ class DescuentoSerializer(serializers.ModelSerializer):
         productos_data = validated_data.pop("productos", [])
         descuento = Descuento.objects.create(**validated_data)
 
-        if validated_data["tipo"] == "PRECIO_FIJO":
+        if descuento.tipo == "PRECIO_FIJO":
             for p in productos_data:
-                producto = Producto.objects.get(id=p["id"])
-                cantidad = p.get("cantidad", 1)
                 ProductoDescuento.objects.create(
-                    producto=producto,
                     descuento=descuento,
-                    cantidad=cantidad
+                    producto_id=p["id"],
+                    cantidad=p.get("cantidad", 1),
                 )
         else:
             for p in productos_data:
-                producto = Producto.objects.get(id=p["id"])
-                descuento.productos.add(producto)
+                descuento.productos.add(p["id"])
 
         return descuento
 
     def update(self, instance, validated_data):
+        productos_data = validated_data.pop("productos", None)
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+
+        if productos_data is not None:
+            instance.items.all().delete()
+
+            if instance.tipo == "PRECIO_FIJO":
+                for p in productos_data:
+                    ProductoDescuento.objects.create(
+                        descuento=instance,
+                        producto_id=p["id"],
+                        cantidad=p.get("cantidad", 1),
+                    )
+            else:
+                for p in productos_data:
+                    instance.productos.add(p["id"])
+
         return instance
+

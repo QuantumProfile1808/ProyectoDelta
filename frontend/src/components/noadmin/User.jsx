@@ -138,14 +138,11 @@ export default function User() {
   const lineas = useDescuentosAplicados(productosSeleccionados) || [];
 
   const grandTotal = useMemo(() => {
-    return lineas.reduce((sum, l) => sum + (l.lineTotal || 0), 0);
+    return lineas.reduce((sum, l) => sum + l.line_total, 0);
   }, [lineas]);
 
   const totalItems = useMemo(() => {
-    return lineas.reduce((sum, item) => {
-      const qty = typeof item.cantidad === "number" ? item.cantidad : 0;
-      return sum + qty;
-    }, 0);
+    return lineas.reduce((sum, l) => sum + l.cantidad, 0);
   }, [lineas]);
 
   if (loading) return <p>Cargando…</p>;

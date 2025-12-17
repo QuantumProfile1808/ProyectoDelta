@@ -17,9 +17,10 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
 
   if (!isOpen) return null;
 
-  const totalVenta = lineas.reduce((acc, item) => acc + item.lineTotal, 0);
+  const totalVenta = lineas.reduce((acc, item) => acc + item.line_total, 0);
+
   const totalDescuento = lineas.reduce(
-    (acc, item) => acc + (item.descuentoAplicado || 0) * item.qty,
+    (acc, item) => acc + (item.descuento_unitario || 0) * item.cantidad,
     0
   );
 
@@ -60,37 +61,29 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
                 <th>Desc.</th>
                 <th>Cant.</th>
                 <th>Precio</th>
-                <th>Descuento</th>
+                <th>Descuento/Item</th>
                 <th>Total</th>
               </tr>
             </thead>
             <tbody>
               {lineas.map((item) => (
                 <tr key={item.id}>
-                  <td className="desc-cell" title={item.descripcion}>
-                    {item.descripcion}
-                    {item.nombreDescuento && (
+                  <td className="desc-cell">
+                    {item.producto_nombre}
+                    {item.promocion?.nombre && (
                       <span className="badge-descuento">
-                        {item.nombreDescuento}
+                        {item.promocion.nombre}
                       </span>
                     )}
                   </td>
-                  <td>{item.qty}</td>
+                  <td>{item.cantidad}</td>
+                  <td>${item.precio_unitario.toFixed(2)}</td>
                   <td>
-                    ${item.unitPrice.toLocaleString("es-AR", {
-                      minimumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td>
-                    {item.descuentoAplicado
-                      ? `-$${item.descuentoAplicado.toFixed(2)}`
+                    {item.descuento_unitario
+                      ? `-$${item.descuento_unitario.toFixed(2)}`
                       : "—"}
                   </td>
-                  <td>
-                    ${item.lineTotal.toLocaleString("es-AR", {
-                      minimumFractionDigits: 2,
-                    })}
-                  </td>
+                  <td>${item.line_total.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>

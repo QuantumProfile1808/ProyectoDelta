@@ -60,6 +60,7 @@ function App() {
             <Route index element={<MenuDashboard />} />
             <Route path="tablaPromociones" element={<TablaPromociones />} />
             <Route path="promociones" element={<Promociones />} />
+            <Route path="promociones/:id" element={<Promociones />} />
             <Route path="backup" element={<BackupPage />} />
           </Route>
         </Route>
