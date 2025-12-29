@@ -1,6 +1,6 @@
 {
   "name": "stockmanager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Lucas & Matias",
   "description": "App Electron con Django + Python Portable",
   "main": "main.js",
