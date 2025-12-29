@@ -1,11 +1,20 @@
 import React, { useState } from "react";
+import { usePerfil } from "../hooks/usePerfil";
 
 function BackupPage() {
   const [mensaje, setMensaje] = useState("");
 
+  const perfil = usePerfil();
+
   const exportar = () => {
-    // Descarga directa del archivo
-    window.location.href = "http://127.0.0.1:8000/api/backup/exportar/";
+    const sucursalNombre =
+      perfil?.sucursal?.localidad || perfil?.sucursal?.nombre || "no-sucursal";
+
+    const url = `http://127.0.0.1:8000/api/backup/exportar/?nombre=${encodeURIComponent(
+      sucursalNombre
+    )}`;
+
+    window.location.href = url;
   };
 
   const importar = async (e) => {
@@ -27,7 +36,7 @@ function BackupPage() {
       const data = await response.json();
       setMensaje(data.mensaje || "Importación completada");
     } catch (error) {
-      setMensaje("Error al importar datos");
+      setMensaje("Error al importar datos, error: ", error);
     }
   };
 

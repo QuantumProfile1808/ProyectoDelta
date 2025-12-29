@@ -12,6 +12,8 @@ from .models import Categoria, Sucursal, Permiso, Perfil, Producto, Descuento, M
 
 class BackupExportView(APIView):
     def get(self, request):
+        nombre = request.GET.get("nombre") or "no-sucursal"
+
         data = serializers.serialize(
             "json",
             list(Categoria.objects.all()) +
@@ -25,8 +27,8 @@ class BackupExportView(APIView):
         )
 
         now = timezone.localtime().strftime("%d-%m-%Y_%H-%M")
-        nombre_archivo = f"backup_{now}.json"
-        
+        nombre_archivo = f"Backup_{nombre}_{now}.json"
+
         response = HttpResponse(data, content_type="application/json")
         response["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
         return response
