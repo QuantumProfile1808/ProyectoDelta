@@ -173,20 +173,12 @@ export default function User() {
     const hora = ahora.toTimeString().slice(0, 8);
 
     const movimientos = lineas.map((l) => ({
-      producto: parseInt(l.id),
+      producto: l.producto_id ?? l.id, // 👈 asegurate que exista
       usuario: perfil.user.id,
-      cantidad: l.cantidad ?? l.qty, // usa cantidad si existe, sino usa qty
+      cantidad: l.cantidad,
       tipo_de_movimiento: "salida",
       metodo_de_pago: paymentMethod.toLowerCase(),
-      descripcion:
-        `Venta de ${l.cantidad ?? l.qty} unidad/es a $${
-          l.unitPrice ?? l.precio
-        } c/u` +
-        (l.descuentoAplicado
-          ? ` con descuento de $${Number(l.descuentoAplicado).toFixed(
-              2
-            )} por unidad`
-          : ""),
+      descripcion: `Venta de ${l.cantidad} unidad/es a $${l.precio_unitario} c/u`,
       fecha,
       hora,
     }));
