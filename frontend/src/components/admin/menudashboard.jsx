@@ -38,7 +38,7 @@ export default function MenuDashboard() {
             <th>Fecha</th>
             <th>Usuario</th>
             <th>Tipo</th>
-            <th>Producto</th>
+            <th className="col-producto">Producto</th>
             <th>Cant</th>
           </tr>
         </thead>
@@ -48,7 +48,7 @@ export default function MenuDashboard() {
               <td>{m.hora}</td>
               <td>{m.usuario_nombre}</td>
               <td>{m.tipo_de_movimiento}</td>
-              <td>{m.producto_nombre}</td>
+              <td className="col-producto" title={m.producto_nombre}> {m.producto_nombre}</td>
               <td>{Number(m.cantidad)}</td>
             </tr>
           ))}
@@ -87,10 +87,10 @@ export default function MenuDashboard() {
 
   const StockModal = selectedStockType && (
     <div
-      className="historial-overlay"
+      className="stock-overlay"
       onClick={() => setSelectedStockType(null)}
     >
-      <div className="historial-popup" onClick={(e) => e.stopPropagation()}>
+      <div className="stock-modal" onClick={(e) => e.stopPropagation()}>
         <div className="historial-popup-header">
           <strong className="historial-popup-title">
             {selectedStockType === "sin"
@@ -108,6 +108,7 @@ export default function MenuDashboard() {
         {productosAMostrar.length === 0 ? (
           <p>No hay productos en esta categoría.</p>
         ) : (
+       <div className="stock-table-container">
           <table className="historial-tabla">
             <thead>
               <tr>
@@ -118,12 +119,13 @@ export default function MenuDashboard() {
             <tbody>
               {productosAMostrar.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.descripcion}</td>
+                  <td className="col-producto" title={p.descripcion}>{p.descripcion}</td>
                   <td>{Number(p.stock)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
         )}
       </div>
     </div>
