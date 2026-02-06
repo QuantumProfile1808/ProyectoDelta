@@ -1,0 +1,5 @@
+backend/db.sqlite3
+electron-app/dist/
+__pycache__/
+*.pyc
+*.pyo
