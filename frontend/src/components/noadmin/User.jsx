@@ -172,16 +172,24 @@ export default function User() {
     const fecha = ahora.toISOString().slice(0, 10);
     const hora = ahora.toTimeString().slice(0, 8);
 
-    const movimientos = lineas.map((l) => ({
+    const movimientos = lineas.map((l) => {
+      const descuentoTotal = (l.descuento_unitario || 0) * (l.cantidad || 0);
+      const promoTxt = l.promocion
+        ? ` con un tipo de descuento ${l.promocion.tipo} (-$${descuentoTotal.toFixed(2)})`
+        : "";
+
+      return {
       producto: l.producto_id ?? l.id, // 👈 asegurate que exista
       usuario: perfil.user.id,
       cantidad: l.cantidad,
       tipo_de_movimiento: "salida",
       metodo_de_pago: paymentMethod.toLowerCase(),
-      descripcion: `Venta de ${l.cantidad} unidad/es a $${l.precio_unitario} c/u`,
+      descripcion: `Venta de ${l.cantidad} unidad/es a $${l.precio_unitario} c/u${promoTxt}`,
+      total: l.line_total,
       fecha,
       hora,
-    }));
+      };
+    });
 
     Promise.all(
       movimientos.map((m) =>

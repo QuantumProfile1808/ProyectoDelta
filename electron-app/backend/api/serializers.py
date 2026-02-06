@@ -82,6 +82,7 @@ class MovimientoSerializer(serializers.ModelSerializer):
     subtotal = serializers.SerializerMethodField()
     producto_nombre = serializers.SerializerMethodField()
     precio_unitario = serializers.SerializerMethodField()
+    total = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     usuario = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         required=False,
@@ -97,8 +98,11 @@ class MovimientoSerializer(serializers.ModelSerializer):
             'usuario', 'usuario_nombre', 'fecha', 'hora',
             'tipo_de_movimiento', 'metodo_de_pago',
             'cantidad', 'cantidad_formateada',
-            'descripcion', 'subtotal', 'descuentos_aplicados'
+            'descripcion', 'subtotal', 'descuentos_aplicados', 'total'
         ]
+        extra_kwargs = {
+            "total": {"write_only": True}
+        }
 
     def get_cantidad_formateada(self, obj):
         c = obj.cantidad
@@ -149,6 +153,16 @@ class MovimientoSerializer(serializers.ModelSerializer):
             "tipo": tipo,
             "monto_por_unidad": round(monto, 2)
         }
+
+    def create(self, validated_data):
+        total = validated_data.pop("total", None)
+        movimiento = Movimiento(**validated_data)
+        if total is not None:
+            movimiento.total = total
+            movimiento.save(skip_descuentos=True)
+        else:
+            movimiento.save()
+        return movimiento
 
 # --- Descuentos ---
 
