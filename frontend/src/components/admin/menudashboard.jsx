@@ -1,156 +1,146 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "../css/menuDashboard.css";
 import { useDashboardData } from "../hooks/useDashboardData";
+import AuthContext from "../../AuthContext";
 
 export default function MenuDashboard() {
-  const { movimientos, productos } = useDashboardData();
+  const { user } = useContext(AuthContext);
+  const sucursalID = user?.perfil?.sucursal?.id;
+
+  const {
+    ultimos,
+    ventasHoy,
+    ventasSemana,
+    ventasMes,
+    gananciaMes,
+    alertasStock,
+  } = useDashboardData(sucursalID);
+
   const [selectedStockType, setSelectedStockType] = useState(null);
-
-  // Últimos 3 movimientos
-  const ultimosMovimientos = [...movimientos]
-    .filter(m => m.tipo_de_movimiento !== "total")
-    .sort((a, b) => {
-      const fechaHoraA = new Date(`${a.fecha || "1970-01-01"}T${a.hora || "00:00:00"}`);
-      const fechaHoraB = new Date(`${b.fecha || "1970-01-01"}T${b.hora || "00:00:00"}`);
-      return fechaHoraB - fechaHoraA;
-    })
-    .slice(0, 3);
-
-  // Ganancia del mes
-  const mesActual = new Date().getMonth();
-  const gananciaMes = movimientos
-    .filter(m => m.tipo_de_movimiento === "salida" && new Date(m.fecha).getMonth() === mesActual)
-    .reduce((acc, m) => acc + (m.subtotal || 0), 0);
-
-  // Informes ventas
-  const hoy = new Date().toISOString().split("T")[0];
-  const inicioSemana = new Date();
-  inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
-
-  const ventasHoy = movimientos.filter(m => m.tipo_de_movimiento === "salida" && m.fecha === hoy).length;
-  const ventasSemana = movimientos.filter(m => {
-    const fecha = new Date(m.fecha);
-    return m.tipo_de_movimiento === "salida" && fecha >= inicioSemana;
-  }).length;
-  const ventasMes = movimientos.filter(m => m.tipo_de_movimiento === "salida" && new Date(m.fecha).getMonth() === mesActual).length;
-
-  // Avisos stock
-  const sinStockProductos = productos.filter(p => p.stock === 0);
-  const bajoStockProductos = productos.filter(p => p.stock > 0 && p.stock < 5);
-
-  const handleOpenModal = (type) => setSelectedStockType(type);
-  const handleCloseModal = () => setSelectedStockType(null);
+  const sinStock = alertasStock.items_sin_stock || [];
+  const bajoStock = alertasStock.items_bajo_stock || [];
 
   const productosAMostrar =
     selectedStockType === "sin"
-      ? sinStockProductos
+      ? sinStock
       : selectedStockType === "bajo"
-      ? bajoStockProductos
+      ? bajoStock
       : [];
 
-  return (
-    <div className="menu-dashboard">
-      <div className="grid">
-        {/* Últimos movimientos */}
-        <section className="dashboard-card">
-          <h3>Últimos Movimientos</h3>
-          <table>
+  // SECCIONES
+
+  const UltimosMovimientos = (
+    <section className="dashboard-card">
+      <h3>Últimos Movimientos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Tipo</th>
+            <th className="col-producto">Producto</th>
+            <th>Cant</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ultimos.map((m) => (
+            <tr key={m.id}>
+              <td>{m.hora}</td>
+              <td>{m.usuario_nombre}</td>
+              <td>{m.tipo_de_movimiento}</td>
+              <td className="col-producto" title={m.producto_nombre}> {m.producto_nombre}</td>
+              <td>{Number(m.cantidad)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+
+  const GananciaMes = (
+    <section className="dashboard-card">
+      <h3>Ganancia del mes</h3>
+      <p>${gananciaMes.toFixed(2)}</p>
+    </section>
+  );
+
+  const InformesVentas = (
+    <section className="dashboard-card">
+      <h3>Informes ventas</h3>
+      <p>Hoy: {ventasHoy.length} productos</p>
+      <p>Semana: {ventasSemana.length} productos</p>
+      <p>Mes: {ventasMes.length} productos</p>
+    </section>
+  );
+
+  const StockInfo = (
+    <section className="dashboard-card">
+      <h3>Avisos Stock</h3>
+      <p onClick={() => setSelectedStockType("sin")} className="stock-link">
+        Sin stock: {sinStock.length}
+      </p>
+      <p onClick={() => setSelectedStockType("bajo")} className="stock-link">
+        Bajo stock: {bajoStock.length}
+      </p>
+    </section>
+  );
+
+  const StockModal = selectedStockType && (
+    <div
+      className="stock-overlay"
+      onClick={() => setSelectedStockType(null)}
+    >
+      <div className="stock-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="historial-popup-header">
+          <strong className="historial-popup-title">
+            {selectedStockType === "sin"
+              ? "Productos sin stock"
+              : "Productos con bajo stock"}
+          </strong>
+          <button
+            className="historial-popup-close"
+            onClick={() => setSelectedStockType(null)}
+          >
+            ✕
+          </button>
+        </div>
+
+        {productosAMostrar.length === 0 ? (
+          <p>No hay productos en esta categoría.</p>
+        ) : (
+       <div className="stock-table-container">
+          <table className="historial-tabla">
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>Usuario</th>
-                <th>Tipo</th>
-                <th>Producto</th>
-                <th>Cant</th>
+                <th>Nombre</th>
+                <th>Stock</th>
               </tr>
             </thead>
             <tbody>
-              {ultimosMovimientos.map((m, i) => (
-                <tr key={i}>
-                  <td>{m.fecha}</td>
-                  <td>{m.usuario}</td>
-                  <td>{m.tipo_de_movimiento}</td>
-                  <td>{m.producto}</td>
-                  <td>{m.cantidad}</td>
+              {productosAMostrar.map((p) => (
+                <tr key={p.id}>
+                  <td className="col-producto" title={p.descripcion}>{p.descripcion}</td>
+                  <td>{Number(p.stock)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </section>
+        </div>
+        )}
+      </div>
+    </div>
+  );
 
-        {/* Ganancia del mes */}
-        <section className="dashboard-card">
-          <h3>Ganancia del mes</h3>
-          <p>${gananciaMes.toFixed(2)}</p>
-        </section>
-
-        {/* Informes ventas */}
-        <section className="dashboard-card">
-          <h3>Informes ventas</h3>
-          <p>Hoy: {ventasHoy} productos</p>
-          <p>Semana: {ventasSemana} productos</p>
-          <p>Mes: {ventasMes} productos</p>
-        </section>
-
-        {/* Avisos stock */}
-        <section className="dashboard-card">
-          <h3>Avisos Stock</h3>
-          <p
-            onClick={() => handleOpenModal("sin")}
-            style={{ cursor: "pointer", textDecoration: "underline" }}
-          >
-            Sin stock: {sinStockProductos.length}
-          </p>
-          <p
-            onClick={() => handleOpenModal("bajo")}
-            style={{ cursor: "pointer", textDecoration: "underline" }}
-          >
-            Bajo stock: {bajoStockProductos.length}
-          </p>
-        </section>
+  return (
+    <div className="menu-dashboard">
+      <div className="grid">
+        {UltimosMovimientos}
+        {GananciaMes}
+        {InformesVentas}
+        {StockInfo}
       </div>
 
-      {/* Modal estilo historial */}
-      {selectedStockType && (
-        <div className="historial-overlay" onClick={handleCloseModal}>
-          <div className="historial-popup" onClick={e => e.stopPropagation()}>
-            <div className="historial-popup-header">
-              <strong className="historial-popup-title">
-                {selectedStockType === "sin" ? "Productos sin stock" : "Productos con bajo stock"}
-              </strong>
-              <button
-                className="historial-popup-close"
-                onClick={handleCloseModal}
-                title="Cerrar"
-              >
-                &#10006;
-              </button>
-            </div>
-            <div>
-              {productosAMostrar.length === 0 ? (
-                <p>No hay productos en esta categoría.</p>
-              ) : (
-                <table className="historial-tabla">
-                  <thead className="historial-tabla-encabezado">
-                    <tr className="historial-fila-encabezado">
-                      <th className="historial-columna">Nombre</th>
-                      <th className="historial-columna">Stock</th>
-                    </tr>
-                  </thead>
-                  <tbody className="historial-tabla-cuerpo">
-                    {productosAMostrar.map(p => (
-                      <tr key={p.id} className="historial-fila">
-                        <td className="historial-celda">{p.descripcion}</td>
-                        <td className="historial-celda">{p.stock}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {StockModal}
     </div>
   );
 }

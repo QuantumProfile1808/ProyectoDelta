@@ -104,8 +104,11 @@ class Movimiento(models.Model):
         return subtotal
 
     def save(self, *args, **kwargs):
-        # Antes de guardar, calcular el total con descuentos aplicados
-        self.total = self.aplicar_descuentos()
+        # Permite guardar un total ya calculado (p. ej. descuentos de combos)
+        skip_descuentos = kwargs.pop("skip_descuentos", False)
+        if not skip_descuentos:
+            # Antes de guardar, calcular el total con descuentos aplicados
+            self.total = self.aplicar_descuentos()
         super().save(*args, **kwargs)
 
     def __str__(self):

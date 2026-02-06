@@ -27,6 +27,19 @@ body, #root {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+/* Quitar flechas en Chrome, Edge, Brave, Electron */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Quitar flechas en Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

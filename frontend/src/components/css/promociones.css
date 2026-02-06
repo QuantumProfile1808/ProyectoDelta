@@ -150,10 +150,25 @@ button[type="submit"]:disabled {
   background-color: #fff;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 24px rgba(90, 73, 73, 0.12);
   z-index: 999;
   max-width: 500px;
   width: 90%;
   font-family: 'Segoe UI', sans-serif;
   color: #333;
+}
+.historial-celda-estado {
+  text-align: -webkit-center !important;
+}
+.items-scroll {
+  max-height: 140px;
+  overflow-y: auto;
+  padding-left: 1.2rem;
+  margin-bottom: 0.8rem;
+  border-left: 3px solid #e0e0e0;
+}
+
+.items-scroll li {
+  margin-bottom: 4px;
+  font-size: 0.95rem;
 }

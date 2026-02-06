@@ -1,0 +1,34 @@
+{
+  "name": "stockmanager",
+  "version": "1.0.2",
+  "author": "Lucas & Matias",
+  "description": "App Electron con Django + Python Portable",
+  "main": "main.js",
+  "scripts": {
+    "start": "npm run build-frontend && electron .",
+    "build-frontend": "cd ../frontend && npm install && npm run build && xcopy dist ..\\electron-app\\frontend\\dist /E /I /Y",
+    "unzip-python": "powershell -command \"Expand-Archive -Path ./python-embed.zip -DestinationPath ./python-embed -Force\"",
+    "package": "npm install && npm run build-frontend && npm run unzip-python && electron-builder"
+  },
+  "build": {
+    "asar": false,
+    "appId": "com.stockmanager.app",
+    "productName": "StockManager",
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "backend",
+      "frontend",
+      "python-embed",
+      "build"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^38.3.0",
+    "electron-builder": "^25.1.8"
+  }
+}

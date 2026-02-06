@@ -16,7 +16,7 @@ const TablaUsuarios = () => {
     last_name: "",
     username: "",
     password: "",
-    role: ""
+    role: "",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,12 +35,12 @@ const TablaUsuarios = () => {
       const res = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active: nuevo })
+        body: JSON.stringify({ is_active: nuevo }),
       });
       if (!res.ok) throw new Error("Patch falló");
 
-      setPerfiles(prev =>
-        prev.map(u =>
+      setPerfiles((prev) =>
+        prev.map((u) =>
           u.user.id === userId
             ? { ...u, user: { ...u.user, is_active: nuevo } }
             : u
@@ -51,7 +51,7 @@ const TablaUsuarios = () => {
     }
   };
 
-  const openEditModal = userObj => {
+  const openEditModal = (userObj) => {
     setSelectedUser(userObj);
     setFormValues({
       dni: userObj.dni || "",
@@ -59,12 +59,12 @@ const TablaUsuarios = () => {
       last_name: userObj.user.last_name || "",
       username: userObj.user.username || "",
       password: "",
-      role: userObj.user.is_staff ? "administrador" : "usuario"
+      role: userObj.user.is_staff ? "administrador" : "usuario",
     });
     setShowModal(true);
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedUser) return;
 
@@ -72,20 +72,23 @@ const TablaUsuarios = () => {
       first_name: formValues.first_name,
       last_name: formValues.last_name,
       username: formValues.username,
-      is_staff: formValues.role === "administrador"
+      is_staff: formValues.role === "administrador",
     };
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/users/${selectedUser.user.id}/`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/users/${selectedUser.user.id}/`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
       if (!res.ok) throw new Error("Falló la edición");
       const updated = await res.json();
 
-      setPerfiles(prev =>
-        prev.map(u =>
+      setPerfiles((prev) =>
+        prev.map((u) =>
           u.user.id === updated.id
             ? { ...u, user: { ...u.user, ...updated }, dni: formValues.dni }
             : u
@@ -99,7 +102,10 @@ const TablaUsuarios = () => {
   };
 
   return (
-    <div className="historial-container" style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
+    <div
+      className="historial-container"
+      style={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}
+    >
       <h2>Gestión de Usuarios</h2>
       <div className="pagination pagination-superior">
         <button
@@ -108,9 +114,13 @@ const TablaUsuarios = () => {
         >
           Anterior
         </button>
-        <span>Página {currentPage} de {totalPages}</span>
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
         <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
         >
           Siguiente
@@ -131,18 +141,27 @@ const TablaUsuarios = () => {
           </tr>
         </thead>
         <tbody className="historial-tabla-cuerpo">
-          {perfilesPaginados.map(u => (
+          {perfilesPaginados.map((u) => (
             <tr key={u.id} className="historial-fila">
               <td className="historial-celda">{u.dni || "-"}</td>
-              <td className={`historial-celda ${u.user.is_active ? "" : "texto-inactivo"}`}>
+              <td
+                className={`historial-celda ${
+                  u.user.is_active ? "" : "texto-inactivo"
+                }`}
+              >
                 {u.user.first_name || "-"}
               </td>
-              <td className={`historial-celda ${u.user.is_active ? "" : "texto-inactivo"}`}>
+              <td
+                className={`historial-celda ${
+                  u.user.is_active ? "" : "texto-inactivo"
+                }`}
+              >
                 {u.user.last_name || "-"}
               </td>
               <td className="historial-celda">{u.user.username || "-"}</td>
               <td className="historial-celda">
-                {u.permiso?.descripcion || (u.user.is_staff ? "Administrador" : "Usuario")}
+                {u.permiso?.descripcion ||
+                  (u.user.is_staff ? "Administrador" : "Usuario")}
               </td>
               <td className="historial-celda">
                 {u.sucursal
@@ -160,14 +179,19 @@ const TablaUsuarios = () => {
                 </label>
               </td>
               <td className="historial-celda">
-                <button className="boton-editar" onClick={() => openEditModal(u)}>
-                  <FaEdit />
-                </button>
-                {u.user.is_staff && (
-                  <span className="icono-admin" title="Administrador">
-                    <FaUserShield />
-                  </span>
-                )}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <button
+                    className="boton-editar"
+                    onClick={() => openEditModal(u)}
+                  >
+                    <FaEdit />
+                  </button>
+                  {u.user.is_staff && (
+                    <span className="icono-admin" title="Administrador">
+                      <FaUserShield />
+                    </span>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

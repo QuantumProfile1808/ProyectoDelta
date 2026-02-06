@@ -221,3 +221,8 @@ body, #root {
   border: 1px solid #00ff15;
   border-radius: 4px;
 }
+
+.export-btn{
+  margin-left: 140px;
+  margin-right: 200px;
+}

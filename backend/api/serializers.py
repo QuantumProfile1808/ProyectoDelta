@@ -66,6 +66,7 @@ class MovimientoSerializer(serializers.ModelSerializer):
     precio_unitario = serializers.SerializerMethodField()
     usuario_nombre = serializers.SerializerMethodField()
     descuentos_aplicados = serializers.SerializerMethodField()
+    total = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
     class Meta:
         model = Movimiento
@@ -73,8 +74,11 @@ class MovimientoSerializer(serializers.ModelSerializer):
             'id', 'producto', 'producto_nombre', 'precio_unitario',
             'usuario', 'usuario_nombre', 'fecha', 'hora',
             'tipo_de_movimiento', 'metodo_de_pago', 'cantidad',
-            'descripcion', 'subtotal', 'descuentos_aplicados'
+            'descripcion', 'subtotal', 'descuentos_aplicados', 'total'
         ]
+        extra_kwargs = {
+            "total": {"write_only": True}
+        }
 
     def get_producto_nombre(self, obj):
         return str(obj.producto) if obj.producto else None
@@ -120,6 +124,16 @@ class MovimientoSerializer(serializers.ModelSerializer):
             "tipo": tipo,
             "monto_por_unidad": round(monto, 2)
         }
+
+    def create(self, validated_data):
+        total = validated_data.pop("total", None)
+        movimiento = Movimiento(**validated_data)
+        if total is not None:
+            movimiento.total = total
+            movimiento.save(skip_descuentos=True)
+        else:
+            movimiento.save()
+        return movimiento
 
 # --- Descuentos ---
 

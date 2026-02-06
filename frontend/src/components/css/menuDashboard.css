@@ -2,8 +2,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100%;
 }
 
 .menu-dashboard {
@@ -17,7 +16,6 @@ html, body {
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
-  overflow-y: auto;
   min-height: auto;
 }
 
@@ -29,6 +27,33 @@ html, body {
   padding-bottom: 32px;
 }
 
+
+.stock-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* 👈 importante */
+  padding-top: 60px;
+  z-index: 1000;
+}
+
+.stock-modal {
+  background: #fcfcfc;
+  border-radius: 14px;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.stock-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
 
 
 .historial-container {
@@ -58,13 +83,21 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   min-height: 250px;
   flex-direction: column;
-  justify-content: center; /* centra verticalmente */
-  align-items: center;     /* centra horizontalmente */
-  text-align: center;      /* centra el texto */
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   min-width: 500px;
 }
 
 
+.col-producto {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+
+}
 
 .dashboard-card h3 {
   margin: 0;
