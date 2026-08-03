@@ -6,8 +6,8 @@ django-cors-headers==4.5.0
 # Autenticación JWT
 djangorestframework-simplejwt==5.3.1
 
-# PostgreSQL driver
-psycopg2==2.9.9
+# PostgreSQL driver (opcional para desarrollo local con SQLite)
+# psycopg2-binary==2.9.9
 
 # Utilidades requeridas por Django
 pytz==2024.1

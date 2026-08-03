@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import "../css/menuDashboard.css";
 import { useDashboardData } from "../hooks/useDashboardData";
 import AuthContext from "../../AuthContext";
+import { Link } from "react-router-dom";
 
 export default function MenuDashboard() {
   const { user } = useContext(AuthContext);
@@ -27,120 +28,187 @@ export default function MenuDashboard() {
       ? bajoStock
       : [];
 
-  // SECCIONES
+  const formatCurrency = (value) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0,
+    }).format(Number(value || 0));
 
-  const UltimosMovimientos = (
-    <section className="dashboard-card">
-      <h3>Últimos Movimientos</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Usuario</th>
-            <th>Tipo</th>
-            <th className="col-producto">Producto</th>
-            <th>Cant</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ultimos.map((m) => (
-            <tr key={m.id}>
-              <td>{m.hora}</td>
-              <td>{m.usuario_nombre}</td>
-              <td>{m.tipo_de_movimiento}</td>
-              <td className="col-producto" title={m.producto_nombre}> {m.producto_nombre}</td>
-              <td>{Number(m.cantidad)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
+  const ventasHoyMonto = ventasHoy.reduce(
+    (acc, item) => acc + Number(item.subtotal || item.total || 0),
+    0
   );
 
-  const GananciaMes = (
-    <section className="dashboard-card">
-      <h3>Ganancia del mes</h3>
-      <p>${gananciaMes.toFixed(2)}</p>
-    </section>
+  const ventasSemanaMonto = ventasSemana.reduce(
+    (acc, item) => acc + Number(item.subtotal || item.total || 0),
+    0
   );
 
-  const InformesVentas = (
-    <section className="dashboard-card">
-      <h3>Informes ventas</h3>
-      <p>Hoy: {ventasHoy.length} productos</p>
-      <p>Semana: {ventasSemana.length} productos</p>
-      <p>Mes: {ventasMes.length} productos</p>
-    </section>
+  const ventasMesMonto = ventasMes.reduce(
+    (acc, item) => acc + Number(item.subtotal || item.total || 0),
+    0
   );
 
-  const StockInfo = (
-    <section className="dashboard-card">
-      <h3>Avisos Stock</h3>
-      <p onClick={() => setSelectedStockType("sin")} className="stock-link">
-        Sin stock: {sinStock.length}
-      </p>
-      <p onClick={() => setSelectedStockType("bajo")} className="stock-link">
-        Bajo stock: {bajoStock.length}
-      </p>
-    </section>
-  );
+  const fechaHoy = new Date().toLocaleDateString("es-AR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-  const StockModal = selectedStockType && (
-    <div
-      className="stock-overlay"
-      onClick={() => setSelectedStockType(null)}
-    >
-      <div className="stock-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="historial-popup-header">
-          <strong className="historial-popup-title">
-            {selectedStockType === "sin"
-              ? "Productos sin stock"
-              : "Productos con bajo stock"}
-          </strong>
-          <button
-            className="historial-popup-close"
-            onClick={() => setSelectedStockType(null)}
-          >
-            ✕
-          </button>
-        </div>
-
-        {productosAMostrar.length === 0 ? (
-          <p>No hay productos en esta categoría.</p>
-        ) : (
-       <div className="stock-table-container">
-          <table className="historial-tabla">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productosAMostrar.map((p) => (
-                <tr key={p.id}>
-                  <td className="col-producto" title={p.descripcion}>{p.descripcion}</td>
-                  <td>{Number(p.stock)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        )}
-      </div>
-    </div>
-  );
+  const tituloSaludo = user?.username ? `Hola, ${user.username}` : "Hola";
 
   return (
     <div className="menu-dashboard">
-      <div className="grid">
-        {UltimosMovimientos}
-        {GananciaMes}
-        {InformesVentas}
-        {StockInfo}
-      </div>
+      <section className="dashboard-hero">
+        <div>
+          <p className="eyebrow">Panel de control</p>
+          <h2>{tituloSaludo} 👋</h2>
+          <p className="hero-text">
+            Aquí tienes una vista clara de ventas, stock y actividad reciente para tu sucursal.
+          </p>
+        </div>
 
-      {StockModal}
+        <div className="hero-card">
+          <span>Resumen de hoy</span>
+          <strong>{fechaHoy}</strong>
+          <Link to="/dashboard/ventas" className="hero-link">
+            Ver ventas
+          </Link>
+        </div>
+      </section>
+
+      <section className="summary-grid">
+        <article className="summary-card accent-blue">
+          <p className="summary-label">Ventas hoy</p>
+          <h3>{formatCurrency(ventasHoyMonto)}</h3>
+          <span>{ventasHoy.length} movimientos</span>
+        </article>
+
+        <article className="summary-card accent-green">
+          <p className="summary-label">Esta semana</p>
+          <h3>{formatCurrency(ventasSemanaMonto)}</h3>
+          <span>{ventasSemana.length} movimientos</span>
+        </article>
+
+        <article className="summary-card accent-purple">
+          <p className="summary-label">Este mes</p>
+          <h3>{formatCurrency(ventasMesMonto)}</h3>
+          <span>{ventasMes.length} movimientos</span>
+        </article>
+
+        <article className="summary-card accent-orange">
+          <p className="summary-label">Ganancia del mes</p>
+          <h3>{formatCurrency(gananciaMes)}</h3>
+          <span>Base para decisiones rápidas</span>
+        </article>
+      </section>
+
+      <section className="dashboard-grid">
+        <article className="panel-card">
+          <div className="panel-header">
+            <div>
+              <p className="eyebrow">Actividad reciente</p>
+              <h3>Últimos movimientos</h3>
+            </div>
+            <Link to="/dashboard/historial">Ver historial</Link>
+          </div>
+
+          <div className="activity-list">
+            {ultimos.length === 0 ? (
+              <p className="empty-state">No hay movimientos recientes todavía.</p>
+            ) : (
+              ultimos.slice(0, 6).map((m) => (
+                <div key={m.id} className="activity-item">
+                  <div>
+                    <strong>{m.producto_nombre}</strong>
+                    <p>
+                      {m.usuario_nombre} • {m.tipo_de_movimiento}
+                    </p>
+                  </div>
+                  <span>{Number(m.cantidad)} und</span>
+                </div>
+              ))
+            )}
+          </div>
+        </article>
+
+        <article className="panel-card">
+          <div className="panel-header">
+            <div>
+              <p className="eyebrow">Control de stock</p>
+              <h3>Alertas rápidas</h3>
+            </div>
+          </div>
+
+          <div className="stock-actions">
+            <button
+              type="button"
+              className="stock-pill"
+              onClick={() => setSelectedStockType("sin")}
+            >
+              Sin stock: {sinStock.length}
+            </button>
+            <button
+              type="button"
+              className="stock-pill"
+              onClick={() => setSelectedStockType("bajo")}
+            >
+              Bajo stock: {bajoStock.length}
+            </button>
+          </div>
+
+          <div className="stock-preview">
+            <p>Revisa productos urgentes para evitar quedarte sin inventario.</p>
+          </div>
+        </article>
+      </section>
+
+      {selectedStockType && (
+        <div className="stock-overlay" onClick={() => setSelectedStockType(null)}>
+          <div className="stock-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="historial-popup-header">
+              <strong className="historial-popup-title">
+                {selectedStockType === "sin"
+                  ? "Productos sin stock"
+                  : "Productos con bajo stock"}
+              </strong>
+              <button
+                className="historial-popup-close"
+                onClick={() => setSelectedStockType(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {productosAMostrar.length === 0 ? (
+              <p className="empty-state">No hay productos en esta categoría.</p>
+            ) : (
+              <div className="stock-table-container">
+                <table className="historial-tabla">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Stock</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productosAMostrar.map((p) => (
+                      <tr key={p.id}>
+                        <td className="col-producto" title={p.descripcion}>
+                          {p.descripcion}
+                        </td>
+                        <td>{Number(p.stock)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

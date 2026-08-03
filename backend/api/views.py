@@ -8,6 +8,7 @@ from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, P
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 
 
@@ -24,11 +25,48 @@ class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.filter(is_active=True)
     serializer_class = ProductoSerializer
 
+    @action(detail=False, methods=['get'], url_path='stock/alertas')
+    def stock_alertas(self, request):
+        sucursal_id = request.query_params.get("sucursal")
+
+        if not sucursal_id:
+            return Response({"error": "Debe enviar ?sucursal=<id>"}, status=400)
+
+        bajo_unidad = Producto.objects.filter(
+            sucursal_id=sucursal_id,
+            medida=False,
+            stock__gt=0,
+            stock__lt=5
+        )
+
+        bajo_kg = Producto.objects.filter(
+            sucursal_id=sucursal_id,
+            medida=True,
+            stock__gt=0,
+            stock__lt=1
+        )
+
+        sin_stock = Producto.objects.filter(sucursal_id=sucursal_id, stock=0)
+
+        items_bajo_total = list(bajo_unidad) + list(bajo_kg)
+
+        return Response({
+            "sin_stock": sin_stock.count(),
+            "bajo_stock": len(items_bajo_total),
+            "bajo_stock_unidad": bajo_unidad.count(),
+            "bajo_stock_kg": bajo_kg.count(),
+            "items_sin_stock": ProductoSerializer(sin_stock, many=True).data,
+            "items_bajo_stock": ProductoSerializer(items_bajo_total, many=True).data,
+            "items_bajo_stock_unidad": ProductoSerializer(bajo_unidad, many=True).data,
+            "items_bajo_stock_kg": ProductoSerializer(bajo_kg, many=True).data,
+        })
+
     @action(detail=False, methods=['get'], url_path='inactivos')
     def productos_inactivos(self, request):
         productos = Producto.objects.filter(is_active=False)
         serializer = self.get_serializer(productos, many=True)
         return Response(serializer.data)
+
     def get_object(self):
         queryset = Producto.objects.all()
         return get_object_or_404(queryset, pk=self.kwargs["pk"])
@@ -52,6 +90,13 @@ class PerfilList(generics.ListAPIView):
 class PerfilViewSet(viewsets.ModelViewSet):
     queryset = Perfil.objects.select_related('user', 'sucursal', 'permiso').all()
     serializer_class = PerfilSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get("user")
+        qs = super().get_queryset()
+        if user_id:
+            qs = qs.filter(user_id=user_id)
+        return qs
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
@@ -89,6 +134,47 @@ class MovimientoViewSet(viewsets.ModelViewSet):
     queryset = Movimiento.objects.all()
     serializer_class = MovimientoSerializer
 
+    @action(detail=False, methods=['get'], url_path='ultimos')
+    def ultimos_movimientos(self, request):
+        sucursal_id = request.query_params.get("sucursal")
+
+        if not sucursal_id:
+            return Response({"error": "Debe enviar ?sucursal=<id>"}, status=400)
+
+        movimientos = (
+            Movimiento.objects
+            .filter(producto__sucursal_id=sucursal_id, tipo_de_movimiento='salida')
+            .select_related("producto", "usuario")
+            .order_by('-fecha', '-hora')[:3]
+        )
+
+        serializer = self.get_serializer(movimientos, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='resumen')
+    def resumen(self, request):
+        sucursal_id = request.query_params.get("sucursal")
+        desde = request.query_params.get("desde")
+        hasta = request.query_params.get("hasta")
+
+        if not sucursal_id:
+            return Response({"error": "Debe enviar ?sucursal="}, status=400)
+
+        queryset = Movimiento.objects.filter(
+            producto__sucursal_id=sucursal_id,
+            tipo_de_movimiento="salida"
+        )
+
+        if desde:
+            queryset = queryset.filter(fecha__gte=desde)
+        if hasta:
+            queryset = queryset.filter(fecha__lte=hasta)
+
+        queryset = queryset.select_related("producto", "usuario")
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
@@ -118,11 +204,10 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 
         if tipo == 'salida':
             if producto.stock is None or cantidad > producto.stock:
-                raise serializer.ValidationError("No hay suficiente stock para esta venta.")
+                raise ValidationError("No hay suficiente stock para esta venta.")
 
         movimiento = serializer.save()
 
-        # Actualizar stock según el tipo de movimiento
         if movimiento.tipo_de_movimiento == 'salida':
             producto.stock -= movimiento.cantidad
         elif movimiento.tipo_de_movimiento == 'entrada':

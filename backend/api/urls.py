@@ -15,10 +15,9 @@ router.register(r'movimiento', MovimientoViewSet)
 router.register(r'descuento', DescuentoViewSet)
 
 
-
 urlpatterns = [
     path('', home, name='home'),  # Si tienes una vista de inicio
-    path('api/', include(router.urls)),  # Incluye las URLs del enrutador
+    path('', include(router.urls)),  # Incluye las URLs del enrutador en /api/
     path('backup/exportar/', BackupExportView.as_view(), name='backup-export'),
     path('backup/importar/', BackupImportView.as_view(), name='backup-import')
 ]
