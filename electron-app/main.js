@@ -7,9 +7,7 @@ let djangoProcess;
 let win;
 
 function getPythonPath() {
-  const embeddedPython = app.isPackaged
-    ? path.join(process.resourcesPath, "app", "python-embed", "python.exe")
-    : path.join(__dirname, "python-embed", "python.exe");
+  const embeddedPython = path.join(__dirname, "python-embed", "python.exe");
 
   console.log("Usando Python embebido:", embeddedPython);
   return embeddedPython;
@@ -37,28 +35,26 @@ function createWindow() {
 
 app.whenReady().then(() => {
   const backendPath = app.isPackaged
-    ? path.join(process.resourcesPath, "app", "backend")
+    ? path.join(process.resourcesPath, "app", "backend-dist")
     : path.join(__dirname, "..", "backend");
-
-  const pythonPath = getPythonPath();
-  if (!fs.existsSync(pythonPath)) {
-    dialog.showErrorBox("Error", "No se encontró Python embebido");
-    return;
-  }
 
   console.log(`Iniciando Django desde: ${backendPath}`);
 
-  const backendExecutable = app.isPackaged
-    ? path.join(
-        process.resourcesPath,
-        "app",
-        "backend",
-        "run_embedded_backend.bat"
-      )
-    : path.join(__dirname, "backend", "run_embedded_backend.bat");
+  const command = app.isPackaged
+    ? path.join(backendPath, "manage.exe")
+    : getPythonPath();
 
-  djangoProcess = spawn(backendExecutable, [], {
-    cwd: path.dirname(backendExecutable),
+  const args = app.isPackaged
+    ? ["runserver", "127.0.0.1:8000"]
+    : ["manage.py", "runserver", "127.0.0.1:8000"];
+
+  if (!fs.existsSync(command)) {
+    dialog.showErrorBox("Error", `No se encontro el backend: ${command}`);
+    return;
+  }
+
+  djangoProcess = spawn(command, args, {
+    cwd: backendPath,
     shell: true,
   });
 
@@ -70,7 +66,7 @@ app.whenReady().then(() => {
     console.error(`Error al iniciar Django: ${err}`)
   );
   djangoProcess.on("close", (code) =>
-    console.log(`Django terminó con código ${code}`)
+    console.log(`Django termino con codigo ${code}`)
   );
 
   createWindow();

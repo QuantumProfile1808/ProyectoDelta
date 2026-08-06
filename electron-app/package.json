@@ -7,8 +7,9 @@
   "scripts": {
     "start": "npm run build-frontend && electron .",
     "build-frontend": "cd ../frontend && npm install && npm run build && xcopy dist ..\\electron-app\\frontend\\dist /E /I /Y",
+    "build-backend": "cd ../backend && python -m PyInstaller --clean --distpath ../electron-app/backend-dist --workpath ../electron-app/backend-build manage.spec",
     "unzip-python": "powershell -command \"Expand-Archive -Path ./python-embed.zip -DestinationPath ./python-embed -Force\"",
-    "package": "npm install && npm run build-frontend && npm run unzip-python && electron-builder"
+    "package": "npm install && npm run build-frontend && npm run build-backend && electron-builder"
   },
   "build": {
     "asar": false,
@@ -21,9 +22,8 @@
     "files": [
       "main.js",
       "package.json",
-      "backend",
+      "backend-dist",
       "frontend",
-      "python-embed",
       "build"
     ]
   },

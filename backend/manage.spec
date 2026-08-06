@@ -9,6 +9,7 @@ a = Analysis(
     hiddenimports=[
         'djoser',
         'djoser.urls',
+        'djoser.urls.jwt',
         'rest_framework',
         'rest_framework.authtoken',
         'djoser.urls.authtoken',
