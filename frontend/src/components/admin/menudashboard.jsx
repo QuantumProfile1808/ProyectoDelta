@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import "../css/menuDashboard.css";
+import "../css/Tabla.css";
 import { useDashboardData } from "../hooks/useDashboardData";
 import AuthContext from "../../AuthContext";
 import { Link } from "react-router-dom";

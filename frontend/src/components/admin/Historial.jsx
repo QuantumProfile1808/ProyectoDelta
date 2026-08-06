@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../css/Historial.css";
+import "../css/Tabla.css";
 import useHistorial from "../hooks/useHistorial.jsx";
 import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageUsuarios.jsx";
 

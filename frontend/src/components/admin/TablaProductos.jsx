@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FaCheck, FaEdit, FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import "../css/TablaProductos.css";
+import "../css/Tabla.css";
 import EditProductModal from "./EditProductModal";
 import { useSucursales } from "../hooks/useSucursales";
 import { useCategorias } from "../hooks/useCategorias";

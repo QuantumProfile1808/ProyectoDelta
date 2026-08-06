@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaEdit, FaUserShield, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import EditUserModal from "./EditUserModal";
-import "../../components/css/TablaUsuario.css";
+import "../css/Tabla.css";
 import { usePerfiles } from "../hooks/usePerfiles";
 import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageUsuarios";
 

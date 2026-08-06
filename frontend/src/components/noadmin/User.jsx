@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from "react";
 import useCategoriasNoadmin from "../hooks/useCategoriasNoadmin";
 import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
+import "../css/Tabla.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 import Header from "../../components/admin/Header";
 import useProductosSucursal from "../hooks/useProductosSucursal";
