@@ -137,15 +137,22 @@ class MovimientoViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='ultimos')
     def ultimos_movimientos(self, request):
         sucursal_id = request.query_params.get("sucursal")
-
-        if not sucursal_id:
+        # If no sucursal is provided, only allow global view for staff users
+        if not sucursal_id and not request.user.is_staff:
             return Response({"error": "Debe enviar ?sucursal=<id>"}, status=400)
 
+        # allow optional filtering by tipo (entrada/salida). By default include both types.
+        tipo = request.query_params.get('tipo')
+
+        movimientos_qs = Movimiento.objects.all()
+        if tipo in ('entrada', 'salida'):
+            movimientos_qs = movimientos_qs.filter(tipo_de_movimiento=tipo)
+
+        if sucursal_id:
+            movimientos_qs = movimientos_qs.filter(producto__sucursal_id=sucursal_id)
+
         movimientos = (
-            Movimiento.objects
-            .filter(producto__sucursal_id=sucursal_id, tipo_de_movimiento='salida')
-            .select_related("producto", "usuario")
-            .order_by('-fecha', '-hora')[:3]
+            movimientos_qs.select_related("producto", "usuario").order_by('-fecha', '-hora')[:3]
         )
 
         serializer = self.get_serializer(movimientos, many=True)
@@ -157,13 +164,13 @@ class MovimientoViewSet(viewsets.ModelViewSet):
         desde = request.query_params.get("desde")
         hasta = request.query_params.get("hasta")
 
-        if not sucursal_id:
+        # If no sucursal is provided, only allow global view for staff users
+        if not sucursal_id and not request.user.is_staff:
             return Response({"error": "Debe enviar ?sucursal="}, status=400)
 
-        queryset = Movimiento.objects.filter(
-            producto__sucursal_id=sucursal_id,
-            tipo_de_movimiento="salida"
-        )
+        queryset = Movimiento.objects.filter(tipo_de_movimiento="salida")
+        if sucursal_id:
+            queryset = queryset.filter(producto__sucursal_id=sucursal_id)
 
         if desde:
             queryset = queryset.filter(fecha__gte=desde)

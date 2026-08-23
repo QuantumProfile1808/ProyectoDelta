@@ -110,6 +110,7 @@ export const Historial = () => {
                 <th className="historial-columna">Fecha</th>
                 <th className="historial-columna">Hora</th>
                 <th className="historial-columna">Tipo</th>
+                <th className="historial-columna">Sucursal</th>
                 <th className="historial-columna">Producto</th>
                 <th className="historial-columna">Cantidad</th>
                 <th className="historial-columna">Método de pago</th>
@@ -130,6 +131,7 @@ export const Historial = () => {
                   <td className="historial-celda">{m.fecha}</td>
                   <td className="historial-celda">{m.hora}</td>
                   <td className="historial-celda">{m.tipo_de_movimiento}</td>
+                  <td className="historial-celda">{m.sucursal ? m.sucursal.localidad : (m.producto && m.producto.sucursal ? m.producto.sucursal.localidad : '')}</td>
                   <td
                     className="historial-celda historial-producto"
                     title={m.producto_nombre}

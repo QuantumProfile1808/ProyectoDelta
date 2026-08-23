@@ -87,6 +87,13 @@ html, body {
   margin-bottom: 20px;
 }
 
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
 .summary-card {
   padding: 18px;
   border-radius: 18px;
@@ -133,8 +140,12 @@ html, body {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.3fr 0.9fr;
+  grid-template-columns: 1.2fr 0.8fr;
   gap: 16px;
+}
+
+.chart-card {
+  min-height: 360px;
 }
 
 .panel-card {
@@ -143,6 +154,118 @@ html, body {
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.chart-layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.donut-chart {
+  position: relative;
+  width: 230px;
+  height: 230px;
+  display: grid;
+  place-items: center;
+}
+
+.donut-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-center strong {
+  font-size: 1.8rem;
+  color: #111827;
+}
+
+.donut-center span {
+  display: block;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.legend-list {
+  display: grid;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.alert-table-wrapper {
+  overflow-x: auto;
+}
+
+.alert-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.alert-table th,
+.alert-table td {
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.alert-table th {
+  color: #64748b;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.alert-table tr.alert-row-medium td {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.alert-table tr.alert-row-tall td {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.alert-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-warning {
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .panel-header {
@@ -301,7 +424,7 @@ html, body {
 }
 
 @media screen and (max-width: 1100px) {
-  .summary-grid {
+  .summary-grid, .summary-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useDashboardData(sucursalID) {
+export function useDashboardData(sucursalID, isAdmin=false) {
   const [ultimos, setUltimos] = useState([]);
   const [ventasHoy, setVentasHoy] = useState([]);
   const [ventasSemana, setVentasSemana] = useState([]);
@@ -12,9 +12,16 @@ export function useDashboardData(sucursalID) {
   });
 
   useEffect(() => {
-    if (!sucursalID) return;
+    if (!sucursalID && !isAdmin) return;
 
-    const get = (url) => fetch(url).then((r) => r.json());
+    const get = (url) => {
+      const token = localStorage.getItem("token");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `JWT ${token}`;
+      return fetch(url, { headers })
+        .then((r) => r.json())
+        .catch(() => null);
+    };
 
     // Fechas
     const hoy = new Date().toISOString().slice(0, 10);
@@ -34,32 +41,52 @@ export function useDashboardData(sucursalID) {
       hoyObj.getMonth() + 1
     ).padStart(2, "0")}-01`;
 
-    // Últimos movimientos
-    get(
-      `http://127.0.0.1:8000/api/movimiento/ultimos/?sucursal=${sucursalID}`
-    ).then(setUltimos);
+    // Últimos movimientos (si es admin y no hay sucursal, traer global)
+    const sucParam = sucursalID ? `?sucursal=${sucursalID}` : "";
+    const ultimosUrl = isAdmin && !sucursalID
+      ? `http://127.0.0.1:8000/api/movimiento/ultimos/`
+      : `http://127.0.0.1:8000/api/movimiento/ultimos/${sucursalID ? `?sucursal=${sucursalID}` : ''}`;
+
+    // normalize ultimosUrl: if sucursalID present it's handled, else empty param removed
+    const ultimosFinal = isAdmin && !sucursalID ? `http://127.0.0.1:8000/api/movimiento/ultimos/` : `http://127.0.0.1:8000/api/movimiento/ultimos/${sucursalID ? `?sucursal=${sucursalID}` : ''}`;
+    // but simpler: build properly
+    const buildUrl = (base, params) => (params ? `${base}?${params}` : base);
+    const ultimosBuilt = isAdmin && !sucursalID ? buildUrl('http://127.0.0.1:8000/api/movimiento/ultimos/', '') : buildUrl('http://127.0.0.1:8000/api/movimiento/ultimos/', sucursalID ? `sucursal=${sucursalID}` : '');
+
+    get(ultimosBuilt).then((data) => setUltimos(Array.isArray(data) ? data : []));
 
     // Ventas hoy
-    get(
-      `http://127.0.0.1:8000/api/movimiento/resumen/?sucursal=${sucursalID}&desde=${hoy}&hasta=${hoy}`
-    ).then(setVentasHoy);
+    const resumenBase = 'http://127.0.0.1:8000/api/movimiento/resumen/';
+    const build = (params) => (params ? `${resumenBase}?${params}` : resumenBase);
+
+    const ventasHoyParams = isAdmin && !sucursalID ? `desde=${hoy}&hasta=${hoy}` : `sucursal=${sucursalID}&desde=${hoy}&hasta=${hoy}`;
+    get(build(ventasHoyParams)).then((data) => setVentasHoy(Array.isArray(data) ? data : []));
 
     // Ventas semana
-    get(
-      `http://127.0.0.1:8000/api/movimiento/resumen/?sucursal=${sucursalID}&desde=${fechaSemana}&hasta=${hoy}`
-    ).then(setVentasSemana);
+    const ventasSemanaParams = isAdmin && !sucursalID ? `desde=${fechaSemana}&hasta=${hoy}` : `sucursal=${sucursalID}&desde=${fechaSemana}&hasta=${hoy}`;
+    get(build(ventasSemanaParams)).then((data) => setVentasSemana(Array.isArray(data) ? data : []));
 
     // Ventas mes + ganancia
-    get(
-      `http://127.0.0.1:8000/api/movimiento/resumen/?sucursal=${sucursalID}&desde=${fechaInicioMes}&hasta=${hoy}`
-    ).then((data) => {
-      setVentasMes(data);
-      setGananciaMes(data.reduce((acc, m) => acc + (m.subtotal || 0), 0));
+    const ventasMesParams = isAdmin && !sucursalID ? `desde=${fechaInicioMes}&hasta=${hoy}` : `sucursal=${sucursalID}&desde=${fechaInicioMes}&hasta=${hoy}`;
+    get(build(ventasMesParams)).then((data) => {
+      const arr = Array.isArray(data) ? data : [];
+      setVentasMes(arr);
+      setGananciaMes(arr.reduce((acc, m) => acc + (m.subtotal || 0), 0));
     });
+
     get(
-      `http://127.0.0.1:8000/api/producto/stock/alertas/?sucursal=${sucursalID}`
-    ).then(setAlertasStock);
-  }, [sucursalID]);
+      `http://127.0.0.1:8000/api/producto/stock/alertas/${sucursalID ? `?sucursal=${sucursalID}` : ''}`
+    ).then((data) => {
+      if (data && typeof data === "object") {
+        setAlertasStock({
+          items_sin_stock: data.items_sin_stock || [],
+          items_bajo_stock: data.items_bajo_stock || [],
+        });
+      } else {
+        setAlertasStock({ items_sin_stock: [], items_bajo_stock: [] });
+      }
+    });
+  }, [sucursalID, isAdmin]);
 
   return {
     ultimos,

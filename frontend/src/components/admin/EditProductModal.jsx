@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { FaTimes, FaCheck } from "react-icons/fa";
 import "../../components/css/EditUserModal.css";
+import "../css/adminForms.css";
 
 const EditProductModal = ({
   show,
@@ -16,12 +17,11 @@ const EditProductModal = ({
   return (
     <div className="modal-backdrop">
       <div className="modal-content custom-edit-modal">
-        <h3>Editar producto</h3>
-        <form onSubmit={onSubmit}>
-          <div className="form-grid">
-            {/* Campo 1 */}
-            <label>
-              Descripción
+        <h3 className="admin-form-title">Editar producto</h3>
+        <form onSubmit={onSubmit} className="admin-form">
+          <div className="admin-form-grid">
+            <div className="admin-form-field">
+              <label>Descripción</label>
               <input
                 type="text"
                 value={formValues.descripcion}
@@ -29,11 +29,10 @@ const EditProductModal = ({
                   onChange({ ...formValues, descripcion: e.target.value })
                 }
               />
-            </label>
+            </div>
 
-            {/* Campo 2 */}
-            <label>
-              Precio
+            <div className="admin-form-field">
+              <label>Precio</label>
               <input
                 type="number"
                 value={formValues.precio}
@@ -44,11 +43,10 @@ const EditProductModal = ({
                   })
                 }
               />
-            </label>
+            </div>
 
-            {/* Campo 3 */}
-            <label>
-              Stock
+            <div className="admin-form-field">
+              <label>Stock</label>
               <input
                 type="number"
                 step={formValues.medida ? "0.001" : "1"}
@@ -59,7 +57,6 @@ const EditProductModal = ({
                   let v = e.target.value;
 
                   if (!formValues.medida) {
-                    // UNIDAD → SOLO ENTEROS
                     v = v.replace(/\D+/g, "");
                     if (v === "") {
                       onChange({ ...formValues, stock: "" });
@@ -76,11 +73,10 @@ const EditProductModal = ({
                   });
                 }}
               />
-            </label>
+            </div>
 
-            {/* Campo 4 */}
-            <label>
-              Medida
+            <div className="admin-form-field">
+              <label>Medida</label>
               <select
                 value={formValues.medida ? "true" : "false"}
                 onChange={(e) =>
@@ -90,11 +86,10 @@ const EditProductModal = ({
                 <option value="false">Unidad</option>
                 <option value="true">KG</option>
               </select>
-            </label>
+            </div>
 
-            {/* Campo 5 */}
-            <label>
-              Sucursal
+            <div className="admin-form-field">
+              <label>Sucursal</label>
               <select
                 value={String(formValues.sucursal)}
                 onChange={(e) =>
@@ -108,11 +103,10 @@ const EditProductModal = ({
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
-            {/* Campo 6 */}
-            <label>
-              Categoría
+            <div className="admin-form-field">
+              <label>Categoría</label>
               <select
                 value={String(formValues.categoria)}
                 onChange={(e) =>
@@ -126,7 +120,7 @@ const EditProductModal = ({
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
           </div>
 
           <div className="modal-buttons edit-modal-buttons">

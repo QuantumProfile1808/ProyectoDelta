@@ -8,20 +8,22 @@ import { useSucursales } from "../hooks/useSucursales";
 import { useCategorias } from "../hooks/useCategorias";
 import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageProductos";
 import { usePerfil } from "../hooks/usePerfil";
+import { useAuth } from "../../AuthContext";
 
 function AddStock({ producto, onClose, onGuardar }) {
   const [cantidad, setCantidad] = useState("");
   if (!producto) return null;
 
   const handleSubmit = () => {
-    const valor = parseFloat(cantidad);
+    const normalized = String(cantidad).replace(',', '.').trim();
+    const valor = parseFloat(normalized);
 
     if (isNaN(valor) || valor <= 0) {
       alert("Ingrese un número válido");
       return;
     }
 
-    // ❌ UNIDAD → SOLO ENTEROS
+    // UNIDAD → SOLO ENTEROS
     if (!producto.medida && !Number.isInteger(valor)) {
       alert("Este producto solo acepta unidades enteras");
       return;
@@ -45,11 +47,14 @@ function AddStock({ producto, onClose, onGuardar }) {
           onChange={(e) => {
             let v = e.target.value;
 
+            // Normalize comma to dot for decimals
+            v = v.replace(',', '.');
+
             if (!producto.medida) {
               // UNIDAD → SOLO ENTEROS
               v = v.replace(/\D+/g, "");
             } else {
-              // KG → Hasta 3 decimales
+              // KG → allow up to 3 decimals
               if (!/^\d*\.?\d{0,3}$/.test(v)) return;
             }
 
@@ -87,6 +92,7 @@ const TablaProductos = () => {
   const categoria = useCategorias();
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const perfil = usePerfil();
+  const { user } = useAuth();
   // Filtros
   const [filtroId, setFiltroId] = useState("");
   const [filtroNombre, setFiltroNombre] = useState("");
@@ -147,7 +153,7 @@ const TablaProductos = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           producto: productoSeleccionado.id,
-          usuario: perfil.user.id,
+          usuario: (perfil && perfil.user && perfil.user.id) || (user && user.id) || null,
           tipo_de_movimiento: "entrada",
           cantidad,
           descripcion: `Ingreso de stock para ${productoSeleccionado.descripcion}`,

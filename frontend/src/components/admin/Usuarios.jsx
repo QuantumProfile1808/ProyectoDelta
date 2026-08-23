@@ -3,6 +3,7 @@ import "../../components/css/Usuario.css";
 import { useSucursales } from "../hooks/useSucursales";
 import { usePermisos } from "../hooks/usePermisos";
 import "../css/inputs.css";
+import "../css/adminForms.css";
 
 const Usuarios = () => {
   const [form, setForm] = useState({
@@ -51,7 +52,7 @@ const Usuarios = () => {
       try { userData = JSON.parse(userText); } catch(e){ /* not json */ }
 
       if (!userRes.ok) {
-        setLoading(false); // ← esto es lo nuevo
+        setLoading(false);
         console.error("Error al crear usuario:", userText);
         alert("Error al crear usuario: " + (userData?.detail || userText || userRes.status));
         return;
@@ -103,35 +104,37 @@ const Usuarios = () => {
 
   // Render form and page
   return (
-    <form className="form" onSubmit={handleSubmit}>
-        <div className="form-grid">
-          <label>
-            DNI
+    <div className="admin-form-card">
+      <h3 className="admin-form-title">Crear usuario</h3>
+      <form className="admin-form" onSubmit={handleSubmit}>
+        <div className="admin-form-grid">
+          <div className="admin-form-field">
+            <label>DNI</label>
             <input name="dni" value={form.dni} onChange={handleChange} required />
-          </label>
+          </div>
 
-          <label>
-            Nombre
+          <div className="admin-form-field">
+            <label>Nombre</label>
             <input name="first_name" value={form.first_name} onChange={handleChange} required />
-          </label>
+          </div>
 
-          <label>
-            Apellido
+          <div className="admin-form-field">
+            <label>Apellido</label>
             <input name="last_name" value={form.last_name} onChange={handleChange} required />
-          </label>
+          </div>
 
-          <label>
-            Usuario
+          <div className="admin-form-field">
+            <label>Usuario</label>
             <input name="username" value={form.username} onChange={handleChange} required />
-          </label>
+          </div>
 
-          <label>
-            Contraseña
+          <div className="admin-form-field">
+            <label>Contraseña</label>
             <input name="password" type="password" value={form.password} onChange={handleChange} required />
-          </label>
+          </div>
 
-          <label>
-            Sucursal
+          <div className="admin-form-field">
+            <label>Sucursal</label>
             <select name="sucursal" value={form.sucursal} onChange={handleChange} required>
               <option value="">Seleccione una sucursal</option>
               {sucursales.map(s => (
@@ -140,26 +143,26 @@ const Usuarios = () => {
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         </div>
 
-        <label className="checkbox-label">
+        <div className="admin-form-field admin-form-checkbox">
           <input
             type="checkbox"
             name="is_staff"
             checked={form.is_staff}
             onChange={handleChange}
           />
-          ¿Es administrador?
-        </label>
+          <label>¿Es administrador?</label>
+        </div>
 
-        <div className="form-actions">
-          <button type="submit" disabled={loading}>
+        <div className="admin-form-actions">
+          <button type="submit" className="admin-form-btn admin-form-btn--primary" disabled={loading}>
             {loading ? "Guardando..." : "Guardar"}
           </button>
         </div>
       </form>
-
+    </div>
   );
 };
 

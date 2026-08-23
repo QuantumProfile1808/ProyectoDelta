@@ -65,6 +65,7 @@ class MovimientoSerializer(serializers.ModelSerializer):
     producto_nombre = serializers.SerializerMethodField()
     precio_unitario = serializers.SerializerMethodField()
     usuario_nombre = serializers.SerializerMethodField()
+    sucursal = serializers.SerializerMethodField()
     descuentos_aplicados = serializers.SerializerMethodField()
     total = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
@@ -74,7 +75,7 @@ class MovimientoSerializer(serializers.ModelSerializer):
             'id', 'producto', 'producto_nombre', 'precio_unitario',
             'usuario', 'usuario_nombre', 'fecha', 'hora',
             'tipo_de_movimiento', 'metodo_de_pago', 'cantidad',
-            'descripcion', 'subtotal', 'descuentos_aplicados', 'total'
+            'descripcion', 'subtotal', 'descuentos_aplicados', 'total', 'sucursal'
         ]
         extra_kwargs = {
             "total": {"write_only": True}
@@ -93,6 +94,16 @@ class MovimientoSerializer(serializers.ModelSerializer):
 
     def get_subtotal(self, obj):
         return float(obj.total or 0)
+
+    def get_sucursal(self, obj):
+        if not obj.producto or not obj.producto.sucursal:
+            return None
+        suc = obj.producto.sucursal
+        return {
+            'id': suc.id,
+            'direccion': suc.direccion,
+            'localidad': suc.localidad,
+        }
 
     def get_descuentos_aplicados(self, obj):
         if not obj.producto:

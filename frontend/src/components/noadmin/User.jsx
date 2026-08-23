@@ -8,6 +8,8 @@ import Header from "../../components/admin/Header";
 import useProductosSucursal from "../hooks/useProductosSucursal";
 import { usePerfil } from "../hooks/usePerfil";
 
+
+
 export default function User() {
   const perfil = usePerfil();
 
@@ -145,6 +147,10 @@ export default function User() {
   const totalItems = useMemo(() => {
     return lineas.reduce((sum, l) => sum + l.cantidad, 0);
   }, [lineas]);
+
+  const hayProductosEnCarrito = useMemo(() => {
+    return Object.values(carrito).some((qty) => typeof qty === "number" && qty > 0);
+  }, [carrito]);
 
   if (loading) return <p>Cargando…</p>;
 
@@ -409,8 +415,8 @@ export default function User() {
             <button
               className="cart-btn-footer"
               onClick={() => setShowModal(true)}
-              disabled={lineas.length === 0}
-              title={lineas.length === 0 ? "Carrito vacío" : "Abrir carrito"}
+              disabled={!hayProductosEnCarrito}
+              title={!hayProductosEnCarrito ? "Carrito vacío" : "Abrir carrito"}
             >
               🛒 Ver Carrito {totalItems > 0 ? `(${totalItems})` : ""}
             </button>
