@@ -1,111 +1,74 @@
-.container {
-  padding: 30px;
-  font-family: Arial, sans-serif;
-  max-width: 1100px;
-  margin: auto;
+.finanzas-page {
+  --finanzas-ink: #17221d;
+  --finanzas-muted: #68746d;
+  --finanzas-line: #dce5df;
+  --finanzas-paper: #f5f8f5;
+  --finanzas-accent: #197c55;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 28px 48px;
+  color: var(--finanzas-ink);
 }
 
-.selector {
+.finanzas-header,
+.finanzas-panel-heading,
+.ranking-item,
+.payment-meta {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #d9d9d9;
-  padding: 12px 20px;
-  border-radius: 12px;
-  margin-bottom: 25px;
-  gap: 15px;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.selector label {
-  font-weight: bold;
-  font-size: 1rem;
-  color: #333;
+.finanzas-header { margin-bottom: 28px; align-items: end; }
+.finanzas-header h1 { margin: 4px 0; font-size: 2.3rem; }
+.finanzas-header p { margin: 0; color: var(--finanzas-muted); }
+.finanzas-eyebrow { color: var(--finanzas-accent); font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+
+.period-selector { display: flex; gap: 6px; padding: 5px; background: var(--finanzas-paper); border: 1px solid var(--finanzas-line); border-radius: 9px; }
+.period-selector button, .period-summary { border: 0; background: transparent; color: var(--finanzas-muted); cursor: pointer; font: inherit; }
+.period-selector button { padding: 9px 14px; border-radius: 6px; }
+.period-selector button.selected { background: var(--finanzas-ink); color: white; }
+
+.finanzas-kpis { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.finanzas-kpi { min-height: 120px; padding: 22px; border: 1px solid var(--finanzas-line); border-radius: 10px; background: white; box-shadow: 0 8px 24px rgba(23, 34, 29, .05); }
+.finanzas-kpi span, .finanzas-kpi small { display: block; color: var(--finanzas-muted); }
+.finanzas-kpi strong { display: block; margin: 14px 0 6px; font-size: 1.85rem; }
+.primary-kpi { background: var(--finanzas-ink); color: white; border-color: var(--finanzas-ink); }
+.primary-kpi span, .primary-kpi small { color: #b9d6c6; }
+
+.finanzas-panels { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; }
+.finanzas-panel, .period-overview { padding: 24px; border: 1px solid var(--finanzas-line); border-radius: 10px; background: white; }
+.finanzas-panel h2, .period-overview h2 { margin: 5px 0 0; font-size: 1.15rem; }
+.panel-period { color: var(--finanzas-muted); font-size: .85rem; }
+.ranking-list, .payment-list { margin-top: 24px; }
+.ranking-item { padding: 14px 0; border-bottom: 1px solid var(--finanzas-line); }
+.ranking-item:last-child { border-bottom: 0; }
+.ranking-number { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #e4f1e9; color: var(--finanzas-accent); font-weight: 800; }
+.ranking-detail { flex: 1; }
+.ranking-detail strong, .ranking-detail span, .payment-item span { display: block; }
+.ranking-detail span, .payment-item span { margin-top: 4px; color: var(--finanzas-muted); font-size: .85rem; }
+.ranking-item b { font-size: .95rem; }
+.payment-item { margin-top: 18px; }
+.payment-meta { align-items: baseline; }
+.payment-item b { font-size: .95rem; }
+.payment-track { height: 7px; margin-top: 9px; overflow: hidden; border-radius: 4px; background: #edf2ee; }
+.payment-track span { display: block; height: 100%; margin: 0; border-radius: inherit; background: var(--finanzas-accent); }
+
+.period-overview { margin-top: 18px; }
+.period-overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+.period-summary { padding: 16px; border: 1px solid var(--finanzas-line); border-radius: 8px; text-align: left; }
+.period-summary:hover, .period-summary.active { border-color: var(--finanzas-accent); background: #f1f8f3; }
+.period-summary span, .period-summary small { display: block; color: var(--finanzas-muted); }
+.period-summary strong { display: block; margin: 10px 0 5px; color: var(--finanzas-ink); }
+.finanzas-message { padding: 24px 28px; color: var(--finanzas-muted); }
+.error-message { color: #a12d2d; background: #fff1f1; border-radius: 8px; }
+
+@media (max-width: 760px) {
+  .finanzas-page { padding: 22px 16px 36px; }
+  .finanzas-header, .finanzas-panel-heading { align-items: flex-start; flex-direction: column; }
+  .period-selector { width: 100%; }
+  .period-selector button { flex: 1; padding-inline: 8px; }
+  .finanzas-kpis, .finanzas-panels { grid-template-columns: 1fr; }
+  .period-overview-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
-.selector input[type="date"] {
-  width: 160px;
-  padding: 8px 12px;
-  border: 1px solid #000;
-  border-radius: 20px;
-  background-color: #fff;
-  color: #555;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.3s;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-  background: url("data:image/svg+xml,%3Csvg fill='333' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E") no-repeat right 0.75rem center/1rem;
-}
-
-.selector input[type="date"]:hover {
-  border-color: #2ecc71;
-}
-
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 40px 100px;
-  justify-items: center;
-  align-items: start;
-  padding: 10px;
-}
-
-.card {
-  background-color: #d9d9d9;
-  border-radius: 16px;
-  padding: 25px;
-  width: 100%;
-  max-width: 550px;
-  height: 190px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease-in-out;
-
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card h2 {
-  font-size: 35px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.card p {
-  font-size: 25px;
-  margin-bottom: 15px;
-}
-
-.balance-btn {
-  background-color: #2ecc71;
-  color: white;
-  font-weight: bold;
-  border: 2px solid #1e8449;
-  border-radius: 25px;
-  padding: 8px 20px;
-  font-size: 1rem;
-  cursor: default;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-  transition: transform 0.1s ease-in-out, background-color 0.2s;
-}
-
-.balance-btn:hover {
-  transform: scale(1.05);
-  background-color: #27ae60;
-}
-
-.container {
-  background-color: #fff;
-  padding: 50px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  font-family: Arial, sans-serif;
-  max-width: 1200px;  
-  margin: auto;
-}
-

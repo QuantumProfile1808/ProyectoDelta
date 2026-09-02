@@ -29,24 +29,24 @@ class ProductoViewSet(viewsets.ModelViewSet):
     def stock_alertas(self, request):
         sucursal_id = request.query_params.get("sucursal")
 
-        if not sucursal_id:
-            return Response({"error": "Debe enviar ?sucursal=<id>"}, status=400)
+        productos_qs = Producto.objects.filter(is_active=True)
 
-        bajo_unidad = Producto.objects.filter(
-            sucursal_id=sucursal_id,
+        if sucursal_id:
+            productos_qs = productos_qs.filter(sucursal_id=sucursal_id)
+
+        bajo_unidad = productos_qs.filter(
             medida=False,
             stock__gt=0,
             stock__lt=5
         )
 
-        bajo_kg = Producto.objects.filter(
-            sucursal_id=sucursal_id,
+        bajo_kg = productos_qs.filter(
             medida=True,
             stock__gt=0,
             stock__lt=1
         )
 
-        sin_stock = Producto.objects.filter(sucursal_id=sucursal_id, stock=0)
+        sin_stock = productos_qs.filter(stock=0)
 
         items_bajo_total = list(bajo_unidad) + list(bajo_kg)
 

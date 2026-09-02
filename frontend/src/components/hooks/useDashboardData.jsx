@@ -14,6 +14,10 @@ export function useDashboardData(sucursalID, isAdmin=false) {
   useEffect(() => {
     if (!sucursalID && !isAdmin) return;
 
+    const stockAlertUrl = sucursalID
+      ? `http://127.0.0.1:8000/api/producto/stock/alertas/?sucursal=${sucursalID}`
+      : 'http://127.0.0.1:8000/api/producto/stock/alertas/';
+
     const get = (url) => {
       const token = localStorage.getItem("token");
       const headers = { "Content-Type": "application/json" };
@@ -55,7 +59,8 @@ export function useDashboardData(sucursalID, isAdmin=false) {
 
     get(ultimosBuilt).then((data) => setUltimos(Array.isArray(data) ? data : []));
 
-    // Ventas hoy
+    // Ventas / resumen del backend: esta ruta ya filtra por MOVIMIENTOS DE TIPO "salida".
+    // Es decir, SOLO toma ventas, no entradas ni otros movimientos.
     const resumenBase = 'http://127.0.0.1:8000/api/movimiento/resumen/';
     const build = (params) => (params ? `${resumenBase}?${params}` : resumenBase);
 
@@ -74,9 +79,7 @@ export function useDashboardData(sucursalID, isAdmin=false) {
       setGananciaMes(arr.reduce((acc, m) => acc + (m.subtotal || 0), 0));
     });
 
-    get(
-      `http://127.0.0.1:8000/api/producto/stock/alertas/${sucursalID ? `?sucursal=${sucursalID}` : ''}`
-    ).then((data) => {
+    get(stockAlertUrl).then((data) => {
       if (data && typeof data === "object") {
         setAlertasStock({
           items_sin_stock: data.items_sin_stock || [],

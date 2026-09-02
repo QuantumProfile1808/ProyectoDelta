@@ -7,9 +7,8 @@ import { Link } from "react-router-dom";
 
 export default function MenuDashboard() {
   const { user } = useContext(AuthContext);
-  const sucursalID = user?.perfil?.sucursal?.id;
-
   const isAdmin = user?.perfil?.permiso?.descripcion === "admin" || user?.is_staff;
+  const sucursalID = isAdmin ? null : user?.perfil?.sucursal?.id;
 
   const {
     ultimos,
@@ -20,16 +19,38 @@ export default function MenuDashboard() {
     alertasStock,
   } = useDashboardData(sucursalID, isAdmin);
 
-  const [selectedStockType, setSelectedStockType] = useState(null);
+  // Filtro del widget: día / semana / mes.
+  // Importante: la API de ventas ya devuelve sólo movimientos tipo "salida".
+  const [selectedSalesPeriod, setSelectedSalesPeriod] = useState("hoy");
   const sinStock = alertasStock.items_sin_stock || [];
   const bajoStock = alertasStock.items_bajo_stock || [];
 
-  const productosAMostrar =
-    selectedStockType === "sin"
-      ? sinStock
-      : selectedStockType === "bajo"
-      ? bajoStock
-      : [];
+  const salesPeriodMap = {
+    hoy: ventasHoy,
+    semana: ventasSemana,
+    mes: ventasMes,
+  };
+
+  const periodoSeleccionado = salesPeriodMap[selectedSalesPeriod] || [];
+
+  // Agrupamos los subtotales por sucursal para dibujar la barra comparativa.
+  const sucursalSales = Object.values(
+    periodoSeleccionado.reduce((acc, item) => {
+      const sucursal = item.sucursal || {};
+      const sucursalId = sucursal.id || "sin-sucursal";
+      const nombre = sucursal.localidad || sucursal.direccion || `Sucursal ${sucursalId}`;
+      const subtotal = Number(item.subtotal || item.total || 0);
+
+      if (!acc[sucursalId]) {
+        acc[sucursalId] = { nombre, total: 0 };
+      }
+
+      acc[sucursalId].total += subtotal;
+      return acc;
+    }, {})
+  ).sort((a, b) => b.total - a.total);
+
+  const maxSucursalSales = Math.max(...sucursalSales.map((item) => item.total), 1);
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", {
@@ -275,78 +296,50 @@ export default function MenuDashboard() {
         <article className="panel-card">
           <div className="panel-header">
             <div>
-              <p className="eyebrow">Control de stock</p>
-              <h3>Alertas rápidas</h3>
+              <p className="eyebrow">Ventas</p>
+              <h3>Por sucursal</h3>
             </div>
           </div>
 
-          <div className="stock-actions">
-            <button
-              type="button"
-              className="stock-pill"
-              onClick={() => setSelectedStockType("sin")}
-            >
-              Sin stock: {sinStock.length}
-            </button>
-            <button
-              type="button"
-              className="stock-pill"
-              onClick={() => setSelectedStockType("bajo")}
-            >
-              Bajo stock: {bajoStock.length}
-            </button>
+          <div className="sales-filter-row">
+            {[
+              { key: "hoy", label: "Día" },
+              { key: "semana", label: "Semana" },
+              { key: "mes", label: "Mes" },
+            ].map((period) => (
+              <button
+                key={period.key}
+                type="button"
+                className={`filter-chip ${selectedSalesPeriod === period.key ? "active" : ""}`}
+                onClick={() => setSelectedSalesPeriod(period.key)}
+              >
+                {period.label}
+              </button>
+            ))}
           </div>
 
-          <div className="stock-preview">
-            <p>Revisa productos urgentes para evitar quedarte sin inventario.</p>
+          <div className="branch-sales-chart">
+            {sucursalSales.length === 0 ? (
+              <p className="empty-state">No hay ventas para este período.</p>
+            ) : (
+              sucursalSales.map((sucursal) => (
+                <div key={sucursal.nombre} className="branch-sales-row">
+                  <div className="branch-sales-meta">
+                    <span>{sucursal.nombre}</span>
+                    <strong>{formatCurrency(sucursal.total)}</strong>
+                  </div>
+                  <div className="branch-sales-track">
+                    <div
+                      className="branch-sales-fill"
+                      style={{ width: `${(sucursal.total / maxSucursalSales) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </article>
       </section>
-
-      {selectedStockType && (
-        <div className="stock-overlay" onClick={() => setSelectedStockType(null)}>
-          <div className="stock-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="historial-popup-header">
-              <strong className="historial-popup-title">
-                {selectedStockType === "sin"
-                  ? "Productos sin stock"
-                  : "Productos con bajo stock"}
-              </strong>
-              <button
-                className="historial-popup-close"
-                onClick={() => setSelectedStockType(null)}
-              >
-                ✕
-              </button>
-            </div>
-
-            {productosAMostrar.length === 0 ? (
-              <p className="empty-state">No hay productos en esta categoría.</p>
-            ) : (
-              <div className="stock-table-container">
-                <table className="historial-tabla">
-                  <thead>
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Stock</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {productosAMostrar.map((p) => (
-                      <tr key={p.id}>
-                        <td className="col-producto" title={p.descripcion}>
-                          {p.descripcion}
-                        </td>
-                        <td>{Number(p.stock)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
