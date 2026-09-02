@@ -40,7 +40,7 @@ export default function CreateCategoria({ onClose, onCreated }) {
             <label>Descripción</label>
             <input value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
           </div>
-
+          
           {error && <div className="admin-form-error">{String(error)}</div>}
 
           <div className="admin-form-actions">
