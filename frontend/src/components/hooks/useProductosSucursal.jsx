@@ -1,17 +1,21 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useGetCatalogQuery } from "../../api/bffApi";
+import { getErrorMessage } from "../../api/client";
 
-export default function useProductosSucursal(sucursalID) {
-  const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
+const EMPTY = [];
 
-  useEffect(() => {
-    if (!sucursalID) return;
-
-    fetch(`http://127.0.0.1:8000/api/producto/?sucursal=${sucursalID}`)
-      .then(res => res.json())
-      .then(data => setProductos(data))
-      .finally(() => setLoading(false));
-  }, [sucursalID]);
-
-  return { productos, loading };
+export default function useBranchProducts(branchId) {
+  const user = useSelector((state) => state.auth.user);
+  const query = useGetCatalogQuery(branchId ? { sucursal: branchId } : undefined, {
+    skip: !user,
+  });
+  const data = query.currentData;
+  return {
+    products: data?.productos ?? EMPTY,
+    categories: data?.categorias ?? EMPTY,
+    loading: query.isLoading || (query.isFetching && !data),
+    fetching: query.isFetching,
+    error: getErrorMessage(query.error),
+    refetch: query.refetch,
+  };
 }

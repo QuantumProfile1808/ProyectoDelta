@@ -5,6 +5,9 @@ import "../../components/css/Usuario.css";
 import "../css/fab.css";
 import "../css/adminForms.css";
 
+import { useCreateProductMutation } from "../../api/bffApi";
+import { getErrorMessage } from "../../api/client";
+
 import CreateSucursal from "./CreateSucursal";
 import CreateCategoria from "./CreateCategoria";
 
@@ -18,6 +21,7 @@ const Productos = () => {
     medida: "",
   });
 
+  const [createProduct, { isLoading, error }] = useCreateProductMutation();
   const sucursales = useSucursales();
   const categorias = useCategorias();
 
@@ -41,16 +45,10 @@ const Productos = () => {
       medida: form.medida === "true",
     };
 
-    const productRes = await fetch("http://127.0.0.1:8000/api/producto/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!productRes.ok) {
-      throw new Error("Failed to create product");
+    try {
+      await createProduct(payload).unwrap();
+    } catch {
+      return;
     }
 
     setForm({
@@ -61,10 +59,6 @@ const Productos = () => {
       categoria: "",
       medida: "",
     });
-  };
-
-  const handleCreated = () => {
-    window.location.reload();
   };
 
   return (
@@ -148,8 +142,9 @@ const Productos = () => {
             </div>
           </div>
 
+          {error && <p role="alert">{getErrorMessage(error)}</p>}
           <div className="admin-form-actions">
-            <button type="submit" className="admin-form-btn admin-form-btn--primary">Crear Producto</button>
+            <button type="submit" disabled={isLoading} className="admin-form-btn admin-form-btn--primary">Crear Producto</button>
           </div>
         </form>
       </div>
@@ -186,13 +181,11 @@ const Productos = () => {
       {showSucursal && (
         <CreateSucursal
           onClose={() => setShowSucursal(false)}
-          onCreated={handleCreated}
         />
       )}
       {showCategoria && (
         <CreateCategoria
           onClose={() => setShowCategoria(false)}
-          onCreated={handleCreated}
         />
       )}
     </div>

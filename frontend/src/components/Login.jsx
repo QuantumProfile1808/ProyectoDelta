@@ -6,7 +6,7 @@ import { Modal } from "./Modal";
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login, loading, error } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -40,7 +40,7 @@ export const Login = () => {
         show={showModal}
         onClose={() => setShowModal(false)}
         title="Usuario o Contraseña incorrecta"
-        message="Por favor, vuelva a intentarlo"
+        message={error || "Por favor, vuelva a intentarlo"}
       />
       <div className="login-box">
         <div className="login-title">Iniciar Sesión</div>
@@ -67,7 +67,7 @@ export const Login = () => {
             placeholder="Contraseña"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button className="login-button" type="submit">
+          <button className="login-button" type="submit" disabled={loading}>
             Iniciar Sesión
           </button>
         </form>

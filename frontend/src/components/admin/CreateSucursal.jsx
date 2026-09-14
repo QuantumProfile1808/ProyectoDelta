@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import "../css/adminForms.css";
+import { useCreateBranchMutation } from "../../api/bffApi";
+import { getErrorMessage } from "../../api/client";
 
 export default function CreateSucursal({ onClose, onCreated }) {
   const [form, setForm] = useState({ direccion: "", localidad: "" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [createBranch, { isLoading: loading, error: requestError }] = useCreateBranchMutation();
+  const error = getErrorMessage(requestError);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -13,26 +15,12 @@ export default function CreateSucursal({ onClose, onCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/sucursal/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        setError(text || "Error al crear sucursal");
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-      onCreated && onCreated();
-      onClose && onClose();
-    } catch (err) {
-      setError(err.message || "Error de red");
-      setLoading(false);
+      await createBranch(form).unwrap();
+      onCreated?.();
+      onClose?.();
+    } catch {
+      // The mutation exposes the error to the form.
     }
   };
 

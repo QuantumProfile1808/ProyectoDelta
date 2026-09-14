@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "../css/carritoModal.css";
 
-export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
+export default function CarritoModal({ isOpen, onClose, onConfirm, lineas, busy = false }) {
   const [metodoPago, setMetodoPago] = useState("transferencia");
   const [montoRecibido, setMontoRecibido] = useState("");
   const [vuelto, setVuelto] = useState(null);
@@ -32,6 +32,7 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
   const puedeConfirmar = esEfectivo ? recibido >= totalVenta : true;
 
   function confirmarVenta() {
+    if (busy) return;
     const cambio = esEfectivo ? recibido - totalVenta : null;
 
     if (esEfectivo && vuelto === null) {
@@ -49,7 +50,7 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
   return ReactDOM.createPortal(
     <div className="modal-overlay">
       <div className="modal">
-        <button onClick={onClose} className="modal-close">
+        <button onClick={onClose} className="modal-close" disabled={busy}>
           ✖
         </button>
         <h2>Detalles del Pedido</h2>
@@ -136,13 +137,13 @@ export default function CarritoModal({ isOpen, onClose, onConfirm, lineas }) {
         )}
 
         <div className="modal-buttons">
-          <button className="btn-cancel" onClick={onClose}>
+          <button className="btn-cancel" onClick={onClose} disabled={busy}>
             Cancelar
           </button>
           <button
             className="btn-confirm"
             onClick={confirmarVenta}
-            disabled={!puedeConfirmar}
+            disabled={!puedeConfirmar || busy || !lineas.length}
           >
             {esEfectivo && vuelto !== null ? "Aceptar" : "Confirmar"}
           </button>

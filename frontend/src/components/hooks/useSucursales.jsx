@@ -1,14 +1,9 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useGetBranchesQuery } from "../../api/bffApi";
 
+const EMPTY = [];
 export function useSucursales() {
-  const [sucursales, setSucursales] = useState([]);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/sucursal/")
-      .then((res) => res.json())
-      .then((data) => setSucursales(data))
-      .catch((err) => console.error("Error al obtener Sucursales:", err));
-  }, []);
-
-  return sucursales;
+  const user = useSelector((state) => state.auth.user);
+  const { data = EMPTY } = useGetBranchesQuery(undefined, { skip: !user });
+  return data;
 }

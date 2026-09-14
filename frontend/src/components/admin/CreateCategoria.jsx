@@ -1,33 +1,21 @@
 import React, { useState } from "react";
 import "../css/adminForms.css";
+import { useCreateCategoryMutation } from "../../api/bffApi";
+import { getErrorMessage } from "../../api/client";
 
 export default function CreateCategoria({ onClose, onCreated }) {
   const [descripcion, setDescripcion] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [createCategory, { isLoading: loading, error: requestError }] = useCreateCategoryMutation();
+  const error = getErrorMessage(requestError);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/categoria/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ descripcion }),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        setError(text || "Error al crear categoría");
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-      onCreated && onCreated();
-      onClose && onClose();
-    } catch (err) {
-      setError(err.message || "Error de red");
-      setLoading(false);
+      await createCategory({ descripcion }).unwrap();
+      onCreated?.();
+      onClose?.();
+    } catch {
+      // The mutation exposes the error to the form.
     }
   };
 

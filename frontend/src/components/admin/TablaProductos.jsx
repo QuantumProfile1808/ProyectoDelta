@@ -1,5 +1,5 @@
 // TablaProductos.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState } from "react";
 import { FaCheck, FaEdit, FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "../css/Tabla.css";
@@ -8,6 +8,8 @@ import { useSucursales } from "../hooks/useSucursales";
 import { useCategorias } from "../hooks/useCategorias";
 import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageProductos";
 import { usePerfil } from "../hooks/usePerfil";
+import { useGetCatalogQuery, useUpdateProductMutation, useCreateMovementMutation } from "../../api/bffApi";
+import { getErrorMessage } from "../../api/client";
 import { useAuth } from "../../AuthContext";
 
 function AddStock({ producto, onClose, onGuardar }) {
@@ -86,7 +88,6 @@ const TablaProductos = () => {
     categoria: "",
     medida: false,
   });
-  const [productos, setProductos] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const sucursal = useSucursales();
   const categoria = useCategorias();
@@ -94,7 +95,6 @@ const TablaProductos = () => {
   const perfil = usePerfil();
   const { user } = useAuth();
   // Filtros
-  const [filtroId, setFiltroId] = useState("");
   const [filtroNombre, setFiltroNombre] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
 
@@ -102,78 +102,42 @@ const TablaProductos = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = useResponsiveItemsPerPage();
 
-  const reloadProductos = useCallback(async () => {
-    const url = mostrarInactivos
-      ? "http://127.0.0.1:8000/api/producto/inactivos/"
-      : "http://127.0.0.1:8000/api/producto/";
-    const res = await fetch(url);
-    const data = await res.json();
-    setProductos(
-      data.map((p) => ({
-        ...p,
-        medida: p.medida === true || p.medida === "true",
-      }))
-    );
-    setCurrentPage(1);
-  }, [mostrarInactivos]);
-
-  useEffect(() => {
-    reloadProductos();
-  }, [reloadProductos]);
+  const { currentData, isLoading, isFetching, error, refetch } = useGetCatalogQuery(
+    { inactivos: mostrarInactivos }, { skip: !user }
+  );
+  const productos = currentData?.productos ?? [];
+  const [updateProduct] = useUpdateProductMutation();
+  const [createMovement, { isLoading: savingStock }] = useCreateMovementMutation();
 
   const abrirPopup = (producto) => setProductoSeleccionado(producto);
   const cerrarPopup = () => setProductoSeleccionado(null);
 
-  const desactivarProducto = (id) => {
-    fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ is_active: false }),
-    })
-      .then((res) => res.ok && res.json())
-      .then(() => reloadProductos())
-      .catch((err) => console.error("Error desactivando producto:", err));
+  const cambiarEstado = async (id, is_active) => {
+    try {
+      await updateProduct({ id, is_active }).unwrap();
+    } catch (error) {
+      alert(getErrorMessage(error));
+    }
   };
-
-  const reactivarProducto = (id) => {
-    fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ is_active: true }),
-    })
-      .then((res) => res.ok && res.json())
-      .then(() => reloadProductos())
-      .catch((err) => console.error("Error reactivando producto:", err));
-  };
+  const desactivarProducto = (id) => cambiarEstado(id, false);
+  const reactivarProducto = (id) => cambiarEstado(id, true);
 
   const guardarStock = async (cantidad) => {
+    if (savingStock) return;
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/movimiento/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          producto: productoSeleccionado.id,
-          usuario: (perfil && perfil.user && perfil.user.id) || (user && user.id) || null,
-          tipo_de_movimiento: "entrada",
-          cantidad,
-          descripcion: `Ingreso de stock para ${productoSeleccionado.descripcion}`,
-          fecha: new Date().toISOString().split("T")[0],
-          hora: new Date().toLocaleTimeString("es-AR", { hour12: false }),
-        }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        alert(error?.detail || "Error al guardar el movimiento");
-        return;
-      }
-
-      await reloadProductos();
+      await createMovement({
+        producto: productoSeleccionado.id,
+        usuario: perfil?.user?.id || user?.id,
+        tipo_de_movimiento: "entrada",
+        cantidad,
+        descripcion: "Ingreso de stock para " + productoSeleccionado.descripcion,
+        fecha: new Date().toISOString().split("T")[0],
+        hora: new Date().toLocaleTimeString("es-AR", { hour12: false }),
+      }).unwrap();
       cerrarPopup();
       alert("Stock agregado correctamente");
-    } catch (err) {
-      console.error(err);
-      alert("Error de conexión con el servidor");
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   };
 
@@ -205,32 +169,26 @@ const TablaProductos = () => {
     };
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/producto/${id}/`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Error al editar producto");
-
-      await reloadProductos();
+      await updateProduct({ id, ...payload }).unwrap();
       setShowEditModal(false);
       setProductoEditando(null);
     } catch (err) {
-      console.error(err);
+      alert(getErrorMessage(err));
     }
   };
 
+  if (isLoading || (isFetching && !currentData)) return <p role="status">Cargando productos...</p>;
+  if (error) return <div role="alert">{getErrorMessage(error)} <button onClick={refetch}>Reintentar</button></div>;
+
   // Filtrado combinado
   const productosFiltrados = productos.filter((p) => {
-    const matchId = filtroId ? p.id.toString().includes(filtroId) : true;
     const matchNombre = filtroNombre
       ? p.descripcion?.toLowerCase().includes(filtroNombre.toLowerCase())
       : true;
     const matchCategoria = filtroCategoria
       ? p.categoria === parseInt(filtroCategoria, 10)
       : true;
-    return matchId && matchNombre && matchCategoria;
+    return matchNombre && matchCategoria;
   });
 
   // Paginación sobre filtrados
@@ -248,7 +206,7 @@ const TablaProductos = () => {
   return (
     <div className="tabla-container">
       <button
-        onClick={() => setMostrarInactivos(!mostrarInactivos)}
+        onClick={() => { setMostrarInactivos(!mostrarInactivos); setCurrentPage(1); }}
         className="btn-toggle"
       >
         {mostrarInactivos ? "Mostrar activos" : "Mostrar desactivados"}

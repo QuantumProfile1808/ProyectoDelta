@@ -7,28 +7,32 @@ import { Link } from "react-router-dom";
 
 export default function MenuDashboard() {
   const { user } = useContext(AuthContext);
-  const isAdmin = user?.perfil?.permiso?.descripcion === "admin" || user?.is_staff;
+  const isAdmin = user?.is_staff;
   const sucursalID = isAdmin ? null : user?.perfil?.sucursal?.id;
 
   const {
-    ultimos,
-    ventasHoy,
-    ventasSemana,
-    ventasMes,
-    gananciaMes,
-    alertasStock,
+    latestMovements,
+    salesToday,
+    salesWeek,
+    salesMonth,
+    stockAlerts,
+    loading,
+    error,
+    refetch,
   } = useDashboardData(sucursalID, isAdmin);
 
   // Filtro del widget: día / semana / mes.
   // Importante: la API de ventas ya devuelve sólo movimientos tipo "salida".
   const [selectedSalesPeriod, setSelectedSalesPeriod] = useState("hoy");
-  const sinStock = alertasStock.items_sin_stock || [];
-  const bajoStock = alertasStock.items_bajo_stock || [];
+  if (loading) return <p role="status">Cargando dashboard...</p>;
+  if (error) return <div role="alert">{error} <button onClick={refetch}>Reintentar</button></div>;
+  const sinStock = stockAlerts.items_sin_stock || [];
+  const bajoStock = stockAlerts.items_bajo_stock || [];
 
   const salesPeriodMap = {
-    hoy: ventasHoy,
-    semana: ventasSemana,
-    mes: ventasMes,
+    hoy: salesToday,
+    semana: salesWeek,
+    mes: salesMonth,
   };
 
   const periodoSeleccionado = salesPeriodMap[selectedSalesPeriod] || [];
@@ -59,17 +63,17 @@ export default function MenuDashboard() {
       maximumFractionDigits: 0,
     }).format(Number(value || 0));
 
-  const ventasHoyMonto = ventasHoy.reduce(
+  const ventasHoyMonto = salesToday.reduce(
     (acc, item) => acc + Number(item.subtotal || item.total || 0),
     0
   );
 
-  const ventasSemanaMonto = ventasSemana.reduce(
+  const ventasSemanaMonto = salesWeek.reduce(
     (acc, item) => acc + Number(item.subtotal || item.total || 0),
     0
   );
 
-  const ventasMesMonto = ventasMes.reduce(
+  const ventasMesMonto = salesMonth.reduce(
     (acc, item) => acc + Number(item.subtotal || item.total || 0),
     0
   );
@@ -83,7 +87,7 @@ export default function MenuDashboard() {
 
   const tituloSaludo = user?.username ? `Hola, ${user.username}` : "Hola";
 
-  const movimientoTipos = ultimos.reduce((acc, m) => {
+  const movimientoTipos = latestMovements.reduce((acc, m) => {
     const tipo = m.tipo_de_movimiento || "Otro";
     acc[tipo] = (acc[tipo] || 0) + 1;
     return acc;
@@ -135,7 +139,7 @@ export default function MenuDashboard() {
       <section className="summary-cards">
         <div className="summary-card">
           <p className="eyebrow">Últimos movimientos</p>
-          <strong>{ultimos.length}</strong>
+          <strong>{latestMovements.length}</strong>
           <span>Registros recientes</span>
         </div>
 
@@ -275,10 +279,10 @@ export default function MenuDashboard() {
           </div>
 
           <div className="activity-list">
-            {ultimos.length === 0 ? (
+            {latestMovements.length === 0 ? (
               <p className="empty-state">No hay movimientos recientes todavía.</p>
             ) : (
-              ultimos.slice(0, 6).map((m) => (
+              latestMovements.slice(0, 6).map((m) => (
                 <div key={m.id} className="activity-item">
                   <div>
                     <strong>{m.producto_nombre}</strong>
