@@ -109,7 +109,11 @@ class MovimientoSerializer(serializers.ModelSerializer):
         if not obj.producto:
             return None
 
-        descuento = obj.producto.descuentos.filter(activo=True).first()
+        active_discounts = getattr(obj.producto, "bff_active_discounts", None)
+        if active_discounts is not None:
+            descuento = active_discounts[0] if active_discounts else None
+        else:
+            descuento = obj.producto.descuentos.filter(activo=True).first()
         if not descuento:
             return None
 

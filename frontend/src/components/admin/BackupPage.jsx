@@ -1,20 +1,23 @@
 import React, { useState } from "react";
+import { useImportBackupMutation } from "../../api/bffApi";
+import { getErrorMessage, buildApiUrl } from "../../api/client";
 import { usePerfil } from "../hooks/usePerfil";
 
 function BackupPage() {
   const [mensaje, setMensaje] = useState("");
 
   const perfil = usePerfil();
+  const [importBackup, { isLoading }] = useImportBackupMutation();
 
   const exportar = () => {
     const sucursalNombre =
-      perfil?.sucursal?.localidad || perfil?.sucursal?.nombre || "no-sucursal";
+      perfil?.sucursal?.localidad || "no-sucursal";
 
-    const url = `http://127.0.0.1:8000/api/backup/exportar/?nombre=${encodeURIComponent(
+    const url = `/api/backup/exportar/?nombre=${encodeURIComponent(
       sucursalNombre
     )}`;
 
-    window.location.href = url;
+    window.location.href = buildApiUrl(url);
   };
 
   const importar = async (e) => {
@@ -25,18 +28,10 @@ function BackupPage() {
     formData.append("archivo", file);
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/backup/importar/",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await response.json();
+      const data = await importBackup(formData).unwrap();
       setMensaje(data.mensaje || "Importación completada");
     } catch (error) {
-      setMensaje("Error al importar datos, error: ", error);
+      setMensaje(getErrorMessage(error));
     }
   };
 
@@ -46,7 +41,7 @@ function BackupPage() {
       <button onClick={exportar}>Exportar datos</button>
       <br />
       <br />
-      <input type="file" onChange={importar} />
+      <input type="file" onChange={importar} disabled={isLoading} />
       {mensaje && <p>{mensaje}</p>}
     </div>
   );

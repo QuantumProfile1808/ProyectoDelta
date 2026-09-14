@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const { user, loading, error } = useSelector((state) => state.auth);
+  const { user, loading, initialized, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(initializeUser());
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     [dispatch, error, loading, user]
   );
 
-  if (loading) {
+  if (!initialized) {
     return <div>Cargando...</div>;
   }
 

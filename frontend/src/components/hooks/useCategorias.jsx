@@ -1,14 +1,9 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useGetCategoriesQuery } from "../../api/bffApi";
 
+const EMPTY = [];
 export function useCategorias() {
-  const [categorias, setCategorias] = useState([]);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/categoria/")
-      .then((res) => res.json())
-      .then((data) => setCategorias(data))
-      .catch((err) => console.error("Error al obtener categorías:", err));
-  }, []);
-
-  return categorias;
+  const user = useSelector((state) => state.auth.user);
+  const { data = EMPTY } = useGetCategoriesQuery(undefined, { skip: !user });
+  return data;
 }

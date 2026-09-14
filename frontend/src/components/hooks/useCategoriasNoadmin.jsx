@@ -1,29 +1,10 @@
-import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useGetCategoriesQuery } from "../../api/bffApi";
+import { getErrorMessage } from "../../api/client";
 
+const EMPTY = [];
 export default function useCategorias() {
-  const [categorias, setCategorias] = useState([]);
-  const [errorCategorias, setErrorCategorias] = useState("");
-
-  useEffect(() => {
-    let mounted = true;
-
-    fetch("http://127.0.0.1:8000/api/categoria/", { credentials: "include" })
-      .then(res => {
-        if (!res.ok) throw new Error("Error al cargar categorías");
-        return res.json();
-      })
-      .then(data => {
-        if (mounted) setCategorias(data);
-      })
-      .catch(err => {
-        console.error("Categorías:", err);
-        setErrorCategorias(err.message);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  return { categorias, errorCategorias };
+  const user = useSelector((state) => state.auth.user);
+  const { data = EMPTY, error } = useGetCategoriesQuery(undefined, { skip: !user });
+  return { categorias: data, errorCategorias: getErrorMessage(error) };
 }

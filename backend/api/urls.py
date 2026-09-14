@@ -3,6 +3,7 @@ from .views import home
 import rest_framework.routers as routers
 from .backupviews import BackupExportView, BackupImportView
 from .views import UserViewSet, PerfilViewSet, SucursalViewSet, PermisoViewSet, CategoriaViewSet, ProductoViewSet, MovimientoViewSet, DescuentoViewSet
+from . import bff
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -18,6 +19,9 @@ router.register(r'descuento', DescuentoViewSet)
 urlpatterns = [
     path('', home, name='home'),  # Si tienes una vista de inicio
     path('', include(router.urls)),  # Incluye las URLs del enrutador en /api/
+    path('bff/session/', bff.session, name='bff-session'),
+    path('bff/catalogo/', bff.catalog, name='bff-catalogo'),
+    path('bff/dashboard/', bff.dashboard, name='bff-dashboard'),
     path('backup/exportar/', BackupExportView.as_view(), name='backup-export'),
     path('backup/importar/', BackupImportView.as_view(), name='backup-import')
 ]

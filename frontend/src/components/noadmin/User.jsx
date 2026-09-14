@@ -1,20 +1,26 @@
 import React, { useState, useMemo, useRef } from "react";
-import useCategoriasNoadmin from "../hooks/useCategoriasNoadmin";
+import { useSelector } from "react-redux";
+import { useCreateMovementMutation, useImportBackupMutation } from "../../api/bffApi";
+import { buildApiUrl, getErrorMessage } from "../../api/client";
 import CarritoModal from "./carritoModal";
 import "../css/Empleado.css";
 import "../css/Tabla.css";
 import { useDescuentosAplicados } from "../hooks/useDescuentosAplicados";
 import Header from "../../components/admin/Header";
-import useProductosSucursal from "../hooks/useProductosSucursal";
+import useBranchProducts from "../hooks/useProductosSucursal";
 import { usePerfil } from "../hooks/usePerfil";
 
 
 
 export default function User() {
+  const user = useSelector((state) => state.auth.user);
   const perfil = usePerfil();
 
-  const { productos, loading } = useProductosSucursal(perfil?.sucursal?.id);
-  const { categorias } = useCategoriasNoadmin();
+  const { products: productos, categories: categorias, loading, error, refetch } = useBranchProducts(perfil?.sucursal?.id);
+  const [createMovement] = useCreateMovementMutation();
+  const [importBackup] = useImportBackupMutation();
+  const [savingSale, setSavingSale] = useState(false);
+  const salePending = useRef(false);
 
   const [carrito, setCarrito] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,7 +33,7 @@ export default function User() {
 
   function exportar() {
     // descarga directa del backup
-    window.location.href = "http://127.0.0.1:8000/api/backup/exportar/";
+    window.location.href = buildApiUrl("/api/backup/exportar/");
   }
 
   async function handleImport(e) {
@@ -38,16 +44,8 @@ export default function User() {
     formData.append("archivo", file);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/backup/importar/", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      const data = await res.json().catch(() => ({}));
-      setMensajeBackup(
-        data.mensaje ||
-          (res.ok ? "Importación completada" : "Error al importar datos")
-      );
+      const data = await importBackup(formData).unwrap();
+      setMensajeBackup(data.mensaje || "Importacion completada");
     } catch (err) {
       console.error(err);
       setMensajeBackup("Error al importar datos");
@@ -123,7 +121,7 @@ export default function User() {
 
   const productosSeleccionados = useMemo(() => {
     return Object.entries(carrito)
-      .filter(([_, qty]) => typeof qty === "number" && qty > 0)
+      .filter(([, qty]) => typeof qty === "number" && qty > 0)
       .map(([id, qty]) => {
         const producto = productos.find((p) => p.id === parseInt(id));
         if (!producto) return null;
@@ -138,7 +136,7 @@ export default function User() {
   }, [carrito, productos]);
 
   // Hook de descuentos en el nivel superior, sin useMemo
-  const lineas = useDescuentosAplicados(productosSeleccionados) || [];
+  const { lineas, loading: pricing, error: pricingError, refetch: retryPricing } = useDescuentosAplicados(productosSeleccionados);
 
   const grandTotal = useMemo(() => {
     return lineas.reduce((sum, l) => sum + l.line_total, 0);
@@ -153,6 +151,8 @@ export default function User() {
   }, [carrito]);
 
   if (loading) return <p>Cargando…</p>;
+
+  if (error) return <div role="alert">{error} <button onClick={refetch}>Reintentar</button></div>;
 
   const productosFiltrados = productos.filter((p) => {
     const term = searchTerm.toLowerCase();
@@ -174,7 +174,10 @@ export default function User() {
   );
   const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
 
-  function handleConfirmSale({ paymentMethod }) {
+  async function handleConfirmSale({ paymentMethod }) {
+    if (salePending.current || pricing || pricingError || !lineas.length) return;
+    salePending.current = true;
+    setSavingSale(true);
     const ahora = new Date();
     const fecha = ahora.toISOString().slice(0, 10);
     const hora = ahora.toTimeString().slice(0, 8);
@@ -187,7 +190,7 @@ export default function User() {
 
       return {
       producto: l.producto_id ?? l.id, // 👈 asegurate que exista
-      usuario: perfil.user.id,
+      usuario: user.id,
       cantidad: l.cantidad,
       tipo_de_movimiento: "salida",
       metodo_de_pago: paymentMethod.toLowerCase(),
@@ -198,52 +201,43 @@ export default function User() {
       };
     });
 
-    Promise.all(
-      movimientos.map((m) =>
-        fetch("http://127.0.0.1:8000/api/movimiento/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(m),
-        })
-      )
-    )
-      .then(async (responses) => {
-        const results = await Promise.all(
-          responses.map(async (r) => {
-            const body = await r.json().catch(() => ({}));
-            return { ok: r.ok, body };
-          })
-        );
-
-        const errores = results.filter((r) => !r.ok);
-        if (errores.length > 0) {
-          const mensaje = errores
-            .map(
-              (e) =>
-                e.body?.non_field_errors?.[0] ||
-                Object.values(e.body || {})[0]?.[0] ||
-                "Error desconocido"
-            )
-            .join("\n");
-          throw new Error(mensaje);
-        }
-
-        setCarrito({});
-        setShowModal(false);
-        alert("Venta registrada con éxito.");
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.error(err);
-        alert(`Error: ${err.message}`);
+    try {
+      const results = await Promise.allSettled(
+        movimientos.map((movimiento) => createMovement(movimiento).unwrap())
+      );
+      const errors = results.filter((result) => result.status === "rejected");
+      // Remove confirmed quantities so a partial failure cannot resubmit them.
+      setCarrito((previous) => {
+        const remaining = { ...previous };
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            const { producto, cantidad } = movimientos[index];
+            const next = Number(remaining[producto] || 0) - cantidad;
+            if (next > 0) remaining[producto] = next;
+            else delete remaining[producto];
+          }
+        });
+        return remaining;
       });
+      setShowModal(false);
+      if (errors.length) {
+        alert(errors.map((result) => getErrorMessage(result.reason)).join("\n"));
+      } else {
+        alert("Venta registrada con exito.");
+      }
+    } finally {
+      salePending.current = false;
+      setSavingSale(false);
+    }
   }
 
   return (
     <div className="user-container">
       <Header />
       <div className="user-card">
+        {mensajeBackup && <p role="status">{mensajeBackup}</p>}
+        {pricing && <p role="status">Calculando descuentos...</p>}
+        {pricingError && <p role="alert">{pricingError} <button onClick={retryPricing}>Reintentar</button></p>}
         <div className="search-container">
           <input
             type="text"
@@ -377,6 +371,7 @@ export default function User() {
 
         <CarritoModal
           isOpen={showModal}
+          busy={savingSale || pricing || Boolean(pricingError)}
           onClose={() => setShowModal(false)}
           onConfirm={({ paymentMethod, amountReceived, change }) =>
             handleConfirmSale({ paymentMethod, amountReceived, change })
@@ -391,7 +386,7 @@ export default function User() {
           <div className="footer-buttons">
             <button
               className="refresh-btn"
-              onClick={() => window.location.reload()}
+              onClick={refetch}
             >
               ⟳
             </button>
@@ -415,7 +410,7 @@ export default function User() {
             <button
               className="cart-btn-footer"
               onClick={() => setShowModal(true)}
-              disabled={!hayProductosEnCarrito}
+              disabled={!hayProductosEnCarrito || pricing || savingSale || Boolean(pricingError)}
               title={!hayProductosEnCarrito ? "Carrito vacío" : "Abrir carrito"}
             >
               🛒 Ver Carrito {totalItems > 0 ? `(${totalItems})` : ""}
