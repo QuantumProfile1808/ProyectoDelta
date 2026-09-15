@@ -1,7 +1,83 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --color-primary-100: #d9d9ff;
+  --color-primary-200: #c8c8f4;
+  --color-primary-300: #9d9dec;
+  --color-primary-400: #7272e3;
+  --color-primary-500: #4747d4;
+  --color-primary-600: #2626a0;
+  --color-primary-700: #101057;
+
+  /* Colors by purpose (light theme) */
+  --color-background: #fafafa;
+  --color-surface: #ffffff;
+  --color-text: #222222;
+  --color-text-muted: #666666;
+  --color-border: #cccccc;
+  --color-action: var(--color-primary-500);
+  --color-action-hover: var(--color-primary-600);
+  --color-on-action: #ffffff;
+  --color-success: #15803d;
+  --color-warning: #a16207;
+  --color-danger: #b91c1c;
+  --color-overlay: rgba(0, 0, 0, 0.4);
+
+  /* Spacing: one step = 4px */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Typography */
+  --font-family-base: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Borders and elevation */
+  --border-width: 1px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 2px 16px rgba(0, 0, 0, 0.12);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --color-focus: var(--color-primary-500);
+
+  /* Motion and stacking */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --ease-standard: ease-in-out;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 1000;
+  --z-toast: 1100;
+
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
 
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);

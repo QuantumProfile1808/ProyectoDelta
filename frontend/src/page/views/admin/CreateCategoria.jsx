@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../css/adminForms.css";
-import { useCreateCategoryMutation } from "../../api/bffApi";
-import { getErrorMessage } from "../../api/client";
+import "../../css/adminForms.css";
+import { useCreateCategoryMutation } from "../../../api/bffApi";
+import { getErrorMessage } from "../../../api/client";
 
 export default function CreateCategoria({ onClose, onCreated }) {
   const [descripcion, setDescripcion] = useState("");

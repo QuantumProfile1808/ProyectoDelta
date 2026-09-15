@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
-import "../css/Promociones.css";
-import "../css/inputs.css";
-import "../css/adminForms.css";
-import useProductosDisponibles from "../hooks/useProductosDisponibles";
+import "../../css/promociones.css";
+import "../../css/inputs.css";
+import "../../css/adminForms.css";
+import useProductosDisponibles from "../../hooks/useProductosDisponibles";
 
 export default function Promociones() {
   const { id } = useParams();

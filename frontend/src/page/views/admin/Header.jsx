@@ -1,10 +1,10 @@
 // src/components/admin/Header.jsx
 import React from "react";
 import { useLocation } from "react-router-dom";
-import "../css/Header.css";
+import "../../css/Header.css";
 import { FaArrowLeft } from "react-icons/fa";
 import { SlArrowLeft } from "react-icons/sl";
-import { usePerfil } from "../hooks/usePerfil";
+import { usePerfil } from "../../hooks/usePerfil";
 
 const PESTANIA_MAP = {
   "": "Inicio",

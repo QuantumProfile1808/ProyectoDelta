@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import "../css/carritoModal.css";
+import "../../css/carritoModal.css";
 
 export default function CarritoModal({ isOpen, onClose, onConfirm, lineas, busy = false }) {
   const [metodoPago, setMetodoPago] = useState("transferencia");

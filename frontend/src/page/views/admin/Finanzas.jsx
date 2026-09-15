@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../css/Finanzas.css";
+import "../../css/Finanzas.css";
 
 const API_URL = "http://127.0.0.1:8000/api/movimiento/";
 

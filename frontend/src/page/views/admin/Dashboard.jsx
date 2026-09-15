@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
-import AuthContext from "../../AuthContext";
+import AuthContext from "../../../AuthContext";
 import { Navigate, Link, Outlet, useLocation } from "react-router-dom";
-import "../css/Dashboard.css";
-import Header from "../../components/admin/Header";
+import "../../css/dashboard.css";
+import Header from "./Header";
 import { FaBars } from "react-icons/fa";
 
 export const Dashboard = () => {

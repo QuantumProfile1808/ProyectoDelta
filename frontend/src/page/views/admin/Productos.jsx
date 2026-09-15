@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useCategorias } from "../hooks/useCategorias";
-import { useSucursales } from "../hooks/useSucursales";
-import "../../components/css/Usuario.css";
-import "../css/fab.css";
-import "../css/adminForms.css";
+import { useCategorias } from "../../hooks/useCategorias";
+import { useSucursales } from "../../hooks/useSucursales";
+import "../../css/Usuario.css";
+import "../../css/fab.css";
+import "../../css/adminForms.css";
 
-import { useCreateProductMutation } from "../../api/bffApi";
-import { getErrorMessage } from "../../api/client";
+import { useCreateProductMutation } from "../../../api/bffApi";
+import { getErrorMessage } from "../../../api/client";
 
 import CreateSucursal from "./CreateSucursal";
 import CreateCategoria from "./CreateCategoria";

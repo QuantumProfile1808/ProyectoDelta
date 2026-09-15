@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
-import AuthContext from "../AuthContext";
+import AuthContext from "../../../AuthContext";
 import { useNavigate } from "react-router-dom";
-import "./css/Login.css";
-import { Modal } from "./Modal";
+import "../../css/login.css";
+import { Modal } from "../../components/Modal/Modal";
 
 export const Login = () => {
   const navigate = useNavigate();

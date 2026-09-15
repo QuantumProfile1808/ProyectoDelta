@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { FaTimes, FaCheck } from "react-icons/fa";
-import "../../components/css/EditUserModal.css";
-import "../css/adminForms.css";
+import "../../css/EditUserModal.css";
+import "../../css/adminForms.css";
 
 const EditProductModal = ({
   show,

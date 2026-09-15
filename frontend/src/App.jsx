@@ -1,23 +1,22 @@
 import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import "./App.css";
 import { AuthProvider } from "./AuthContext";
-import { Login } from "./components/Login";
-import { Dashboard } from "./components/admin/Dashboard";
-import NoStaff from "./components/noadmin/no-staff";
-import Usuarios from "./components/admin/Usuarios";
-import Ventas from "./components/admin/Ventas";
-import Productos from "./components/admin/Productos";
-import Historial from "./components/admin/Historial";
-import TablaUsuario from "./components/admin/tablausuario";
-import TablaProductos from "./components/admin/TablaProductos";
-import User from "./components/noadmin/User";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Header from "./components/admin/Header";
-import MenuDashboard from "./components/admin/menudashboard";
-import TablaPromociones from "./components/admin/tablapromociones";
-import Promociones from "./components/admin/promociones";
-import BackupPage from "./components/admin/BackupPage";
-
+import { Login } from "./page/views/auth/Login";
+import { Dashboard } from "./page/views/admin/Dashboard";
+import NoStaff from "./page/views/noadmin/no-staff";
+import Usuarios from "./page/views/admin/Usuarios";
+import Ventas from "./page/views/admin/Ventas";
+import Productos from "./page/views/admin/Productos";
+import Historial from "./page/views/admin/Historial";
+import TablaUsuario from "./page/views/admin/tablausuario";
+import TablaProductos from "./page/views/admin/TablaProductos";
+import User from "./page/views/noadmin/User";
+import ProtectedRoute from "./page/ProtectedRoute";
+import Header from "./page/views/admin/Header";
+import MenuDashboard from "./page/views/admin/menudashboard";
+import TablaPromociones from "./page/views/admin/tablapromociones";
+import Promociones from "./page/views/admin/promociones";
+import BackupPage from "./page/views/admin/BackupPage";
 function AdminLayout() {
   return (
     <>

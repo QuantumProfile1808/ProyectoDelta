@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "../../components/css/Usuario.css";
-import { useSucursales } from "../hooks/useSucursales";
-import { usePermisos } from "../hooks/usePermisos";
-import "../css/inputs.css";
-import "../css/adminForms.css";
+import "../../css/Usuario.css";
+import { useSucursales } from "../../hooks/useSucursales";
+import { usePermisos } from "../../hooks/usePermisos";
+import "../../css/inputs.css";
+import "../../css/adminForms.css";
 
 const Usuarios = () => {
   const [form, setForm] = useState({

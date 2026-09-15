@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
-import "../css/Tabla.css";
-import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPagePromociones";
+import "../../css/Tabla.css";
+import { useResponsiveItemsPerPage } from "../../hooks/useResponsiveItemsPerPagePromociones";
 
 export const ListaPromociones = () => {
   const [todas, setTodas] = useState([]);

@@ -2,15 +2,15 @@
 import React, { useState } from "react";
 import { FaCheck, FaEdit, FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import "../css/Tabla.css";
+import "../../css/Tabla.css";
 import EditProductModal from "./EditProductModal";
-import { useSucursales } from "../hooks/useSucursales";
-import { useCategorias } from "../hooks/useCategorias";
-import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageProductos";
-import { usePerfil } from "../hooks/usePerfil";
-import { useGetCatalogQuery, useUpdateProductMutation, useCreateMovementMutation } from "../../api/bffApi";
-import { getErrorMessage } from "../../api/client";
-import { useAuth } from "../../AuthContext";
+import { useSucursales } from "../../hooks/useSucursales";
+import { useCategorias } from "../../hooks/useCategorias";
+import { useResponsiveItemsPerPage } from "../../hooks/useResponsiveItemsPerPageProductos";
+import { usePerfil } from "../../hooks/usePerfil";
+import { useGetCatalogQuery, useUpdateProductMutation, useCreateMovementMutation } from "../../../api/bffApi";
+import { getErrorMessage } from "../../../api/client";
+import { useAuth } from "../../../AuthContext";
 
 function AddStock({ producto, onClose, onGuardar }) {
   const [cantidad, setCantidad] = useState("");

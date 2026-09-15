@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { FaEdit, FaUserShield, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import EditUserModal from "./EditUserModal";
-import "../css/Tabla.css";
-import { usePerfiles } from "../hooks/usePerfiles";
-import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageUsuarios";
+import "../../css/Tabla.css";
+import { usePerfiles } from "../../hooks/usePerfiles";
+import { useResponsiveItemsPerPage } from "../../hooks/useResponsiveItemsPerPageUsuarios";
 
 const TablaUsuarios = () => {
   const [perfiles, setPerfiles] = usePerfiles();

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../css/Tabla.css";
-import useHistorial from "../hooks/useHistorial.jsx";
-import { useResponsiveItemsPerPage } from "../hooks/useResponsiveItemsPerPageUsuarios.jsx";
+import "../../css/Tabla.css";
+import useHistorial from "../../hooks/useHistorial.jsx";
+import { useResponsiveItemsPerPage } from "../../hooks/useResponsiveItemsPerPageUsuarios.jsx";
 
 export const Historial = () => {
   const { movimientos, loading } = useHistorial();

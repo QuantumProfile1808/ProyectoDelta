@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { usePerfil } from "../hooks/usePerfil";
-import { useAuth } from "../../AuthContext";
-import useFinanzas from "../hooks/useFinanzas";
-import "../css/Finanzas.css";
+import { usePerfil } from "../../hooks/usePerfil";
+import { useAuth } from "../../../AuthContext";
+import useFinanzas from "../../hooks/useFinanzas";
+import "../../css/Finanzas.css";
 
 const PERIODOS = [
   { key: "dia", label: "Día" },
