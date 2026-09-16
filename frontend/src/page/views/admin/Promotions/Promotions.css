@@ -1,0 +1,173 @@
+@import "../../../../styles/inputs.css";
+@import "../../../../styles/adminForms.css";
+
+.combo-preview {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.combo-preview h4 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.combo-preview ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.combo-preview li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  color: #334155;
+}
+
+.combo-preview input {
+  max-width: 90px;
+}
+
+.combo-preview p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.select-wrapper {
+  width: 100%;
+}
+
+.select-wrapper .react-select__control {
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  min-height: 46px;
+}
+
+.select-wrapper .react-select__control--is-focused {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.select-wrapper .react-select__menu {
+  z-index: 30;
+}
+
+.select-wrapper .react-select__multi-value {
+  background-color: #dbeafe;
+  border-radius: 999px;
+}
+
+.select-wrapper .react-select__multi-value__label {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.select-wrapper .react-select__multi-value__remove {
+  color: #1d4ed8;
+  border-radius: 999px;
+}
+
+.select-wrapper .react-select__multi-value__remove:hover {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.history-container {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem; /* Compact text size */  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.history-table th,
+.history-table td {
+  padding: 1px 20px; /* Compact vertical spacing */  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.history-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.history-table td {
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px; /* Limit cell width. */}
+.history-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 20px;
+}
+
+.btn-toggle {
+  background-color: #0078D4;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-toggle:hover {
+  background-color: #005fa3;}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%); /* Offset the modal slightly upward. */  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(90, 73, 73, 0.12);
+  z-index: 999;
+  max-width: 500px;
+  width: 90%;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+.history-cell-status {
+  text-align: -webkit-center !important;
+}
+.items-scroll {
+  max-height: 140px;
+  overflow-y: auto;
+  padding-left: 1.2rem;
+  margin-bottom: 0.8rem;
+  border-left: 3px solid #e0e0e0;
+}
+
+.items-scroll li {
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}

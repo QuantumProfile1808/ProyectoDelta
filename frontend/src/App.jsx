@@ -3,19 +3,19 @@ import "./App.css";
 import { AuthProvider } from "./AuthContext";
 import { Login } from "./page/views/auth/Login";
 import { Dashboard } from "./page/views/admin/Dashboard";
-import NoStaff from "./page/views/noadmin/no-staff";
-import Usuarios from "./page/views/admin/Usuarios";
-import Ventas from "./page/views/admin/Ventas";
-import Productos from "./page/views/admin/Productos";
-import Historial from "./page/views/admin/Historial";
-import TablaUsuario from "./page/views/admin/tablausuario";
-import TablaProductos from "./page/views/admin/TablaProductos";
+import NoStaff from "./page/views/noadmin/NoStaff";
+import Users from "./page/views/admin/Users";
+import Sales from "./page/views/admin/Sales";
+import Products from "./page/views/admin/Products";
+import History from "./page/views/admin/History";
+import UserTable from "./page/views/admin/UserTable";
+import ProductTable from "./page/views/admin/ProductTable";
 import User from "./page/views/noadmin/User";
-import ProtectedRoute from "./page/ProtectedRoute";
-import Header from "./page/views/admin/Header";
-import MenuDashboard from "./page/views/admin/menudashboard";
-import TablaPromociones from "./page/views/admin/tablapromociones";
-import Promociones from "./page/views/admin/promociones";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/Header";
+import MenuDashboard from "./page/views/admin/MenuDashboard";
+import PromotionTable from "./page/views/admin/PromotionTable";
+import Promotions from "./page/views/admin/Promotions";
 import BackupPage from "./page/views/admin/BackupPage";
 function AdminLayout() {
   return (
@@ -50,16 +50,16 @@ function App() {
           }
         >
           <Route path="/dashboard" element={<Dashboard />}>
-            <Route path="productos" element={<Productos />} />
-            <Route path="historial" element={<Historial />} />
-            <Route path="ventas" element={<Ventas />} />
-            <Route path="usuarios" element={<Usuarios />} />
-            <Route path="tablausuario" element={<TablaUsuario />} />
-            <Route path="TablaProductos" element={<TablaProductos />} />
+            <Route path="productos" element={<Products />} />
+            <Route path="historial" element={<History />} />
+            <Route path="ventas" element={<Sales />} />
+            <Route path="usuarios" element={<Users />} />
+            <Route path="tablausuario" element={<UserTable />} />
+            <Route path="TablaProductos" element={<ProductTable />} />
             <Route index element={<MenuDashboard />} />
-            <Route path="tablaPromociones" element={<TablaPromociones />} />
-            <Route path="promociones" element={<Promociones />} />
-            <Route path="promociones/:id" element={<Promociones />} />
+            <Route path="tablaPromociones" element={<PromotionTable />} />
+            <Route path="promociones" element={<Promotions />} />
+            <Route path="promociones/:id" element={<Promotions />} />
             <Route path="backup" element={<BackupPage />} />
           </Route>
         </Route>

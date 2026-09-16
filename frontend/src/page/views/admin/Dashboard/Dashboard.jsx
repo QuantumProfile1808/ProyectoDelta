@@ -1,0 +1,69 @@
+import "./Dashboard.css";
+import React, { useContext, useState } from "react";
+import AuthContext from "../../../../AuthContext";
+import { Navigate, Link, Outlet, useLocation } from "react-router-dom";
+
+import Header from "../../../../components/Header";
+import { FaBars } from "react-icons/fa";
+
+export const Dashboard = () => {
+  const { user, logout } = useContext(AuthContext);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  if (!user) return <Navigate to="/login" replace />;
+  const isDashboardRoot = location.pathname === "/dashboard";
+
+  return (
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <aside className={`sidebar${sidebarOpen ? " open" : ""}`} aria-hidden={!sidebarOpen}>
+        <div className="sidebar-header">
+          <h2 className="sidebar-title">Dashboard</h2>
+
+          {/* Toggle button inside the open sidebar. */}
+          {sidebarOpen && (
+            <button
+              className="hamburger inside"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Cerrar sidebar"
+            >
+              <FaBars />
+            </button>
+          )}
+        </div>
+
+        <nav>
+          <ul>
+            <li><Link to="/dashboard">Inicio</Link></li>
+            <li><Link to="/dashboard/tablaproductos">Productos</Link></li>
+            <li><Link to="/dashboard/historial">Historial</Link></li>
+            <li><Link to="/dashboard/ventas">Ventas</Link></li>
+            <li><Link to="/dashboard/tablausuario">Usuarios</Link></li>
+            <li><Link to="/dashboard/tablapromociones">Promociones</Link></li>
+            <li><Link to="/dashboard/backup">Import & Export</Link></li>
+          </ul>
+        </nav>
+
+        <button onClick={logout} className="sidebar-logout">Logout</button>
+      </aside>
+
+      {/* Toggle button outside the closed sidebar. */}
+      {!sidebarOpen && (
+        <button
+          className="hamburger outside"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Abrir sidebar"
+        >
+          <FaBars />
+        </button>
+      )}
+
+      {/* Main content */}
+      <main className="dashboard-content">
+        {isDashboardRoot && <div className="dashboard-welcome" />}
+        <Outlet />
+      </main>
+    </div>
+  );
+};
