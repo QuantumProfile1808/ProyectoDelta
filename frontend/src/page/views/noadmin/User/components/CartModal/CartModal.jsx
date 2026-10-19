@@ -69,7 +69,7 @@ export default function CartModal({ isOpen, onClose, onConfirm, lines, busy = fa
             </thead>
             <tbody>
               {lines.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.producto_id}>
                   <td className="desc-cell">
                     {item.producto_nombre}
                     {item.promocion?.nombre && (

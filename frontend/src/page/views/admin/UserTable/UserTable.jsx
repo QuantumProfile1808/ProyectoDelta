@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../../api/client";
 import "./UserTable.css";
 import React, { useState } from "react";
 import { FaEdit, FaUserShield, FaPlus } from "react-icons/fa";
@@ -33,12 +34,11 @@ const UserTable = () => {
   const toggleActive = async (userId, curr) => {
     const newItem = !curr;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
+      await apiFetch(`/api/users/${userId}/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_active: newItem }),
       });
-      if (!res.ok) throw new Error("Patch falló");
 
       setProfiles((prev) =>
         prev.map((u) =>
@@ -77,16 +77,14 @@ const UserTable = () => {
     };
 
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/users/${selectedUser.user.id}/`,
+      const updated = await apiFetch(
+        `/api/users/${selectedUser.user.id}/`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
       );
-      if (!res.ok) throw new Error("Falló la edición");
-      const updated = await res.json();
 
       setProfiles((prev) =>
         prev.map((u) =>

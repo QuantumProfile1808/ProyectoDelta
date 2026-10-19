@@ -10,6 +10,7 @@ class CustomUserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = User
         fields = BaseUserSerializer.Meta.fields + ('is_staff', 'is_superuser')
+        read_only_fields = BaseUserSerializer.Meta.read_only_fields + ('is_staff', 'is_superuser')
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -151,6 +152,23 @@ class MovimientoSerializer(serializers.ModelSerializer):
         return movimiento
 
 # --- Descuentos ---
+
+class CartItemSerializer(serializers.Serializer):
+    producto_id = serializers.IntegerField(min_value=1)
+    cantidad = serializers.DecimalField(
+        max_digits=12, decimal_places=3, min_value=Decimal("0.001")
+    )
+
+
+class CartPricingSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+
+    def validate_items(self, items):
+        ids = [item["producto_id"] for item in items]
+        if len(ids) != len(set(ids)):
+            raise serializers.ValidationError("No repitas productos en el carrito.")
+        return items
+
 
 class ProductoDescuentoReadSerializer(serializers.ModelSerializer):
     descripcion = serializers.CharField(source="producto.descripcion")

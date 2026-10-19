@@ -1,24 +1,20 @@
 import "./BackupPage.css";
 import React, { useState } from "react";
 import { useImportBackupMutation } from "../../../../api/bffApi";
-import { getErrorMessage, buildApiUrl } from "../../../../api/client";
-import { useProfile } from "../../../hooks/useProfile";
+import { getErrorMessage } from "../../../../api/client";
+import { downloadBackup } from "../../../../api/backup";
 
 function BackupPage() {
   const [statusMessage, setStatusMessage] = useState("");
 
-  const profile = useProfile();
   const [importBackup, { isLoading }] = useImportBackupMutation();
 
-  const exportBackup = () => {
-    const branchName =
-      profile?.sucursal?.localidad || "no-sucursal";
-
-    const url = `/api/backup/exportar/?nombre=${encodeURIComponent(
-      branchName
-    )}`;
-
-    window.location.href = buildApiUrl(url);
+  const exportBackup = async () => {
+    try {
+      await downloadBackup();
+    } catch (error) {
+      setStatusMessage(getErrorMessage(error));
+    }
   };
 
   const importData = async (e) => {

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.core import serializers
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.apps import apps
@@ -10,6 +11,8 @@ from django.db import transaction, connection, transaction
 from .models import Producto, Categoria, Movimiento, Sucursal, Perfil, Permiso, Descuento
 
 class BackupExportView(APIView):
+    permission_classes = [IsAdminUser]
+
     def get(self, request):
         data = serializers.serialize(
             "json",
@@ -27,6 +30,7 @@ class BackupExportView(APIView):
 
 
 class BackupImportView(APIView):
+    permission_classes = [IsAdminUser]
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):

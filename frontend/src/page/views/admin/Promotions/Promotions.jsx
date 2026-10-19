@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../../api/client";
 import "./Promotions.css";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,8 +29,7 @@ export default function Promotions() {
 
     const loadPromotion = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/descuento/${id}/`);
-        const data = await res.json();
+        const data = await apiFetch(`/api/descuento/${id}/`);
 
         setForm({
           nombre: data.nombre || "",
@@ -110,27 +110,20 @@ export default function Promotions() {
     };
 
     const url = isEdit
-      ? `http://127.0.0.1:8000/api/descuento/${id}/`
-      : `http://127.0.0.1:8000/api/descuento/`;
+      ? `/api/descuento/${id}/`
+      : `/api/descuento/`;
 
     const method = isEdit ? "PUT" : "POST";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      setFormError(errorData?.detail || "Error al guardar el descuento.");
+    try {
+      await apiFetch(url, { method, body: JSON.stringify(payload) });
+      alert(isEdit ? "Descuento actualizado!" : "Descuento creado!");
+      navigate("/dashboard/tablapromociones");
+    } catch (error) {
+      setFormError(error.message || "Error al guardar el descuento.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    alert(isEdit ? "Descuento actualizado!" : "Descuento creado!");
-    setLoading(false);
-    navigate("/dashboard/tablapromociones");
   };
 
   return (

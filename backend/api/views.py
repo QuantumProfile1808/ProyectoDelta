@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from rest_framework import viewsets
 from django.contrib.auth.models import User
@@ -8,7 +7,12 @@ from .serializers import UserSerializer, PerfilSerializer, SucursalSerializer, P
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from decimal import Decimal
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from .permissions import IsStaffOrReadOnly, IsStaffOrCreateReadOnly, request_branch_id
+from .serializers import CartPricingSerializer
+from .services.descuentos import calcular_descuentos
 
 
 
@@ -19,17 +23,26 @@ def home(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 class ProductoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Producto.objects.filter(is_active=True)
     serializer_class = ProductoSerializer
+
+    def get_queryset(self):
+        queryset = Producto.objects.all() if self.request.user.is_staff else super().get_queryset()
+        if self.action in ('list', 'stock_alertas'):
+            queryset = queryset.filter(is_active=True)
+        branch_id = request_branch_id(self.request)
+        return queryset.filter(sucursal_id=branch_id) if branch_id else queryset
 
     @action(detail=False, methods=['get'], url_path='stock/alertas')
     def stock_alertas(self, request):
         sucursal_id = request.query_params.get("sucursal")
 
-        productos_qs = Producto.objects.filter(is_active=True)
+        productos_qs = self.get_queryset()
 
         if sucursal_id:
             productos_qs = productos_qs.filter(sucursal_id=sucursal_id)
@@ -61,33 +74,39 @@ class ProductoViewSet(viewsets.ModelViewSet):
             "items_bajo_stock_kg": ProductoSerializer(bajo_kg, many=True).data,
         })
 
-    @action(detail=False, methods=['get'], url_path='inactivos')
+    @action(detail=False, methods=['get'], url_path='inactivos', permission_classes=[IsAdminUser])
     def productos_inactivos(self, request):
-        productos = Producto.objects.filter(is_active=False)
+        productos = self.get_queryset().filter(is_active=False)
         serializer = self.get_serializer(productos, many=True)
         return Response(serializer.data)
 
-    def get_object(self):
-        queryset = Producto.objects.all()
-        return get_object_or_404(queryset, pk=self.kwargs["pk"])
-    
 class SucursalViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Sucursal.objects.all()
     serializer_class = SucursalSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        branch_id = request_branch_id(self.request)
+        return queryset.filter(pk=branch_id) if branch_id else queryset
+
 class CategoriaViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
 class PermisoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
     queryset = Permiso.objects.all()
     serializer_class = PermisoSerializer
 
 class PerfilList(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
     queryset = Perfil.objects.select_related('user', 'sucursal', 'permiso').all()
     serializer_class = PerfilSerializer
 
 class PerfilViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
     queryset = Perfil.objects.select_related('user', 'sucursal', 'permiso').all()
     serializer_class = PerfilSerializer
 
@@ -131,8 +150,14 @@ class PerfilViewSet(viewsets.ModelViewSet):
         return response
 
 class MovimientoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsStaffOrCreateReadOnly]
     queryset = Movimiento.objects.all()
     serializer_class = MovimientoSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        branch_id = request_branch_id(self.request)
+        return queryset.filter(producto__sucursal_id=branch_id) if branch_id else queryset
 
     @action(detail=False, methods=['get'], url_path='ultimos')
     def ultimos_movimientos(self, request):
@@ -144,7 +169,7 @@ class MovimientoViewSet(viewsets.ModelViewSet):
         # allow optional filtering by tipo (entrada/salida). By default include both types.
         tipo = request.query_params.get('tipo')
 
-        movimientos_qs = Movimiento.objects.all()
+        movimientos_qs = self.get_queryset()
         if tipo in ('entrada', 'salida'):
             movimientos_qs = movimientos_qs.filter(tipo_de_movimiento=tipo)
 
@@ -168,7 +193,7 @@ class MovimientoViewSet(viewsets.ModelViewSet):
         if not sucursal_id and not request.user.is_staff:
             return Response({"error": "Debe enviar ?sucursal="}, status=400)
 
-        queryset = Movimiento.objects.filter(tipo_de_movimiento="salida")
+        queryset = self.get_queryset().filter(tipo_de_movimiento="salida")
         if sucursal_id:
             queryset = queryset.filter(producto__sucursal_id=sucursal_id)
 
@@ -209,11 +234,19 @@ class MovimientoViewSet(viewsets.ModelViewSet):
         cantidad = serializer.validated_data['cantidad']
         tipo = serializer.validated_data.get('tipo_de_movimiento')
 
+        if not self.request.user.is_staff:
+            if producto.sucursal_id != request_branch_id(self.request) or not producto.is_active:
+                raise PermissionDenied("No puede vender este producto.")
+            if tipo != 'salida':
+                raise PermissionDenied("Solo puede registrar ventas.")
+        if cantidad <= 0:
+            raise ValidationError({"cantidad": "Debe ser mayor que cero."})
+
         if tipo == 'salida':
             if producto.stock is None or cantidad > producto.stock:
                 raise ValidationError("No hay suficiente stock para esta venta.")
 
-        movimiento = serializer.save()
+        movimiento = serializer.save(usuario=self.request.user)
 
         if movimiento.tipo_de_movimiento == 'salida':
             producto.stock -= movimiento.cantidad
@@ -225,7 +258,33 @@ class MovimientoViewSet(viewsets.ModelViewSet):
 
 
 class DescuentoViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
+
+    @action(detail=False, methods=["post"], url_path="aplicar", permission_classes=[IsAuthenticated])
+    def aplicar_descuentos(self, request):
+        cart = CartPricingSerializer(data=request.data)
+        cart.is_valid(raise_exception=True)
+        items = cart.validated_data["items"]
+        branch_id = request_branch_id(request)
+        products = Producto.objects.filter(
+            id__in=[item["producto_id"] for item in items], is_active=True
+        )
+        if branch_id:
+            products = products.filter(sucursal_id=branch_id)
+        products_by_id = {product.id: product for product in products}
+        if len(products_by_id) != len(items):
+            raise NotFound("Hay productos no disponibles para este carrito.")
+        for item in items:
+            if not products_by_id[item["producto_id"]].medida and item["cantidad"] % 1:
+                raise ValidationError({"cantidad": "Los productos por unidad requieren cantidades enteras."})
+
+        discounts = Descuento.objects.filter(activo=True).prefetch_related("items")
+        lines = calcular_descuentos(items, products, discounts)
+        for line in lines:
+            line["producto_nombre"] = products_by_id[line["producto_id"]].descripcion
+        total = sum((Decimal(str(line["line_total"])) for line in lines), Decimal("0"))
+        return Response({"lineas": lines, "total": float(total)})
 
 

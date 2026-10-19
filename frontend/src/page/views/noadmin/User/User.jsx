@@ -2,7 +2,8 @@ import "./User.css";
 import React, { useState, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useCreateMovementMutation, useImportBackupMutation } from "../../../../api/bffApi";
-import { buildApiUrl, getErrorMessage } from "../../../../api/client";
+import { getErrorMessage } from "../../../../api/client";
+import { downloadBackup } from "../../../../api/backup";
 import CartModal from "./components/CartModal";
 
 
@@ -32,9 +33,12 @@ export default function User() {
   const [backupMessage, setBackupMessage] = useState("");
   const fileInputRef = useRef(null);
 
-  function exportBackup() {
-    // Download the backup directly.
-    window.location.href = buildApiUrl("/api/backup/exportar/");
+  async function exportBackup() {
+    try {
+      await downloadBackup();
+    } catch (error) {
+      setBackupMessage(getErrorMessage(error));
+    }
   }
 
   async function handleImport(e) {
@@ -391,7 +395,7 @@ export default function User() {
             >
               ⟳
             </button>
-            <div className="backup-buttons">
+            {user.is_staff && <div className="backup-buttons">
               <button className="export-btn" onClick={exportBackup}>
                 Exportar
               </button>
@@ -407,7 +411,7 @@ export default function User() {
                 style={{ display: "none" }}
                 onChange={handleImport}
               />
-            </div>
+            </div>}
             <button
               className="cart-btn-footer"
               onClick={() => setShowModal(true)}

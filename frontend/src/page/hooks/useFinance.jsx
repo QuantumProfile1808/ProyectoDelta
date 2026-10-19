@@ -1,6 +1,7 @@
+import { apiFetch } from "../../api/client";
 import { useEffect, useState } from "react";
 
-const API_URL = "http://127.0.0.1:8000/api/movimiento/resumen/";
+const API_URL = "/api/movimiento/resumen/";
 
 export default function useFinance(profileBranchId, isAdmin = false) {
   const [periods, setPeriods] = useState({ day: [], week: [], month: [], year: [] });
@@ -16,15 +17,9 @@ export default function useFinance(profileBranchId, isAdmin = false) {
     }
 
     const get = async (startDate, endDate) => {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `JWT ${token}` } : {};
       const params = new URLSearchParams({ desde: startDate, hasta: endDate });
       if (profileBranchId) params.set("sucursal", profileBranchId);
-      const response = await fetch(`${API_URL}?${params}`, { headers });
-
-      if (!response.ok) throw new Error("No se pudieron cargar las ventas.");
-
-      const data = await response.json();
+      const data = await apiFetch(`${API_URL}?${params}`);
       if (!Array.isArray(data)) throw new Error("La respuesta de ventas no es válida.");
       return data;
     };

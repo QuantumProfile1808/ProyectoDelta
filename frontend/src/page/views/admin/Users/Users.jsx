@@ -1,8 +1,8 @@
+import { apiFetch } from "../../../../api/client";
 import "./Users.css";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { useBranches } from "../../../hooks/useBranches";
-import { usePermissions } from "../../../hooks/usePermissions";
 
 
 
@@ -18,7 +18,6 @@ const Users = () => {
   });
 
   const branches = useBranches();
-  const permissions = usePermissions();
   const [loading, setLoading] = useState(false);
 
 
@@ -36,7 +35,7 @@ const Users = () => {
 
     try {
       // Create user
-      const userRes = await fetch("http://127.0.0.1:8000/api/users/", {
+      const user = await apiFetch("/api/users/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -48,21 +47,8 @@ const Users = () => {
         }),
       });
 
-      const userText = await userRes.text();
-      let userData = null;
-      try { userData = JSON.parse(userText); } catch(e){ /* not json */ }
-
-      if (!userRes.ok) {
-        setLoading(false);
-        console.error("Failed to create user:", userText);
-        alert("Error al crear usuario: " + (userData?.detail || userText || userRes.status));
-        return;
-      }
-
-      const user = userData || JSON.parse(userText);
-
       // Create profile
-      const profileResponse = await fetch("http://127.0.0.1:8000/api/perfil/", {
+      await apiFetch("/api/perfil/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -72,17 +58,6 @@ const Users = () => {
           dni: form.dni,
         }),
       });
-
-      const profileText = await profileResponse.text();
-      let profileData = null;
-      try { profileData = JSON.parse(profileText); } catch(e){}
-
-      if (!profileResponse.ok) {
-        setLoading(false); // Include the profile fields.
-        console.error("Failed to create profile:", profileText);
-        alert("Error al crear perfil: " + (profileData?.detail || profileResponse.status || profileText));
-        return;
-      }
 
       alert("Usuario creado correctamente");
       setForm({

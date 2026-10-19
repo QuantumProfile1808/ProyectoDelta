@@ -1,8 +1,9 @@
+import { apiFetch } from "../../../../api/client";
 import "./Finance.css";
 import { useEffect, useState } from "react";
 
 
-const API_URL = "http://127.0.0.1:8000/api/movimiento/";
+const API_URL = "/api/movimiento/";
 
 function FinanceSummary() {
   const [movements, setMovements] = useState([]);
@@ -10,12 +11,12 @@ function FinanceSummary() {
   const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
-    fetch(API_URL)
-      .then(res => res.json())
+    apiFetch(API_URL)
       .then(data => {
         setMovements(data.filter(m => m.tipo_de_movimiento !== "total"));
-        setLoading(false);
-      });
+      })
+      .catch((error) => console.error("Failed to load finance:", error))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <p className="text-center">Cargando...</p>;

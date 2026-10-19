@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../../api/client";
 import "./PromotionTable.css";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,8 +19,7 @@ export const PromotionList = () => {
 
   const loadPromotions = useCallback(async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/descuento/");
-      const data = await res.json();
+      const data = await apiFetch("/api/descuento/");
       const list = Array.isArray(data) ? data : data.results || [];
       setAllItems(list);
       setCurrentPage(1);
@@ -94,12 +94,11 @@ export const PromotionList = () => {
 
   const toggleActive = async (id, curr) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/descuento/${id}/`, {
+      await apiFetch(`/api/descuento/${id}/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ activo: !curr }),
       });
-      if (!res.ok) throw new Error("Error al actualizar estado");
       await loadPromotions();
     } catch (err) {
       console.error(err);

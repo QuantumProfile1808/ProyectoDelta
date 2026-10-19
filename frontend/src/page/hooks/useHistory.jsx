@@ -1,3 +1,4 @@
+import { apiFetch } from "../../api/client";
 import { useEffect, useState } from "react";
 
 export default function useHistory() {
@@ -5,8 +6,7 @@ export default function useHistory() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/movimiento/")
-      .then(res => res.json())
+    apiFetch("/api/movimiento/")
       .then(data => {
         const sortedItems = [...data].sort((a, b) => {
           if (a.fecha > b.fecha) return -1;
@@ -16,8 +16,9 @@ export default function useHistory() {
           return 0;
         });
         setMovements(sortedItems);
-        setLoading(false);
-      });
+      })
+      .catch((error) => console.error("Failed to load history:", error))
+      .finally(() => setLoading(false));
   }, []);
 
   return { movements, loading };

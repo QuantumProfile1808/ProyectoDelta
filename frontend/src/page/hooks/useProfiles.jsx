@@ -1,11 +1,11 @@
+import { apiFetch } from "../../api/client";
 import { useEffect, useState } from "react";
 
 export function useProfiles() {
   const [profiles, setProfiles] = useState([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/perfil/")
-      .then(res => res.json())
+    apiFetch("/api/perfil/")
       .then(data => setProfiles(data))
       .catch(err => console.error("Failed to fetch profiles:", err));
   }, []);
