@@ -12,7 +12,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied, ValidationErro
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from .permissions import IsStaffOrReadOnly, IsStaffOrCreateReadOnly, request_branch_id
 from .serializers import CartPricingSerializer
-from .services.descuentos import calcular_descuentos
+from .services.discounts import calculate_discounts
 
 
 
@@ -281,7 +281,7 @@ class DescuentoViewSet(viewsets.ModelViewSet):
                 raise ValidationError({"cantidad": "Los productos por unidad requieren cantidades enteras."})
 
         discounts = Descuento.objects.filter(activo=True).prefetch_related("items")
-        lines = calcular_descuentos(items, products, discounts)
+        lines = calculate_discounts(items, products, discounts)
         for line in lines:
             line["producto_nombre"] = products_by_id[line["producto_id"]].descripcion
         total = sum((Decimal(str(line["line_total"])) for line in lines), Decimal("0"))
